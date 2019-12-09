@@ -1,10 +1,13 @@
-{% extends 'layout.html' %} {% block content %}
-
-<form action="">
+{% extends 'layout.html' %} {% block content %} {% with messages = get_flashed_messages() %} {% if messages %}
+<div class="notification is-danger">
+    {{ messages[0] }} Go to <a href="{{ url_for('auth.login')}}">Login Page</a>
+</div>
+{% endif %} {% endwith %}
+<form action="/signup" method="POST">
     <input type="text" name="username" placeholder="Enter username" />
     <input type="text" name="email" placeholder="Enter email" />
-    <input type="text" name="password" placeholder="Enter password" />
-    <button type="submit">Confirm</button>
+    <input type="password" name="password" placeholder="Enter password" />
+    <button type="submit">Sign Up</button>
 </form>
 
 {% endblock %}

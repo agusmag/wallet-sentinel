@@ -1,9 +1,11 @@
-{% extends 'layout.html' %} {% block content %}
-
-
-<form action="">
+{% extends 'layout.html' %} {% block content %} {% with messages = get_flashed_messages() %} {% if messages %}
+<div class="notification is-danger">
+    {{ messages[0] }}
+</div>
+{% endif %} {% endwith %}
+<form action="/login" method="POST">
     <input type="text" name="username" placeholder="Enter Username" />
-    <input type="text" name="password" placeholder="Enter Password" />
+    <input type="password" name="password" placeholder="Enter Password" />
 
     <button type="submit" name="login">Log in</button>
 </form>
