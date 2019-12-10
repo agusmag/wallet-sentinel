@@ -1,0 +1,63 @@
+/*
+****************
+* GENERAL STYLES
+****************
+*/
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    background: #0F2027;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #2C5364, #203A43, #0F2027);
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+
+/*
+***************
+* FOOTER STYLES
+***************
+*/
+
+.my-footer {
+    background-color: #ccc;
+    height: 50px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+
+/*
+*************
+* CARD STYLES
+*************
+*/
+
+.custom-card {
+    widows: 18rem;
+    margin: 0 auto;
+    border-radius: 5%;
+    background: #3c505e;
+}
+
+.custom-card-img {
+    margin: 0 auto;
+    padding: 5px;
+    height: 225px;
+    width: 225px;
+}
+
+.custom-card-button {
+    width: 100%;
+}
+
+.custom-card:hover {
+    border: 1px solid #fff550;
+}

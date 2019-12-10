@@ -1,11 +1,94 @@
-{% extends 'home.html' %} {% block body %}
-<div>
-    <h1>Soy el dashboard de {{ name }} y tengo:</h1>
-    <p> Un bloque de código para:
-        <p>Filtros</p>
-        <p>Tabla con registros de cash-in / cash-out + Botonera de Edit/Delete</p>
-        <p>Boton para agregar registro (Agregas registro)</p>
-    </p>
+{% extends 'layout.html' %} {% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-start pb-4">
+        <div class="col-4">
+            <h3>Mes actual <span class="badge badge-info">Diciembre </span></h3>
+        </div>
+    </div>
+    <div class="row pb-4">
+        <div class="col-6">
+            <h1>Total <span class="badge badge-success">$ 100.000,00 </span></h1>
+        </div>
+        <div class="col-6">
+            <h1>Gastado <span class="badge badge-warning">$ 25.000,00 </span></h1>
+        </div>
+    </div>
+    <div class="row justify-content-center pb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Filtros</h4>
+                </div>
+                <div class="card-body text-center">
+                    <form class="form-row">
+                        <div class="col-4">
+                            <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Mes</label>
+                            <select class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
+                                  <option selected>Elija un mes...</option>
+                                  <option value="1">Enero</option>
+                                  <option value="2">Febrero</option>
+                                  <option value="3">Marzo</option>
+                                  <option value="4">...</option>
+                        </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Tipo</label>
+                            <select class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
+                                              <option selected>Elija un tipo...</option>
+                                              <option value="1">Combustible</option>
+                                              <option value="2">Regalo</option>
+                                              <option value="3">Cuota</option>
+                                              <option value="4">...</option>
+                                    </select>
+
+                        </div>
+                        <div class="col-4 align-self-end">
+                            <button type="submit" class="btn btn-primary my-1">Filtrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row pb-4">
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Detalle</th>
+                    <th scope="col">Monto</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>Nafta</td>
+                    <td>$ 1.500,00</td>
+                    <td> Combustible</td>
+                    <td><a href="#" class="btn btn-info mr-3">Editar</a><a href="#" class="btn btn-danger">Eliminar</a></td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Burguerking</td>
+                    <td>$ 576,50</td>
+                    <td> Comida</td>
+                    <td><a href="#" class="btn btn-info mr-3">Editar</a><a href="#" class="btn btn-danger">Eliminar</a></td>
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>Starbucks</td>
+                    <td>$ 400,00</td>
+                    <td> Comida</td>
+                    <td><a href="#" class="btn btn-info mr-3">Editar</a><a href="#" class="btn btn-danger">Eliminar</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+
+    </div>
 </div>
 
 {% endblock %}

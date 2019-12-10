@@ -1,13 +1,30 @@
-{% extends 'layout.html' %} {% block content %} {% with messages = get_flashed_messages() %} {% if messages %}
-<div class="notification is-danger">
-    {{ messages[0] }} Go to <a href="{{ url_for('auth.login')}}">Login Page</a>
+{% extends 'layout.html' %} {% block content %}
+
+<div class="row">
+    <div class="mx-auto">
+        <div class="card mt-4" style="width: 18rem;">
+            <img src="../static/assets/matrix_hunter.png" class="card-img-top" alt="Logo">
+            <div class="card-body">
+                {% with messages = get_flashed_messages() %} {% if messages %}
+                <div class="notification is-danger">
+                    {{ messages[0] }} Go to <a href="{{ url_for('auth.login')}}">Login Page</a>
+                </div>
+                {% endif %} {% endwith %}
+                <form action="/signup" method="POST">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="username" placeholder="Enter username" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="email" placeholder="Enter email" />
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" name="password" placeholder="Enter password" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-{% endif %} {% endwith %}
-<form action="/signup" method="POST">
-    <input type="text" name="username" placeholder="Enter username" />
-    <input type="text" name="email" placeholder="Enter email" />
-    <input type="password" name="password" placeholder="Enter password" />
-    <button type="submit">Sign Up</button>
-</form>
 
 {% endblock %}

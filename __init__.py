@@ -10,7 +10,7 @@ def create_app():
 
     #MySQL Connection with SQLAlchemy
     app.config['SECRET_KEY'] = 'thisismysecretkeycustompython'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://agustinmag:password@localhost/wallet_centinel_db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://agustinmag:password@localhost/wallet_sentinel_db'
 
     db.init_app(app)
 
