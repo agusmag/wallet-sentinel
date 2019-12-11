@@ -1,18 +1,24 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_migrate import Migrate
 
-#ORM to Manage DB Models
 db = SQLAlchemy()
 
-def create_app():
+def create_app(config=None):
     app = Flask(__name__)
 
-    #MySQL Connection with SQLAlchemy
-    app.config['SECRET_KEY'] = 'thisismysecretkeycustompython'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://agustinmag:password@localhost/wallet_sentinel_db'
+    #Load App Config file & Initialize Database
+    if app.config["ENV"] == "production":
+        app.config.from_object("config.ProductionConfig")
+    else:
+        app.config.from_object("config.DevelopConfig")
 
+    #ORM to Manage DB Models
     db.init_app(app)
+
+    #Enabled migrations
+    migrate = Migrate(app, db)
 
     #Initialize LoginManager and set the default view for not authentication requests.
     login_manager = LoginManager()
@@ -31,5 +37,10 @@ def create_app():
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
+
+    #with app.app_context():
+        # Imports
+        #from . import routes
+        #db.create_all()
 
     return app

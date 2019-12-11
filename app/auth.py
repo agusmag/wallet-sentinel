@@ -38,6 +38,9 @@ def signup_post():
     email = request.form.get('email')
     password = request.form.get('password')
 
+    #Fill the default amount
+    totalAmount = 0
+
     #Verify that the user doesn't exist in the DB
     user = User.query.filter_by(email=email, username=username).first()
 
@@ -46,7 +49,7 @@ def signup_post():
         return redirect(url_for('auth.signup'))
 
     #Create the object User to store it in the DB
-    new_user = User(email=email, username=username, password=generate_password_hash(password, method='sha256'))
+    new_user = User(email=email, username=username, password=generate_password_hash(password, method='sha256'), totalAmount=totalAmount)
 
     db.session.add(new_user)
     db.session.commit()
