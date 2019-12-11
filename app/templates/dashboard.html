@@ -2,15 +2,15 @@
 <div class="container-fluid">
     <div class="row justify-content-start pb-4">
         <div class="col-4">
-            <h3>Mes actual <span class="badge badge-info">Diciembre </span></h3>
+            <h3>Mes actual <span class="badge badge-info">{{ month }} </span></h3>
         </div>
     </div>
     <div class="row pb-4">
         <div class="col-6">
-            <h1>Total <span class="badge badge-success">$ 100.000,00 </span></h1>
+            <h1>Total <span class="badge badge-success">$ {{ totalAmount }} </span></h1>
         </div>
         <div class="col-6">
-            <h1>Gastado <span class="badge badge-warning">$ 25.000,00 </span></h1>
+            <h1>Gastado <span class="badge badge-warning">$ {{ spendAmount }}</span></h1>
         </div>
     </div>
     <div class="row justify-content-center pb-4">
@@ -24,23 +24,20 @@
                         <div class="col-4">
                             <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Mes</label>
                             <select class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
-                                  <option selected>Todos</option>
-                                  <option value="1">Enero</option>
-                                  <option value="2">Febrero</option>
-                                  <option value="3">Marzo</option>
-                                  <option value="4">...</option>
-                        </select>
+                                <option selected>Todos</option>
+                                {% for mt in months %}
+                                    <option value={{ mt.id }}>{{ mt.description }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="col-4">
                             <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Tipo</label>
                             <select class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
-                                              <option selected>Todos</option>
-                                              <option value="1">Combustible</option>
-                                              <option value="2">Regalo</option>
-                                              <option value="3">Cuota</option>
-                                              <option value="4">...</option>
-                                    </select>
-
+                                <option selected>Todos</option>
+                                {% for ot in operationTypes %}
+                                    <option value={{ ot.id }}>{{ ot.description }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="col-4 align-self-end">
                             <button type="submit" class="btn btn-primary my-1">Filtrar</button>
@@ -54,35 +51,25 @@
         <table class="table">
             <thead class="thead-light">
                 <tr>
-                    <th scope="col">#</th>
+                    <th scope="col">Nro</th>
                     <th scope="col">Detalle</th>
                     <th scope="col">Monto</th>
                     <th scope="col">Tipo</th>
+                    <th scope="col">Fecha</th>
                     <th scope="col">Acción</th>
                 </tr>
             </thead>
             <tbody>
+                {% for op in operations %}
                 <tr>
-                    <th scope="row">1</th>
-                    <td>Nafta</td>
-                    <td>$ 1.500,00</td>
-                    <td> Combustible</td>
+                    <th scope="row">{{ op.id }}</th>
+                    <td>{{ op.description }}</td>
+                    <td>$ {{ op.amount }}</td>
+                    <td> {{ op.type_id }}</td>
+                    <td>{{ op.date }}</td>
                     <td><a href="#" class="btn btn-info mr-3">Editar</a><a href="#" class="btn btn-danger">Eliminar</a></td>
                 </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Burguerking</td>
-                    <td>$ 576,50</td>
-                    <td> Comida</td>
-                    <td><a href="#" class="btn btn-info mr-3">Editar</a><a href="#" class="btn btn-danger">Eliminar</a></td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Starbucks</td>
-                    <td>$ 400,00</td>
-                    <td> Comida</td>
-                    <td><a href="#" class="btn btn-info mr-3">Editar</a><a href="#" class="btn btn-danger">Eliminar</a></td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

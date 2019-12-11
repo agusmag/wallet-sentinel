@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from . import db
+from app import db
 
 #The UserMixin is a module from flask_login to ease the login implementation
 class User(UserMixin, db.Model):
