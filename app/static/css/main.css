@@ -61,3 +61,17 @@ body {
 .custom-card:hover {
     border: 1px solid #fff550;
 }
+
+
+/*
+*********************
+* ERROR LIST MESSAGES
+*********************
+*/
+
+.custom-error-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    color: rgb(228, 72, 72);
+}
