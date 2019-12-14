@@ -1,6 +1,9 @@
-from flask import Blueprint, render_template, Markup
+from flask import Blueprint, render_template, Markup, redirect, url_for, flash, request
 from flask_login import login_required, current_user
-import datetime
+import datetime, calendar
+
+# DB
+from app import db
 
 # Forms
 from .forms import FiltersForm, NewOperationForm
@@ -33,11 +36,11 @@ colors = [
 def home():
     return render_template('home.html')
 
-@main.route('/home/dashboard')
+@main.route('/home/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    filterForm = FiltersForm()
-    newOperationForm = NewOperationForm()
+    if request.method == 'GET':
+        filterForm = FiltersForm(month_id=0, type_id=0)
 
     #Calculate current month
     month = datetime.date.today().month
@@ -45,8 +48,23 @@ def dashboard():
     # Get User Data
     user = User.query.filter_by(username=current_user.username).first()
 
-    # Calculate SpendAmount ( user.totalAmount - SUM(user.operations.amount))
-    operations = Operation.query.filter_by(user_id=user.id)
+    #Set hidden user_id to NewOperationForm
+    newOperationForm = NewOperationForm(user_id=user.id)
+    newOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
+    
+    if request.method == 'POST':
+        filterForm = FiltersForm()
+
+        if filterForm.validate():
+            currentYear = datetime.date.today().year
+            formatDate = datetime.datetime(currentYear, filterForm.month, calendar.monthrange(currentYear, filterForm.month)[1])
+            operations = Operation.query.filter(Operation.user_id == user.id, Operation.date <= formatDate)
+        else:
+            flash('Los valores de los filtros son incorrectos', category="alert-danger")
+    else:
+        # Calculate SpendAmount ( user.totalAmount - SUM(user.operations.amount))
+        operations = Operation.query.filter_by(user_id=user.id)
+    
     spendAmount = sum(operation.amount for operation in operations)
 
     # Load Months
@@ -59,6 +77,30 @@ def dashboard():
     findMonth = Month.query.filter_by(id=month).first()
 
     return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount=user.totalAmount, spendAmount=spendAmount, months=months, operationTypes=operationTypes, operations=operations, form=filterForm, form2=newOperationForm)
+
+@main.route('/home/dashboard/new_operation', methods=['POST'])
+@login_required
+def new_operation():
+    #Obtain data from template
+    formOperation = NewOperationForm()
+    formOperation.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
+
+    print(formOperation.type_id.choices)
+    print(formOperation.type_id)
+
+    if formOperation.validate():
+        #Save operation in DB
+        operation = Operation(description= formOperation.description, date=formOperation.date, amount=formOperation.amount, type_id=formOperation.type_id, user_id=formOperation.user_id)
+        
+        db.session.add(operation)
+        db.session.commit()
+
+        flash('La operación fue creada con éxito!', category="alert-success")
+        return redirect(url_for('main.dashboard'))
+    
+    flash('Algún dato de la operación es incorrecto', category="alert-danger")
+    return redirect(url_for('main.dashboard'))
+
 
 @main.route('/home/statistics')
 @login_required

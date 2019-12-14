@@ -52,4 +52,3 @@ class NewOperationForm(FlaskForm):
     ])
     type_id = SelectField('Tipo Operación', coerce=int)
     user_id = HiddenField('User Id')
-

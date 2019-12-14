@@ -17,13 +17,19 @@ class Operation(db.Model):
     description = db.Column(db.String(100), nullable=False)
     date = db.Column(db.DateTime, nullable=False)
     amount = db.Column(db.Float, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     type_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class OperationType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(200), nullable=False)
 
+    def __repr__(self):
+        return '{}'.format(self.description)
+
 class Month(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(50), nullable=False)
+
+    def __repr__(self):
+        return '{}'.format(self.description)
