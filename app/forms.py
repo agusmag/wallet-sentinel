@@ -1,6 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, PasswordField, DateField, DecimalField, SelectField, HiddenField
+from wtforms import BooleanField, StringField, PasswordField, DecimalField, SelectField, HiddenField
+from wtforms.fields.html5 import DateField
 from wtforms.validators import  Length, InputRequired, Email, DataRequired, EqualTo, Optional
+
+import datetime
 
 class SignupForm(FlaskForm):
     username = StringField('Username', validators=[
@@ -46,9 +49,7 @@ class NewOperationForm(FlaskForm):
     ])
     date = DateField('Fecha', validators=[
         InputRequired('Tenés que indicar una fecha')
-    ])
-    amount = DecimalField('Monto', places=2, validators=[
-        InputRequired('Tenés que indicar un monto')
-    ])
+    ], format='%Y-%m-%d')
+    amount = StringField('Monto', validators=[InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\$\d{1,3}(,\d{3})*(\.\d+)?$', 'data-type': 'currency', 'placeholder': '$ 0,00'})
     type_id = SelectField('Tipo Operación', coerce=int)
-    user_id = HiddenField('User Id')
+    user_id = HiddenField('User Id')  

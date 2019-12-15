@@ -57,7 +57,7 @@ def dashboard():
 
         if filterForm.validate():
             currentYear = datetime.date.today().year
-            formatDate = datetime.datetime(currentYear, filterForm.month, calendar.monthrange(currentYear, filterForm.month)[1])
+            formatDate = datetime.datetime(currentYear, filterForm.month.data, calendar.monthrange(currentYear, filterForm.month.data)[1])
             operations = Operation.query.filter(Operation.user_id == user.id, Operation.date <= formatDate)
         else:
             flash('Los valores de los filtros son incorrectos', category="alert-danger")
@@ -85,12 +85,12 @@ def new_operation():
     formOperation = NewOperationForm()
     formOperation.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
 
-    print(formOperation.type_id.choices)
-    print(formOperation.type_id)
-
     if formOperation.validate():
+        #Parse amount string to decimal
+        convertedAmount = float(formOperation.amount.data.replace("$","").replace(",",""))
+
         #Save operation in DB
-        operation = Operation(description= formOperation.description, date=formOperation.date, amount=formOperation.amount, type_id=formOperation.type_id, user_id=formOperation.user_id)
+        operation = Operation(description= formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data)
         
         db.session.add(operation)
         db.session.commit()
@@ -99,8 +99,44 @@ def new_operation():
         return redirect(url_for('main.dashboard'))
     
     flash('Algún dato de la operación es incorrecto', category="alert-danger")
+    return redirect(url_for('main.dashboard', form2=formOperation))
+
+
+@main.route('/home/dashboard/update_operation/<string:id>', methods=['POST'])
+@login_required
+def update_operation(id):
+    editOperationForm = NewOperationForm()
+    editOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
+    
+    if editOperationForm.validate():
+        #Search the edited operation from DB to update it
+        edit_operation = Operation.query.filter_by(id=id)
+
+        # Update the fields
+        edit_operation.description = editOperationForm.description.data
+        edit_operation.date = editOperationForm.date.data
+        edit_operation.amount = editOperationForm.amount.data
+        edit_operation.type_id = editOperationForm.type_id.data
+
+        # Commit changes
+        db.session.commit()
+
+        flash('La operación fue actualizada con éxito', category='alert-success')
+        return redirect(url_for('main.dashboard'))
+
+    flash('Hubo un problema actualizando la operación', category='alert-danger')
     return redirect(url_for('main.dashboard'))
 
+@main.route('/home/dashboard/delete_operation/<string:id>', methods=['POST'])
+@login_required
+def delete_operation(id):
+    #Detele operation from DB
+    Operation.query.filter_by(id=id).delete()
+
+    db.session.commit()
+
+    flash('La operación fue eliminada con éxito', category='alert-success')
+    return redirect(url_for('main.dashboard'))
 
 @main.route('/home/statistics')
 @login_required

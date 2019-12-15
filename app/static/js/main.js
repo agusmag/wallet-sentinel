@@ -1,3 +1,9 @@
+/**
+ * ************
+ * AMOUNT INPUT
+ * ************
+ */
+
 $("input[data-type='currency']").on({
     keyup: function() {
         formatCurrency($(this));
