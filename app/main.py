@@ -6,7 +6,7 @@ import datetime, calendar
 from app import db
 
 # Forms
-from .forms import FiltersForm, NewOperationForm
+from .forms import FiltersForm, NewOperationForm, UserSettingsForm
 
 # Models
 from .models import User, Operation, OperationType, Month
@@ -48,10 +48,15 @@ def dashboard():
     # Get User Data
     user = User.query.filter_by(username=current_user.username).first()
 
-    #Set hidden user_id to NewOperationForm
+    #Set hidden user_id to all the Forms in the Dashboard View
     newOperationForm = NewOperationForm(user_id=user.id)
+    editOperationForm = NewOperationForm(user_id=user.id)
+    userSettingsForm = UserSettingsForm(user_id=user.id)
+
+    #Set DataTypes to all the Selects of EveryForm in Dashboard View
     newOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
-    
+    editOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
+
     if request.method == 'POST':
         filterForm = FiltersForm()
 
@@ -76,7 +81,7 @@ def dashboard():
     #Find Month Name
     findMonth = Month.query.filter_by(id=month).first()
 
-    return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount=user.totalAmount, spendAmount=spendAmount, months=months, operationTypes=operationTypes, operations=operations, form=filterForm, form2=newOperationForm)
+    return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount=user.totalAmount, spendAmount=spendAmount, months=months, operationTypes=operationTypes, operations=operations, form=filterForm, form2=newOperationForm, form3=editOperationForm, form4=userSettingsForm)
 
 @main.route('/home/dashboard/new_operation', methods=['POST'])
 @login_required
@@ -98,8 +103,8 @@ def new_operation():
         flash('La operación fue creada con éxito!', category="alert-success")
         return redirect(url_for('main.dashboard'))
     
-    flash('Algún dato de la operación es incorrecto', category="alert-danger")
-    return redirect(url_for('main.dashboard', form2=formOperation))
+    flash('Hubo un problema al crear la operación', category="alert-danger")
+    return redirect(url_for('main.dashboard', form2=formOperation, showNewModal=True))
 
 
 @main.route('/home/dashboard/update_operation/<string:id>', methods=['POST'])
@@ -107,15 +112,15 @@ def new_operation():
 def update_operation(id):
     editOperationForm = NewOperationForm()
     editOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
-    
+
     if editOperationForm.validate():
         #Search the edited operation from DB to update it
-        edit_operation = Operation.query.filter_by(id=id)
+        edit_operation = Operation.query.filter_by(id=id).first()
 
         # Update the fields
         edit_operation.description = editOperationForm.description.data
         edit_operation.date = editOperationForm.date.data
-        edit_operation.amount = editOperationForm.amount.data
+        edit_operation.amount = float(editOperationForm.amount.data.replace("$","").replace(",",""))
         edit_operation.type_id = editOperationForm.type_id.data
 
         # Commit changes
@@ -124,7 +129,7 @@ def update_operation(id):
         flash('La operación fue actualizada con éxito', category='alert-success')
         return redirect(url_for('main.dashboard'))
 
-    flash('Hubo un problema actualizando la operación', category='alert-danger')
+    flash('Hubo un problema al actualizar la operación', category='alert-danger')
     return redirect(url_for('main.dashboard'))
 
 @main.route('/home/dashboard/delete_operation/<string:id>', methods=['POST'])
