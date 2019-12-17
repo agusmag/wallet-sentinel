@@ -6,7 +6,7 @@ from flask_login import login_user, logout_user, login_required
 from .forms import LoginForm, SignupForm
 # Models
 
-from .models import User
+from .models import User, UserConfiguration
 
 from app import db
 
@@ -48,8 +48,6 @@ def signup_post():
     signupForm = SignupForm()
 
     if signupForm.validate():
-        totalAmount = 0
-
         #Verify that the user doesn't exist in the DB
         user = User.query.filter_by(email=signupForm.email.data, username=signupForm.username.data).first()
 
@@ -57,10 +55,18 @@ def signup_post():
             flash('El email ya se encuentra registrado.')
             return redirect(url_for('auth.signup'))
 
+        totalAmount = 0
+        mainThemeEnabled = True
+
         #Create the object User to store it in the DB
         new_user = User(email=signupForm.email.data, username=signupForm.username.data, password=generate_password_hash(signupForm.password.data, method='sha256'), totalAmount=totalAmount)
 
+        #Create the object UserConfiguration to store it in the BD
+        new_user_config = UserConfiguration(available_amount=totalAmount, main_theme=mainThemeEnabled, user_id=new_user.id)
+        
+        #Save both records in the DB
         db.session.add(new_user)
+        db.session.add(new_user_config)
         db.session.commit()
 
         return redirect(url_for('auth.login'))

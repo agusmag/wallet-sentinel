@@ -36,15 +36,9 @@
                     <h4>Filtros</h4>
                 </div>
                 <div class="card-body text-center">
-                    <form class="form-row">
+                    <form class="form-row" action="/home/dashboard" method="POST">
                         <div class="col-4">
-                            <label class="my-1 mr-2" for="monthTypes">Mes</label>
-                            <select class="custom-select my-1 mr-sm-2" id="monthTypes">
-                                <option {% if form.month_id == 0 %}selected{% endif %}>Todos</option>
-                                {% for mt in months %}
-                                    <option value={{ mt.id }} {% if form.month_id == mt.id %}selected{% endif %}>{{ mt.description }}</option>
-                                {% endfor %}
-                            </select>
+                            <label class="my-1 mr-2" for="monthTypes">Mes</label> {{ form.month_id(class_="form-control custom-select my-1 mr-sm-2") }}
                             <ul class="custom-error-list">
                                 {% for error in form.month_id.errors %}
                                 <li>{{ error }}</li>
@@ -52,13 +46,7 @@
                             </ul>
                         </div>
                         <div class="col-4">
-                            <label class="my-1 mr-2" for="operationType">Tipo</label>
-                            <select class="custom-select my-1 mr-sm-2" id="operationType">
-                                <option {% if form.type_id == 0 %}selected{% endif %}>Todos</option>
-                                {% for ot in operationTypes %}
-                                    <option value={{ ot.id }} {% if form.type_id == ot.id %}selected{% endif %}>{{ ot.description }}</option>
-                                {% endfor %}
-                            </select>
+                            <label class="my-1 mr-2" for="operationType">Tipo</label> {{ form.type_id(class_="form-control custom-select my-1 mr-sm-2") }}
                             <ul class="custom-error-list">
                                 {% for error in form.type_id.errors %}
                                 <li>{{ error }}</li>
@@ -250,7 +238,7 @@
                         </button>
                 </div>
                 <div class="modal-body">
-                    <form action="/home/dashboard/update_settings/{{ user_id }}" method="POST">
+                    <form action="/home/dashboard" method="POST">
                         {{ form4.hidden_tag() }}
                         <div class="form-group">
                             {{ form4.available_amount.label }} <br> {{ form4.available_amount(class_="form-control") }}

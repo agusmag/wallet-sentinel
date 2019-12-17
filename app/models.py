@@ -11,6 +11,13 @@ class User(UserMixin, db.Model):
     spendLimit = db.Column(db.Float)
     warningPercent = db.Column(db.Integer)
     operations = db.relationship('Operation', backref='user', lazy=True)
+    configuration = db.relationship('UserConfiguration', backref='user', lazy=True)
+
+class UserConfiguration(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    available_amount = db.Column(db.Float, nullable=False)
+    main_theme = db.Column(db.Boolean)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Operation(db.Model):
     id = db.Column(db.Integer, primary_key=True)

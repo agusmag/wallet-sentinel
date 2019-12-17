@@ -34,6 +34,11 @@ class LoginForm(FlaskForm):
         Length(min=8, max=100, message='La longitud debe ser entre %(min)d y %(max)d')
     ])
 
+class UserSettingsForm(FlaskForm):
+    available_amount = StringField('Monto Disponible', validators=[ Optional()], render_kw={'pattern':'^\$\d{1,3}(,\d{3})*(\.\d+)?$', 'data-type': 'currency', 'placeholder': '$ 0,00'})
+    main_theme = BooleanField('Apecto Oscuro', validators=[ Optional()], default="checked", render_kw={"data-toggle": "toggle", "data-onstyle": "success", "data-offstyle": "default"})
+    user_id = HiddenField('User Id')
+
 class FiltersForm(FlaskForm):
     month_id = SelectField('Mes', coerce=int, validators=[
         Optional()
@@ -53,8 +58,3 @@ class NewOperationForm(FlaskForm):
     amount = StringField('Monto', validators=[InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\$\d{1,3}(,\d{3})*(\.\d+)?$', 'data-type': 'currency', 'placeholder': '$ 0,00'})
     type_id = SelectField('Tipo Operación', coerce=int)
     user_id = HiddenField('User Id') 
-
-class UserSettingsForm(FlaskForm):
-    available_amount = StringField('Monto Disponible', validators=[ Optional()], render_kw={'pattern':'^\$\d{1,3}(,\d{3})*(\.\d+)?$', 'data-type': 'currency', 'placeholder': '$ 0,00'})
-    main_theme = BooleanField('Apecto Oscuro', validators=[ Optional()], render_kw={"data-toggle": "toggle", "data-onstyle": "success", "data-offstyle": "default"})
-    user_id = HiddenField('User Id')
