@@ -9,10 +9,10 @@
     <!-- User Amount Data -->
     <div class="row pb-4">
         <div class="col-6">
-            <h1>Total <span class="badge badge-success">$ {{ totalAmount }} </span></h1>
+            <h1 id="availableAmountTitle">Total <span class="badge badge-success">{{ totalAmount }} </span></h1>
         </div>
         <div class="col-6">
-            <h1>Gastado <span class="badge badge-warning">$ {{ spendAmount }}</span></h1>
+            <h1 id="spendAmountTitle">Gastado <span class="badge {{ spendAmountStatusColor }}">{{ spendAmount }}</span></h1>
         </div>
     </div>
 

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, Markup, redirect, url_for, flash, request, session
 from flask_login import login_required, current_user
-import datetime, calendar, json
+import datetime, calendar, json, locale
 
 # DB
 from app import db
@@ -43,7 +43,7 @@ def dashboard():
         filter_month_id = 0
         filter_type_id = 0
 
-        #Check for cookies values from preview dashboard filter POST
+        # Check for cookies values from preview dashboard filter POST
         if request.args.get('messages') is not None:
             messages = request.args['messages']
             messages=json.loads(messages)
@@ -56,7 +56,7 @@ def dashboard():
 
         filterForm = FiltersForm(month_id=filter_month_id, type_id=filter_type_id)
 
-        #Calculate current month
+        # Calculate current month
         month = datetime.date.today().month
 
         # Get User Data
@@ -65,14 +65,14 @@ def dashboard():
         # Get User Configuration
         userConfig = UserConfiguration.query.filter_by(user_id=user.id).first()
 
-        #Set User Settings to UserSettingsForm
+        # Set User Settings to UserSettingsForm
         userSettingsForm = UserSettingsForm(available_amount="$ {0}".format(userConfig.available_amount), main_theme=userConfig.main_theme, user_id=userConfig.user_id)
 
-        #Set hidden user_id to all the Forms in the Dashboard View
+        # Set hidden user_id to all the Forms in the Dashboard View
         newOperationForm = NewOperationForm(user_id=user.id)
         editOperationForm = NewOperationForm(user_id=user.id)
 
-        #Set DataTypes to all the Selects of EveryForm in Dashboard View
+        # Set DataTypes to all the Selects of EveryForm in Dashboard View
         filterForm.month_id.choices = [(m.id, m.description) for m in Month.query.order_by('id')]
         filterForm.month_id.choices.insert(0, ('0', 'Todos'))
         
@@ -102,15 +102,27 @@ def dashboard():
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
 
-        #Find Month Name CHANGE TO DATETIME INSTED OF QUERY TO DB
+        # Find Month Name CHANGE TO DATETIME INSTED OF QUERY TO DB
         findMonth = Month.query.filter_by(id=month).first()
 
-        return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount= userConfig.available_amount, spendAmount=spendAmount, operationTypes=operationTypes, operations=operations, form=filterForm, form2=newOperationForm, form3=editOperationForm, form4=userSettingsForm)
+        # Format All the Amounts to Currency
+        locale.setlocale( locale.LC_ALL, '' )
+        formattedAvailableAmount = locale.currency( userConfig.available_amount, grouping=True )
+        formattedSpendAmount = locale.currency( spendAmount, grouping=True )
+
+        # Calculate Spend Amount Badge Status Color
+        spendAmountStatusColor = 'badge-success'
+        if spendAmount >= (userConfig.available_amount * 0.25) and spendAmount < userConfig.available_amount:
+            spendAmountStatusColor = 'badge-warning'
+        elif spendAmount >= userConfig.available_amount:
+            spendAmountStatusColor = 'badge-danger'
+
+        return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount= formattedAvailableAmount, spendAmount=formattedSpendAmount, spendAmountStatusColor=spendAmountStatusColor, operationTypes=operationTypes, operations=operations, form=filterForm, form2=newOperationForm, form3=editOperationForm, form4=userSettingsForm)
 
     elif request.method == 'POST':
         filterForm = FiltersForm()
 
-        #Set DataTypes to all the Selects of EveryForm in Dashboard View
+        # Set DataTypes to all the Selects of EveryForm in Dashboard View
         filterForm.month_id.choices = [(m.id, m.description) for m in Month.query.order_by('id')]
         filterForm.month_id.choices.insert(0, ('0', 'Todos'))
         
@@ -127,11 +139,10 @@ def dashboard():
             # Get User Configuration
             userConfig = UserConfiguration.query.filter_by(user_id=userSettingsForm.user_id.data).first()
 
-            #Update the fields with the current values
+            # Update the fields with the current values
             userConfig.available_amount = float(userSettingsForm.available_amount.data.replace("$","").replace(",",""))
             userConfig.main_theme = userSettingsForm.main_theme.data
 
-            #Update the record from db
             db.session.commit()
             
             flash('La configuración fue actualizada con éxito', category='alert-success')
@@ -145,15 +156,15 @@ def dashboard():
 @main.route('/home/dashboard/new_operation', methods=['POST'])
 @login_required
 def new_operation():
-    #Obtain data from template
+    # Obtain data from template
     formOperation = NewOperationForm()
     formOperation.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
 
     if formOperation.validate():
-        #Parse amount string to decimal
+        # Parse amount string to decimal
         convertedAmount = float(formOperation.amount.data.replace("$","").replace(",",""))
 
-        #Save operation in DB
+        # Save operation in DB
         operation = Operation(description= formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data)
         
         db.session.add(operation)
@@ -173,7 +184,7 @@ def update_operation(id):
     editOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
 
     if editOperationForm.validate():
-        #Search the edited operation from DB to update it
+        # Search the edited operation from DB to update it
         edit_operation = Operation.query.filter_by(id=id).first()
 
         # Update the fields
@@ -182,7 +193,6 @@ def update_operation(id):
         edit_operation.amount = float(editOperationForm.amount.data.replace("$","").replace(",",""))
         edit_operation.type_id = editOperationForm.type_id.data
 
-        # Commit changes
         db.session.commit()
 
         flash('La operación fue actualizada con éxito', category='alert-success')
@@ -194,7 +204,7 @@ def update_operation(id):
 @main.route('/home/dashboard/delete_operation/<string:id>', methods=['POST'])
 @login_required
 def delete_operation(id):
-    #Detele operation from DB
+    # Detele operation from DB
     Operation.query.filter_by(id=id).delete()
 
     db.session.commit()

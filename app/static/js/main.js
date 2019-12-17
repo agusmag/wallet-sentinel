@@ -1,7 +1,7 @@
 /**
- * ************
- * AMOUNT INPUT
- * ************
+ * *******************************
+ * AMOUNT INPUTS AND LABELS FORMAT
+ * *******************************
  */
 
 $("input[data-type='currency']").on({
