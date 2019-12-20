@@ -90,3 +90,31 @@ $("#openUserConfig").on({
         formatCurrency($("#available_amount"), "blur");
     }
 })
+
+/**
+ * ###########
+ * DATA TABLES
+ * ###########
+ */
+
+$('#operations_table').DataTable({
+    searching: false,
+    lengthMenu: [
+        [5, 10, 25, 50, -1],
+        [5, 10, 25, 50, "All"]
+    ],
+    "language": {
+        "lengthMenu": "Mostrar _MENU_ registros por página",
+        "zeroRecords": "No se han encontrado registros",
+        "info": "Página _PAGE_ de _PAGES_",
+        "infoEmpty": "",
+        "infoFiltered": "(filtrado de _MAX_ total registros)",
+        "oPaginate": {
+            "sFirst": "Primero",
+            "sLast": "Último",
+            "sNext": "Siguiente",
+            "sPrevious": "Anterior"
+        }
+    },
+    "dom": '<"row justify-content-start"<"col text-left"l>>rt<"row justify-content-between"<"col text-left"i><"col text-right"p>>'
+});

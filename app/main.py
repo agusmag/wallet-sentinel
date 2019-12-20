@@ -31,7 +31,6 @@ colors = [
     "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"
     ]
 
-
 @main.route('/')
 def home():
     return render_template('home.html')
@@ -67,7 +66,7 @@ def dashboard():
 
         # Set User Settings to UserSettingsForm
         userSettingsForm = UserSettingsForm(available_amount="$ {0}".format(userConfig.available_amount), main_theme=userConfig.main_theme, user_id=userConfig.user_id)
-
+        
         # Set hidden user_id to all the Forms in the Dashboard View
         newOperationForm = NewOperationForm(user_id=user.id)
         editOperationForm = NewOperationForm(user_id=user.id)

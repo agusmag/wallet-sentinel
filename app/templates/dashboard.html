@@ -1,5 +1,6 @@
 {% extends 'layout.html' %} {% block content %}
-<div class="container-fluid">
+
+<div class="container">
     <div class="row justify-content-start mt-4 pb-4">
         <div class="col-4">
             <h3>Mes actual <span class="badge badge-info">{{ month }} </span></h3>
@@ -29,7 +30,7 @@
     </div>
 
     <!-- Filters -->
-    <div class="row justify-content-center pb-4">
+    <div class="row-full justify-content-center pb-4">
         <div class="col">
             <div class="card">
                 <div class="card-header">
@@ -63,17 +64,16 @@
     </div>
 
     <!-- Operations Table -->
-    <div class="row pb-4 justify-content-center">
-        <!-- <div class="table-responsive-md"> -->
-        <table class="table">
+    <div class="row-full pb-4">
+        <table class="table table-striped table-bordered hover order-column" style="width:100%;" id="operations_table">
             <thead class="thead-light">
                 <tr>
-                    <th scope="col">Nro</th>
-                    <th scope="col">Detalle</th>
-                    <th scope="col">Monto</th>
-                    <th scope="col">Tipo</th>
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Acción</th>
+                    <th>Nro</th>
+                    <th>Detalle</th>
+                    <th>Monto</th>
+                    <th>Tipo</th>
+                    <th>Fecha</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,12 +82,12 @@
                     <th scope="row">{{ loop.index }}</th>
                     <td>{{ op.description }}</td>
                     <td>$ {{ op.amount }}</td>
-                    <td> {{ op.type_id }}</td>
+                    <td> {{ operationTypes[op.type_id].description }}</td>
                     <td>{{ op.date.strftime('%d-%m-%Y') }}</td>
                     <td>
                         <div class="row justify-content-center">
                             <div class="col-4 mr-3">
-                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editOperationModal{{loop.index0}}">Editar</button>
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editOperationModal{{loop.index0}}">Editar</button>
 
                                 <!-- Edit Modal -->
                                 <div class="modal fade" id="editOperationModal{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="editOperationTitle" aria-hidden="true">
@@ -103,15 +103,12 @@
                                                 <form action="/home/dashboard/update_operation/{{ op.id }}" method="POST">
                                                     {{ form3.hidden_tag() }}
                                                     <div class="form-group">
-                                                        <!-- <input type="text" class="form-control" name="description" value="{{ op.description }}" /> -->
                                                         {{ form3.description(class_="form-control", **{"value": op.description }) }}
                                                     </div>
                                                     <div class="form-group">
-                                                        <!-- <input type="date" class="form-control" name="date" value={{ op.date }}> -->
-                                                        {{ form3.date(class_="form-control", **{"value": op.date}) }}
+                                                        {{ form3.date(class_="form-control", **{"value": op.date.strftime('%Y-%m-%d') }) }}
                                                     </div>
                                                     <div class="form-group">
-                                                        <!-- <input class="form-control" type="text" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" data-type="currency" value="$ {{ op.amount }}"> -->
                                                         {{ form3.amount(class_="form-control", **{"value": "$ " ~ op.amount }) }}
                                                     </div>
                                                     <div class="form-group">
@@ -132,7 +129,7 @@
                                 </div>
                             </div>
                             <div class="col-4">
-                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteOperationModal{{loop.index0}}">Eliminar</button>
+                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#confirmDeleteOperationModal{{loop.index0}}">Eliminar</button>
 
                                 <!-- Confirmation Modal -->
                                 <div class="modal fade" id="confirmDeleteOperationModal{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="TitleModalLabel" aria-hidden="true">
@@ -163,31 +160,9 @@
                 {% endfor %}
             </tbody>
         </table>
-        <!-- </div> -->
     </div>
 
-    <!-- Navigation -->
-    <div class="row justify-content-end pb-4 ">
-        <nav aria-label="Page navigation example" class="mr-4">
-            <ul class="pagination">
-                <li class="page-item">
-                    <a class="page-link" href="#" aria-label="Anterior">
-                        <span aria-hidden="true">&laquo;</span>
-                        <span class="sr-only">Anterior</span>
-                    </a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#" aria-label="Siguiente">
-                        <span aria-hidden="true">&raquo;</span>
-                        <span class="sr-only">Siguiente</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    <!-- Create Operation Button-->
     <div class="row justify-content-center">
         <button type="button" class="btn btn-success mb-4" data-toggle="modal" data-target="#newOperationModal">Nuevo</button>
     </div>
@@ -209,7 +184,7 @@
                             <input type="text" class="form-control" name="description" placeholder="Ingresar una descripción..." />
                         </div>
                         <div class="form-group">
-                            {{ form2.date(class_="form-control")}}
+                            {{ form2.date(class_="form-control", **{"value": curDate })}}
                         </div>
                         <div class="form-group">
                             {{ form2.amount(class_="form-control") }}
@@ -240,8 +215,11 @@
                 <div class="modal-body">
                     <form action="/home/dashboard" method="POST">
                         {{ form4.hidden_tag() }}
+                        <div class="row justify-content-start pl-4">
+                            {{ form4.available_amount.label }}
+                        </div>
                         <div class="form-group">
-                            {{ form4.available_amount.label }} <br> {{ form4.available_amount(class_="form-control") }}
+                            {{ form4.available_amount(class_="form-control") }}
                         </div>
                         <div class="row justify-content-start pl-4">
                             <div class="form-group">
@@ -257,7 +235,6 @@
             </div>
         </div>
     </div>
-
 </div>
 
 {% endblock %}
