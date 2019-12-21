@@ -1,3 +1,5 @@
+document.body.firstElementChild.tabIndex = 1
+
 /**
  * *******************************
  * AMOUNT INPUTS AND LABELS FORMAT
@@ -74,6 +76,8 @@ function formatCurrency(input, blur) {
         if (blur === "blur") {
             input_val += ".00";
         }
+
+        $(this).next().focus();
     }
 
     // send updated string to input

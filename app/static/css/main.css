@@ -19,6 +19,18 @@ body {
 }
 
 
+/**
+***************
+* NAVBAR STYLES
+***************
+*/
+
+#customNavBar a {
+    color: white;
+    border: none;
+}
+
+
 /*
 ***************
 * FOOTER STYLES
