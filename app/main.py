@@ -31,9 +31,19 @@ colors = [
     "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"
     ]
 
+operationTypeIcons = [
+    "fas fa-tshirt", "fas fa-hamburger", "fas fa-file-invoice-dollar", "fas fa-gift",
+    "fas fa-laptop", "fas fa-couch", "fas fa-gas-pump", "fas fa-money-check-alt", "fas fa-bath",
+    "far fa-eye", "fas fa-bus", "fas fa-suitcase-rolling"
+]
+
 @main.route('/')
+@main.route('/home')
 def home():
-    return render_template('home.html')
+    if ( current_user.is_authenticated ):
+        return redirect(url_for('main.dashboard'))
+    else:
+        return render_template('home.html')
 
 @main.route('/home/dashboard', methods=['GET', 'POST'])
 @login_required
@@ -65,8 +75,8 @@ def dashboard():
         userConfig = UserConfiguration.query.filter_by(user_id=user.id).first()
 
         # Set User Settings to UserSettingsForm
-        userSettingsForm = UserSettingsForm(available_amount="$ {0}".format(userConfig.available_amount), main_theme=userConfig.main_theme, user_id=userConfig.user_id)
-        
+        userSettingsForm = UserSettingsForm(available_amount=userConfig.available_amount, main_theme=userConfig.main_theme, user_id=userConfig.user_id)
+
         # Set hidden user_id to all the Forms in the Dashboard View
         newOperationForm = NewOperationForm(user_id=user.id)
         editOperationForm = NewOperationForm(user_id=user.id)
@@ -100,7 +110,7 @@ def dashboard():
 
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
-
+        print(operationTypes)
         # Find Month Name CHANGE TO DATETIME INSTED OF QUERY TO DB
         findMonth = Month.query.filter_by(id=month).first()
 
@@ -116,7 +126,7 @@ def dashboard():
         elif spendAmount >= userConfig.available_amount:
             spendAmountStatusColor = 'badge-danger'
 
-        return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount= formattedAvailableAmount, spendAmount=formattedSpendAmount, spendAmountStatusColor=spendAmountStatusColor, operationTypes=operationTypes, operations=operations, form=filterForm, form2=newOperationForm, form3=editOperationForm, form4=userSettingsForm)
+        return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount= formattedAvailableAmount, spendAmount=formattedSpendAmount, spendAmountStatusColor=spendAmountStatusColor, operationTypes=operationTypes, operationTypeIcons=operationTypeIcons, operations=operations, form=filterForm, form2=newOperationForm, form3=editOperationForm, form4=userSettingsForm)
 
     elif request.method == 'POST':
         filterForm = FiltersForm()

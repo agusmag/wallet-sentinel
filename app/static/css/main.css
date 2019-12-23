@@ -7,15 +7,20 @@
 html,
 body {
     height: 100%;
+    color: #ccc !important;
 }
 
 body {
-    background: #0F2027;
+    background: #16222A;
     /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);
+    background: -webkit-linear-gradient(to left, #3A6073, #16222A);
     /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #2C5364, #203A43, #0F2027);
+    background: linear-gradient(to left, #3A6073, #16222A);
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.container-fluid {
+    height: 100%;
 }
 
 
@@ -38,40 +43,32 @@ body {
 */
 
 .my-footer {
-    background-color: #ccc;
+    background-color: #272b30;
     height: 50px;
-    position: fixed;
-    bottom: 0;
     width: 100%;
+}
+
+.my-footer * {
+    color: #ccc;
 }
 
 
 /*
-*************
-* CARD STYLES
-*************
+**************
+* HOME BUTTONS
+**************
 */
 
-.custom-card {
-    widows: 18rem;
-    margin: 0 auto;
+.homeChoicesCol {
+    margin-top: 200px;
+    width: 215px;
+    height: 275px;
+    background-color: #ccc;
     border-radius: 5%;
-    background: #3c505e;
 }
 
-.custom-card-img {
-    margin: 0 auto;
-    padding: 5px;
-    height: 225px;
-    width: 225px;
-}
-
-.custom-card-button {
-    width: 100%;
-}
-
-.custom-card:hover {
-    border: 1px solid #fff550;
+.homeChoicesCol img {
+    margin-top: 50px;
 }
 
 
@@ -86,4 +83,69 @@ body {
     margin: 0;
     padding: 0;
     color: rgb(228, 72, 72);
+}
+
+
+/*
+***************
+* FILTER STYLES
+***************
+*/
+
+#filterCard .card-header {
+    background-color: #2d2d2d;
+}
+
+#filterCard .card-body {
+    background-color: #272b30;
+}
+
+
+/*
+*******************
+* RESPONSIVE STYLES
+*******************
+*/
+
+@media (max-width: 768px) {
+    .homeChoicesCol {
+        margin-top: 25px;
+    }
+    .customDashboardHeader .row {
+        justify-content: center;
+    }
+    .customDashboardAmountsHeader {
+        display: inline-block;
+    }
+    #operations_table {
+        border: 0;
+    }
+    #operations_table thead {
+        display: none;
+    }
+    #operations_table tr {
+        margin-bottom: 20px;
+        display: block;
+    }
+    #operations_table td {
+        display: block;
+        text-align: right;
+        font-size: 13px;
+    }
+    #operations_table tr th,
+    #operations_table tr td {
+        border-right-width: 0 !important;
+    }
+    #operations_table td:last-child {
+        border-bottom: 0;
+    }
+    #operations_table td::before {
+        content: attr(data-label);
+        float: left;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+    #operations_table th {
+        border-width: 1;
+    }
 }

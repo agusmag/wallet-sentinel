@@ -79,4 +79,4 @@ def logout():
     #The logout_user method provided by flask_login remove the cookie from browser
     logout_user()
 
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('auth.home'))

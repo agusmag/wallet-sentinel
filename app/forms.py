@@ -36,7 +36,7 @@ class LoginForm(FlaskForm):
 
 class UserSettingsForm(FlaskForm):
     #'pattern':'^\$\d{1,3}(,\d{3})*(\.\d+)?$', 'data-type': 'currency', 
-    available_amount = StringField('Monto Disponible', validators=[ Optional()], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
+    available_amount = StringField('Monto Disponible', validators=[ InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
     main_theme = BooleanField('Apecto Oscuro', validators=[ Optional()], default="checked", render_kw={"data-toggle": "toggle", "data-onstyle": "success", "data-offstyle": "default"})
     user_id = HiddenField('User Id')
 

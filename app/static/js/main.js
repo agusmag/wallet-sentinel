@@ -89,12 +89,6 @@ function formatCurrency(input, blur) {
     input[0].setSelectionRange(caret_pos, caret_pos);
 }
 
-$("#openUserConfig").on({
-    click: function() {
-        formatCurrency($("#available_amount"), "blur");
-    }
-})
-
 /**
  * ###########
  * DATA TABLES
@@ -122,3 +116,56 @@ $('#operations_table').DataTable({
     },
     "dom": '<"row justify-content-start"<"col text-left"l>>rt<"row justify-content-between"<"col text-left"i><"col text-right"p>>'
 });
+
+/**
+ ********************
+ * RESPONSIVE CLASSES
+ ********************
+ */
+
+$(window).on({
+    load: function() {
+        changeResponsiveElements($(this));
+    },
+    resize: function() {
+        changeResponsiveElements($(this));
+    }
+});
+
+function changeResponsiveElements(window) {
+    if (window.width() < 768) {
+        $('.homeChoicesRow').removeClass('mr-5');
+        $('.homeChoicesRow').addClass('pl-4');
+        $('#monthInfoTitle').removeClass('col-4');
+        $('#monthInfoTitle').addClass('col-6');
+        $('#customFilterForm').removeClass('form-row');
+        $('#customFilterForm').addClass('form');
+        $('#customMonthField').removeClass('col-4');
+        $('#customMonthField').addClass('col');
+        $('#customOpTypeField').removeClass('col-4');
+        $('#customOpTypeField').addClass('col');
+        $('#customFilterSubmit').removeClass('col-4 align-self-end');
+        $('#customFilterSubmit').addClass('col');
+        $('#operations_table').removeClass('table-striped');
+        $('.custom-info-buttons').removeClass('mr-3');
+        $('.custom-info-buttons').addClass('text-center');
+        $('.custom-danger-buttons').addClass('text-center');
+    } else {
+        $('.homeChoicesRow').addClass('mr-5');
+        $('.homeChoicesRow').removeClass('pl-4');
+        $('#monthInfoTitle').removeClass('col-6');
+        $('#monthInfoTitle').addClass('col-4');
+        $('#customFilterForm').removeClass('form');
+        $('#customFilterForm').addClass('form-row');
+        $('#customMonthField').removeClass('col');
+        $('#customMonthField').addClass('col-4');
+        $('#customOpTypeField').removeClass('col');
+        $('#customOpTypeField').addClass('col-4');
+        $('#customFilterSubmit').removeClass('col');
+        $('#customFilterSubmit').addClass('col-4 align-self-end');
+        $('#operations_table').addClass('table-striped');
+        $('.custom-info-buttons').removeClass('text-center');
+        $('.custom-info-buttons').addClass('mr-3');
+        $('.custom-danger-buttons').removeClass('text-center');
+    }
+}
