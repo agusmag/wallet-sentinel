@@ -94,7 +94,16 @@
                     <th scope="row">{{ loop.index }}</th>
                     <td>{{ op.description }}</td>
                     <td>$ {{ op.amount }}</td>
-                    <td> {{ operationTypes[op.type_id-1].description }} <i class="fas {{ operationTypeIcons[op.type_id-1] }}"></i></td>
+                    <td>
+                        <div class="row justify-content-center iconRow">
+                            <div class="col-6 align-self-center iconLabel">
+                                {{ operationTypes[op.type_id-1].description }}
+                            </div>
+                            <div class="col-4 iconContent">
+                                <div class="icon-shape icon-color-{{ operationTypeIconsColor[op.type_id - 1]}}"><i class="{{ operationTypeIcons[op.type_id - 1] }}"></i></div>
+                            </div>
+                        </div>
+                    </td>
                     <td>{{ op.date.strftime('%d-%m-%Y') }}</td>
                     <td>
                         <div class="row justify-content-center">
@@ -154,7 +163,7 @@
                                                 </button>
                                             </div>
                                             <div class="modal-body">
-                                                <p>Si confirmas la eliminación se borrará de forma permanente la operación <strong>{{ op.description }}</strong>. <br> ¿Deseas eliminarla de todas formas?</p>
+                                                <p>Si confirmas la eliminación se borrará de forma permanente la operación <i><strong>{{ op.description }}</strong></i>. <br> ¿Deseas eliminarla de todas formas?</p>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -232,11 +241,6 @@
                         </div>
                         <div class="form-group">
                             {{ form4.available_amount(class_="form-control") }}
-                        </div>
-                        <div class="row justify-content-start pl-4">
-                            <div class="form-group">
-                                {{ form4.main_theme.label }} <br> {{ form4.main_theme(class_="form-control") }}
-                            </div>
                         </div>
                         <div class="modal-footer">
                             <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">

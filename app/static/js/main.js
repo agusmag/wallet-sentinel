@@ -150,6 +150,10 @@ function changeResponsiveElements(window) {
         $('.custom-info-buttons').removeClass('mr-3');
         $('.custom-info-buttons').addClass('text-center');
         $('.custom-danger-buttons').addClass('text-center');
+        $('.iconRow').removeClass('justify-content-center');
+        $('.iconRow').addClass('justify-content-end');
+        $('.iconContent').removeClass('col-4');
+        $('.iconContent').addClass('col-2');
     } else {
         $('.homeChoicesRow').addClass('mr-5');
         $('.homeChoicesRow').removeClass('pl-4');
@@ -167,5 +171,9 @@ function changeResponsiveElements(window) {
         $('.custom-info-buttons').removeClass('text-center');
         $('.custom-info-buttons').addClass('mr-3');
         $('.custom-danger-buttons').removeClass('text-center');
+        $('.iconRow').removeClass('justify-content-end');
+        $('.iconRow').addClass('justify-content-center');
+        $('.iconContent').removeClass('col-2');
+        $('.iconContent').addClass('col-4');
     }
 }

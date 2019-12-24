@@ -33,8 +33,13 @@ colors = [
 
 operationTypeIcons = [
     "fas fa-tshirt", "fas fa-hamburger", "fas fa-file-invoice-dollar", "fas fa-gift",
-    "fas fa-laptop", "fas fa-couch", "fas fa-gas-pump", "fas fa-money-check-alt", "fas fa-bath",
-    "far fa-eye", "fas fa-bus", "fas fa-suitcase-rolling"
+    "fas fa-laptop", "fas fa-couch", "fas fa-gas-pump", "fas fa-money-check-alt", "fas fa-eye",
+    "fas fa-bath", "fas fa-bus", "fas fa-suitcase-rolling"
+]
+
+operationTypeIconsColor = [
+    "tshirt", "hamburger", "file-invoice-dollar", "gift", "laptop",
+    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling"
 ]
 
 @main.route('/')
@@ -110,7 +115,7 @@ def dashboard():
 
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
-        print(operationTypes)
+
         # Find Month Name CHANGE TO DATETIME INSTED OF QUERY TO DB
         findMonth = Month.query.filter_by(id=month).first()
 
@@ -126,7 +131,7 @@ def dashboard():
         elif spendAmount >= userConfig.available_amount:
             spendAmountStatusColor = 'badge-danger'
 
-        return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount= formattedAvailableAmount, spendAmount=formattedSpendAmount, spendAmountStatusColor=spendAmountStatusColor, operationTypes=operationTypes, operationTypeIcons=operationTypeIcons, operations=operations, form=filterForm, form2=newOperationForm, form3=editOperationForm, form4=userSettingsForm)
+        return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount= formattedAvailableAmount, spendAmount=formattedSpendAmount, spendAmountStatusColor=spendAmountStatusColor, operationTypes=operationTypes, operationTypeIcons=operationTypeIcons, operationTypeIconsColor=operationTypeIconsColor, operations=operations, form=filterForm, form2=newOperationForm, form3=editOperationForm, form4=userSettingsForm)
 
     elif request.method == 'POST':
         filterForm = FiltersForm()
@@ -157,8 +162,6 @@ def dashboard():
             flash('La configuración fue actualizada con éxito', category='alert-success')
         
         messages = json.dumps({'month_id': filterForm.month_id.data, 'type_id': filterForm.type_id.data})
-
-        print(session.get('messages'))
         
         return redirect(url_for('main.dashboard', messages=messages))
 
