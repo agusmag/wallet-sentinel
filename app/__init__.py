@@ -1,16 +1,13 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
 
-# SQLAlchemy
-from sqlalchemy import event, DDL
-from flask_sqlalchemy import SQLAlchemy
+# Flask_SQLAlchemy
+from .extensions import db
  
-# Flask_Login
-from flask_login import LoginManager
-
 # Flask_Migrate
-from flask_migrate import Migrate
+from .extensions import migrations
 
-db = SQLAlchemy()
+# Flask_Login
+from .extensions import login_manager
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -25,10 +22,9 @@ def create_app(config=None):
     db.init_app(app)
 
     #Enabled migrations
-    migrate = Migrate(app, db)
+    migrations.init_app(app, db)
 
-    #Initialize LoginManager and set the default view for not authentication requests.
-    login_manager = LoginManager()
+    #Set the default view for not authentication requests.
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
@@ -44,45 +40,5 @@ def create_app(config=None):
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
-
-
-    # Models
-    from .models import Month, OperationType
-    
-    # Populate default info in the DB
-    # event.listen(Month.__table__, 'after_create',
-    #         DDL(""" INSERT INTO month (id, description) 
-    #                     VALUES  (1, 'Enero')        ,
-    #                             (2, 'Febrero')      ,
-    #                             (3, 'Marzo')        ,
-    #                             (4, 'Abril')        ,
-    #                             (5, 'Mayo')         ,
-    #                             (6, 'Junio')        ,
-    #                             (7, 'Julio')        ,
-    #                             (8, 'Agosto')       ,
-    #                             (9, 'Septiembre')   ,
-    #                             (10, 'Octubre')     ,
-    #                             (11, 'Noviembre')   ,
-    #                             (12, 'Diciembre')   
-    #             """))
-    
-    # event.listen(OperationType.__table__, 'after_create',
-    #         DDL(""" INSERT INTO operation_type (id, description) 
-    #                     VALUES  (1, 'Indumentaria') ,
-    #                             (2, 'Comida')       ,
-    #                             (3, 'Impuesto')     ,
-    #                             (4, 'Regalo')       ,
-    #                             (5, 'Tecnología')   ,
-    #                             (6, 'Mueble')       ,
-    #                             (7, 'Decoración')   ,
-    #                             (8, 'Cuota')        ,
-    #                             (9, 'Belleza')      ,
-    #                             (10, 'Higiene')     
-    #             """))
-
-    #with app.app_context():
-        # Imports
-        #from . import routes
-        #db.create_all()
 
     return app

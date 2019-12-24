@@ -4,11 +4,11 @@ from flask_login import login_user, logout_user, login_required
 
 # Forms 
 from .forms import LoginForm, SignupForm
-# Models
 
+# Models
 from .models import User, UserConfiguration
 
-from app import db
+from .extensions import db
 
 auth = Blueprint('auth', __name__)
 
@@ -61,11 +61,13 @@ def signup_post():
         #Create the object User to store it in the DB
         new_user = User(email=signupForm.email.data, username=signupForm.username.data, password=generate_password_hash(signupForm.password.data, method='sha256'), totalAmount=totalAmount)
 
+        #Save both records in the DB
+        db.session.add(new_user)
+        db.session.commit()
+
         #Create the object UserConfiguration to store it in the BD
         new_user_config = UserConfiguration(available_amount=totalAmount, main_theme=mainThemeEnabled, user_id=new_user.id)
         
-        #Save both records in the DB
-        db.session.add(new_user)
         db.session.add(new_user_config)
         db.session.commit()
 

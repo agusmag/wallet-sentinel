@@ -1,26 +1,23 @@
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-prodDB = 'mysql+pymysql://agustinmag:password@localhost/wallet_sentinel_db_prod'
-devDB = 'mysql+pymysql://agustinmag:password@localhost/wallet_sentinel_db_dev'
-testDB = 'mysql+pymysql://agustinmag:password@localhost/wallet_sentinel_db_test'
 
 class ProductionConfig(object):
     DEBUG = False
     TESTING = False
 
-    SECRET_KEY = 'you-will-never-guess-prod'
+    SECRET_KEY = os.environ.get('SECRET_KEY_PROD')
 
-    SQLALCHEMY_DATABASE_URI = prodDB
+    SQLALCHEMY_DATABASE_URI = os.environ.get('PROD_DB')
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopConfig(object):
     DEBUG = True
-    TESTING = False
+    TESTING = True
 
-    SECRET_KEY = 'you-will-never-guess-dev'
+    SECRET_KEY = os.environ.get('SECRET_KEY_DEV')
 
-    SQLALCHEMY_DATABASE_URI = devDB
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DB')
 
     SQLALCHEMY_TRACK_MODIFICATIONS = True
