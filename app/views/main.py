@@ -2,14 +2,14 @@ from flask import Blueprint, render_template, Markup, redirect, url_for, flash, 
 from flask_login import login_required, current_user
 import datetime, calendar, json, locale
 
-# DB
-from .extensions import db
-
 # Forms
-from .forms import FiltersForm, NewOperationForm, UserSettingsForm
+from app.forms import FiltersForm, NewOperationForm, UserSettingsForm
 
 # Models
-from .models import User, UserConfiguration, Operation, OperationType, Month
+from app.models import User, UserConfiguration, Operation, OperationType, Month
+
+# Database
+from app.extensions import db
 
 main = Blueprint('main', __name__)
 

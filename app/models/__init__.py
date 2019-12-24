@@ -2,7 +2,7 @@ from flask_login import UserMixin
 
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from .extensions import db
+from app.extensions import db
 
 #The UserMixin is a module from flask_login to ease the login implementation
 class User(UserMixin, db.Model):

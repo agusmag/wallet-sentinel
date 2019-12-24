@@ -1,22 +1,26 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
+import os, logging, config
 
 # Flask_SQLAlchemy
-from .extensions import db
+from app.extensions import db
  
 # Flask_Migrate
-from .extensions import migrations
+from app.extensions import migrations
 
 # Flask_Login
-from .extensions import login_manager
+from app.extensions import login_manager
 
-def create_app(config=None):
+logging.basicConfig(level=logging.DEBUG,
+                   format='[%(asctime)s]: {} %(levelname)s %(message)s'.format(os.getpid()),
+                   datefmt='%Y-%m-%d %H:%M:%S',
+                   handlers=[logging.StreamHandler()])
+
+logger = logging.getLogger()
+
+def create_app():
+    logger.info(f'Starting app in {config.APP_ENV} environment')
     app = Flask(__name__)
-
-    #Load App Config file & Initialize Database
-    if app.config["ENV"] == "production":
-        app.config.from_object("config.ProductionConfig")
-    else:
-        app.config.from_object("config.DevelopConfig")
+    app.config.from_object('config')
 
     #ORM to Manage DB Models
     db.init_app(app)
@@ -28,17 +32,17 @@ def create_app(config=None):
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
-    from .models import User
+    from app.models import User
 
     #Flask_Login method to find the active user cookie and verify it in the DB
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint)
+    from app.views.auth import auth
+    app.register_blueprint(auth)
 
-    from .main import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+    from app.views.main import main
+    app.register_blueprint(main)
 
     return app
