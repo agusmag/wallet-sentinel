@@ -1,0 +1,256 @@
+{% extends 'layout.html' %} {% block content %}
+
+<div class="container customDashboardHeader">
+    <div class="customDashboardMonthHeader">
+        <!-- Month Info -->
+        <div class="row mt-4 pb-4">
+            <div class="col-4" id="monthInfoTitle">
+                <h3>Mes actual <span class="badge badge-info">{{ month }} </span></h3>
+            </div>
+        </div>
+        <!-- User Amount Data -->
+        <div class="row pb-4 justify-content-between customDashboardAmountsHeader">
+            <div class="row pb-4">
+                <div class="col">
+                    <h2 id="availableAmountTitle">Total</h1>
+                </div>
+                <div class="col">
+                    <h2><span class="badge badge-success">{{ totalAmount }} </span></h1>
+                </div>
+            </div>
+            <div class="row pb-4">
+                <div class="col">
+                    <h2 id="spendAmountTitle">Gastado</h1>
+                </div>
+                <div class="col">
+                    <h2><span class="badge {{ spendAmountStatusColor }}">{{ spendAmount }}</span></h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center pb-4">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+        <div class="alert {{category}}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %} {% endif %} {% endwith %} {% for field in form2.errors %} {% for error in form2.errors[field] %}
+        <div class="alert alert-error">
+            <strong>Error!</strong> {{error}}
+        </div>
+        {% endfor %} {% endfor %}
+    </div>
+
+    <!-- Filters -->
+    <div class="row-full justify-content-center pb-4">
+        <div class="col">
+            <div class="card" id="filterCard">
+                <div class="card-header">
+                    <h4>Filtros</h4>
+                </div>
+                <div class="card-body text-center">
+                    <form class="form-row" id="customFilterForm" action="/home/dashboard" method="POST">
+                        <div class="col-4" id="customMonthField">
+                            <label class="my-1 mr-2" for="monthTypes">Mes</label> {{ form.month_id(class_="form-control custom-select my-1 mr-sm-2") }}
+                            <ul class="custom-error-list">
+                                {% for error in form.month_id.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-4" id="customOpTypeField">
+                            <label class="my-1 mr-2" for="operationType">Tipo</label> {{ form.type_id(class_="form-control custom-select my-1 mr-sm-2") }}
+                            <ul class="custom-error-list">
+                                {% for error in form.type_id.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-4 align-self-end" id="customFilterSubmit">
+                            <input type="submit" class="btn btn-primary my-1" value="Filtrar">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operations Table -->
+    <div class="row-full pb-4">
+        <table class="table table-striped table-bordered table-hover order-column" style="width:100%;" id="operations_table">
+            <thead class="thead-light">
+                <tr>
+                    <th>Nro</th>
+                    <th>Detalle</th>
+                    <th>Monto</th>
+                    <th>Tipo</th>
+                    <th>Fecha</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for op in operations %}
+                <tr class="table-dark">
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>{{ op.description }}</td>
+                    <td>$ {{ op.amount }}</td>
+                    <td>
+                        <div class="row justify-content-center iconRow">
+                            <div class="col-6 align-self-center iconLabel">
+                                {{ operationTypes[op.type_id-1].description }}
+                            </div>
+                            <div class="col-4 iconContent">
+                                <div class="icon-shape icon-color-{{ operationTypeIconsColor[op.type_id - 1]}}"><i class="{{ operationTypeIcons[op.type_id - 1] }}"></i></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ op.date.strftime('%d-%m-%Y') }}</td>
+                    <td>
+                        <div class="row justify-content-center">
+                            <div class="col-4 mr-3 custom-info-buttons">
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editOperationModal{{loop.index0}}">Editar</button>
+
+                                <!-- Edit Modal -->
+                                <div class="modal fade" id="editOperationModal{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="editOperationTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editOperationTitle">Editar operación</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="/home/dashboard/update_operation/{{ op.id }}" method="POST">
+                                                    {{ form3.hidden_tag() }}
+                                                    <div class="form-group">
+                                                        {{ form3.description(class_="form-control", **{"value": op.description }) }}
+                                                    </div>
+                                                    <div class="form-group">
+                                                        {{ form3.date(class_="form-control", **{"value": op.date.strftime('%Y-%m-%d') }) }}
+                                                    </div>
+                                                    <div class="form-group">
+                                                        {{ form3.amount(class_="form-control", **{"value": op.amount }) }}
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <select class="form-control custom-select my-1 mr-sm-2" name="type_id" id="type_id">
+                                                            {% for ot in operationTypes %}
+                                                                <option value={{ ot.id }} {% if op.type_id == ot.id %}selected{% endif %}>{{ ot.description }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
+                                                        <input type="submit" class="btn btn-success" value="Confirmar">
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4 custom-info-buttons">
+                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#confirmDeleteOperationModal{{loop.index0}}">Eliminar</button>
+
+                                <!-- Confirmation Modal -->
+                                <div class="modal fade" id="confirmDeleteOperationModal{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="TitleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="TitleModalLabel">Confirmación</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Si confirmas la eliminación se borrará de forma permanente la operación <i><strong>{{ op.description }}</strong></i>. <br> ¿Deseas eliminarla de todas formas?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                                <form action="/home/dashboard/delete_operation/{{ op.id }}" method="POST">
+                                                    <button type="submit" class="btn btn-success">Confirmar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Create Operation Button-->
+    <div class="row justify-content-center">
+        <button type="button" class="btn btn-success mb-4" data-toggle="modal" data-target="#newOperationModal">Nuevo</button>
+    </div>
+
+    <!-- New Operation Modal -->
+    <div class="modal fade" id="newOperationModal" tabindex="-1" role="dialog" aria-labelledby="newOperationTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newOperationTitle">Nueva operación</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/home/dashboard/new_operation" method="POST">
+                        {{ form2.hidden_tag() }}
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="description" placeholder="Ingresar una descripción..." />
+                        </div>
+                        <div class="form-group">
+                            {{ form2.date(class_="form-control", **{"value": curDate })}}
+                        </div>
+                        <div class="form-group">
+                            {{ form2.amount(class_="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form2.type_id(class_="form-control custom-select my-1 mr-sm-2") }}
+                        </div>
+                        <div class="modal-footer">
+                            <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
+                            <input type="submit" class="btn btn-success" value="Crear">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Settings Modal -->
+    <div class="modal fade" id="userSettingsModal" tabindex="-1" role="dialog" aria-labelledby="userSettingsTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userSettingsTitle">Configuración</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/home/dashboard" method="POST">
+                        {{ form4.hidden_tag() }}
+                        <div class="row justify-content-start pl-4">
+                            {{ form4.available_amount.label }}
+                        </div>
+                        <div class="form-group">
+                            {{ form4.available_amount(class_="form-control") }}
+                        </div>
+                        <div class="modal-footer">
+                            <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
+                            <input type="submit" class="btn btn-success" value="Actualizar">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

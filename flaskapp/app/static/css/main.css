@@ -1,0 +1,236 @@
+/*
+****************
+* GENERAL STYLES
+****************
+*/
+
+html,
+body {
+    height: 100%;
+    color: #ccc !important;
+    font-family: 'Varela Round', sans-serif;
+}
+
+#pageContent {
+    height: 100%;
+}
+
+body {
+    background: #16222A;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to left, #3A6073, #16222A);
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to left, #3A6073, #16222A);
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.container-fluid {
+    height: 100%;
+}
+
+
+/**
+***************
+* NAVBAR STYLES
+***************
+*/
+
+#customNavBar a {
+    color: white;
+    border: none;
+}
+
+
+/*
+***************
+* FOOTER STYLES
+***************
+*/
+
+.my-footer {
+    display: none;
+    background-color: #272b30;
+    height: 50px;
+    width: 100%;
+}
+
+.my-footer * {
+    color: #ccc;
+}
+
+
+/*
+*************
+* HOME STYLES
+*************
+*/
+
+#homeTitle {
+    margin-top: 40px;
+}
+
+.homeChoicesCol {
+    margin-top: 200px;
+    width: 215px;
+    height: 275px;
+    background-color: #ccc;
+    border-radius: 5%;
+}
+
+.homeChoicesCol img {
+    margin-top: 50px;
+}
+
+
+/*
+*********************
+* ERROR LIST MESSAGES
+*********************
+*/
+
+.custom-error-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    color: rgb(228, 72, 72);
+}
+
+
+/*
+***************
+* FILTER STYLES
+***************
+*/
+
+#filterCard .card-header {
+    background-color: #2d2d2d;
+}
+
+#filterCard .card-body {
+    background-color: #272b30;
+}
+
+
+/*
+*************
+* ICON STYLES
+*************
+*/
+
+.icon-shape {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    text-align: center;
+}
+
+.icon-shape i {
+    padding-top: 7px;
+}
+
+.icon-color-tshirt {
+    background-color: rgb(0, 124, 182);
+}
+
+.icon-color-hamburger {
+    background-color: rgb(11, 168, 63);
+}
+
+.icon-color-file-invoice-dollar {
+    background-color: rgb(255, 127, 22);
+}
+
+.icon-color-gift {
+    background-color: rgb(199, 59, 180);
+}
+
+.icon-color-laptop {
+    background-color: rgb(119, 119, 119);
+}
+
+.icon-color-couch {
+    background-color: rgb(139, 63, 0);
+}
+
+.icon-color-gas-pump {
+    background-color: rgb(226, 204, 0);
+}
+
+.icon-color-money-check {
+    background-color: rgb(207, 0, 0);
+}
+
+.icon-color-bath {
+    background-color: rgb(79, 20, 128);
+}
+
+.icon-color-eye {
+    background-color: rgb(170, 0, 85);
+}
+
+.icon-color-bus {
+    background-color: rgb(1, 109, 67);
+}
+
+.icon-color-suitcase-rolling {
+    background-color: coral;
+}
+
+
+/*
+*******************
+* RESPONSIVE STYLES
+*******************
+*/
+
+@media (max-width: 768px) {
+    .my-footer {
+        display: block;
+    }
+    .homeChoicesCol {
+        margin-top: 25px;
+    }
+    .customDashboardHeader .row {
+        justify-content: center;
+    }
+    .customDashboardAmountsHeader {
+        display: inline-block;
+    }
+    #operations_table {
+        border: 0;
+    }
+    #operations_table thead {
+        display: none;
+    }
+    #operations_table tr {
+        margin-bottom: 20px;
+        display: block;
+    }
+    #operations_table td {
+        display: block;
+        text-align: right;
+        font-size: 13px;
+    }
+    #operations_table tr th,
+    #operations_table tr td {
+        border-right-width: 0 !important;
+    }
+    #operations_table td:last-child {
+        border-bottom: 0;
+    }
+    #operations_table td::before {
+        content: attr(data-label);
+        float: left;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+    #operations_table th {
+        border-width: 1;
+    }
+    #operations_table .iconLabel {
+        display: none;
+    }
+    #operations_table .iconContent {
+        margin-right: 10px;
+    }
+}
