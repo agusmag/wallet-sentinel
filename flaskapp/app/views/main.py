@@ -102,9 +102,8 @@ def dashboard():
         findMonth = Month.query.filter_by(id=month).first()
 
         # Format All the Amounts to Currency
-        locale.setlocale( locale.LC_ALL, '' )
-        formattedAvailableAmount = locale.currency( userConfig.available_amount, grouping=True )
-        formattedSpendAmount = locale.currency( spendAmount, grouping=True )
+        formattedAvailableAmount = "$ {:,.2f}".format(userConfig.available_amount)
+        formattedSpendAmount = "$ {:,.2f}".format(spendAmount)
 
         # Calculate Spend Amount Badge Status Color
         spendAmountStatusColor = 'badge-success'
