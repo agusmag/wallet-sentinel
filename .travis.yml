@@ -1,0 +1,29 @@
+sudo: required
+services:
+    - docker
+
+language: python
+
+python:
+    - "2.7"
+    - "3.5"
+    
+before_install:
+    - pip --version
+    - docker --version
+    - docker-compose --version
+    - docker build -t agustinmag/flask-client-test ./flaskapp
+
+script:
+    - docker run agustinmag/flask-client-test pytest 
+
+after_success:
+    - docker build -t agustinmag/flask-client ./flaskapp
+    - docker build -t agustinmag/flask-nginx ./nginx
+    - docker build -t agustinmag/flask-migrations ./flaskapp
+    # Log in to docker CLI
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    # Take those images and push them to Docker Hub
+    - docker push agustinmag/flask-client
+    - docker push agustinmag/flask-nginx
+    - docker push agustinmag/flask-migrations
