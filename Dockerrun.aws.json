@@ -1,0 +1,27 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions": [{
+            "name": "flaskapp",
+            "image": "agustinmag/flask-client",
+            "hostname": "flask",
+            "essential": false
+        },
+        {
+            "name": "migrations",
+            "image": "agustinmag/flask-migrations",
+            "hostname": "migrations",
+            "essential": false
+        },
+        {
+            "name": "nginx",
+            "image": "agustinmag/flask-nginx",
+            "hostname": "nginx",
+            "essential": true,
+            "portMappings": [{
+                "hostPort": 80,
+                "containerPort": 80
+            }],
+            "links": ["flaskapp"]
+        }
+    ]
+}
