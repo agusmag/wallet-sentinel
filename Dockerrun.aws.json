@@ -4,13 +4,15 @@
             "name": "flaskapp",
             "image": "agustinmag/flask-client",
             "hostname": "flask",
-            "essential": false
+            "essential": false,
+            "memory": 128
         },
         {
             "name": "migrations",
             "image": "agustinmag/flask-migrations",
             "hostname": "migrations",
-            "essential": false
+            "essential": false,
+            "memory": 128
         },
         {
             "name": "nginx",
@@ -21,7 +23,8 @@
                 "hostPort": 80,
                 "containerPort": 80
             }],
-            "links": ["flaskapp"]
+            "links": ["flaskapp"],
+            "memory": 128
         }
     ]
 }
