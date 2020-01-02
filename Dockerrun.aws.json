@@ -8,13 +8,6 @@
             "memory": 128
         },
         {
-            "name": "migrations",
-            "image": "agustinmag/flask-migrations",
-            "hostname": "migrations",
-            "essential": false,
-            "memory": 128
-        },
-        {
             "name": "nginx",
             "image": "agustinmag/flask-nginx",
             "hostname": "nginx",

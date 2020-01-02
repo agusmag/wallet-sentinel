@@ -14,18 +14,18 @@ before_install:
     - docker build -t agustinmag/flask-client-test ./flaskapp
 
 script:
+    # Execute pytest
     - docker run agustinmag/flask-client-test pytest 
 
 after_success:
+    # Build docker images
     - docker build -t agustinmag/flask-client ./flaskapp
     - docker build -t agustinmag/flask-nginx ./nginx
-    - docker build -t agustinmag/flask-migrations ./flaskapp
     # Log in to docker CLI
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
     # Take those images and push them to Docker Hub
     - docker push agustinmag/flask-client
     - docker push agustinmag/flask-nginx
-    - docker push agustinmag/flask-migrations
 
 deploy:
     edge: true
