@@ -20,11 +20,12 @@ def create_app():
 
     #ORM to Manage DB Models
     db.init_app(app)
-    print("Database Created")
-    
+
     #Enabled migrations
     migrations.init_app(app, db)
-    print("Migrations enabled")
+
+    with app.app_context():
+        db.create_all()
 
     #Set the default view for not authentication requests.
     login_manager.login_view = 'auth.login'
