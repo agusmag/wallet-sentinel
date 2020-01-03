@@ -7,10 +7,12 @@ from app.extensions import db
 # Flask_Migrate
 from app.extensions import migrations
 
+from config import TestConfig
+
 # Flask_Login
 from app.extensions import login_manager
 
-def create_app():
+def create_app(config=None):
     app = Flask(__name__)
 
     if os.environ.get('FLASK_ENV') == 'production':
@@ -24,8 +26,9 @@ def create_app():
     #Enabled migrations
     migrations.init_app(app, db)
 
-    with app.app_context():
-        db.create_all()
+    if config != TestConfig:
+        with app.app_context():
+            db.create_all()
 
     #Set the default view for not authentication requests.
     login_manager.login_view = 'auth.login'

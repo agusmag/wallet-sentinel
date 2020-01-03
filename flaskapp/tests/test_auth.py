@@ -1,10 +1,11 @@
 import pytest
 
 from app import create_app
+from config import TestConfig
 
 @pytest.fixture
 def app():
-    app = create_app()
+    app = create_app(TestConfig)
     return app
 
 
