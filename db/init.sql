@@ -110,7 +110,7 @@ CREATE TABLE `operation_type` (
 
 LOCK TABLES `operation_type` WRITE;
 /*!40000 ALTER TABLE `operation_type` DISABLE KEYS */;
-INSERT INTO `operation_type` VALUES (1,'Indumentaria'),(2,'Comida'),(3,'Impuesto'),(4,'Regalo'),(5,'Tecnología'),(6,'Mueble'),(7,'Decoración'),(8,'Cuota'),(9,'Belleza'),(10,'Higiene');
+INSERT INTO `operation_type` VALUES (1,'Indumentaria'),(2,'Comida'),(3,'Impuesto'),(4,'Regalo'),(5,'Tecnología'),(6,'Mueble'),(7,'Decoración'),(8,'Cuota'),(9,'Belleza'),(10,'Higiene'), (11, 'Transporte'), (12, 'Viaje');
 /*!40000 ALTER TABLE `operation_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -126,9 +126,6 @@ CREATE TABLE `user` (
   `username` varchar(25) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(100) NOT NULL,
-  `totalAmount` int(11) NOT NULL,
-  `spendLimit` float DEFAULT NULL,
-  `warningPercent` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `username` (`username`)
@@ -155,6 +152,8 @@ CREATE TABLE `user_configuration` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `available_amount` float NOT NULL,
   `main_theme` tinyint(1) DEFAULT NULL,
+  `spend_limit` float DEFAULT NULL,
+  `warning_percent` int(11) DEFAULT 75,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),

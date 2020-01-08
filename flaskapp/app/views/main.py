@@ -36,9 +36,13 @@ def home():
 @login_required
 def dashboard():
     if request.method == 'GET':
-        filter_month_id = 0
-        filter_type_id = 0
+         # Calculate current month
+        month = datetime.date.today().month
 
+        # Fill Filter Fields with current date and None for Operation_Type
+        filter_month_id = month
+        filter_type_id = 0
+        
         # Check for cookies values from preview dashboard filter POST
         if request.args.get('messages') is not None:
             messages = request.args['messages']
@@ -50,11 +54,11 @@ def dashboard():
             if messages.get('type_id') is not None:
                 filter_type_id = messages.get('type_id')
 
+       
+
         filterForm = FiltersForm(month_id=filter_month_id, type_id=filter_type_id)
-
-        # Calculate current month
-        month = datetime.date.today().month
-
+        
+        
         # Get User Data
         user = User.query.filter_by(username=current_user.username).first()
 
@@ -62,7 +66,7 @@ def dashboard():
         userConfig = UserConfiguration.query.filter_by(user_id=user.id).first()
 
         # Set User Settings to UserSettingsForm
-        userSettingsForm = UserSettingsForm(available_amount=userConfig.available_amount, main_theme=userConfig.main_theme, user_id=userConfig.user_id)
+        userSettingsForm = UserSettingsForm(available_amount=userConfig.available_amount, main_theme=userConfig.main_theme, spend_limit=userConfig.spend_limit, warning_percent=userConfig.warning_percent, user_id=userConfig.user_id)
 
         # Set hidden user_id to all the Forms in the Dashboard View
         newOperationForm = NewOperationForm(user_id=user.id)
@@ -104,15 +108,19 @@ def dashboard():
         # Format All the Amounts to Currency
         formattedAvailableAmount = "$ {:,.2f}".format(userConfig.available_amount)
         formattedSpendAmount = "$ {:,.2f}".format(spendAmount)
+        formattedAvailableAmount = "$ {:,.2f}".format(userConfig.available_amount - spendAmount)
 
         # Calculate Spend Amount Badge Status Color
         spendAmountStatusColor = 'badge-success'
-        if spendAmount >= (userConfig.available_amount * 0.25) and spendAmount < userConfig.available_amount:
+        if userConfig.warning_percent is None:
+            userConfig.warning_percent = 25
+
+        if spendAmount >= (userConfig.available_amount * ( userConfig.warning_percent / 100)) and spendAmount < userConfig.available_amount:
             spendAmountStatusColor = 'badge-warning'
         elif spendAmount >= userConfig.available_amount:
             spendAmountStatusColor = 'badge-danger'
 
-        return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount= formattedAvailableAmount, spendAmount=formattedSpendAmount, spendAmountStatusColor=spendAmountStatusColor, operationTypes=operationTypes, operationTypeIcons=operationTypeIcons, operationTypeIconsColor=operationTypeIconsColor, operations=operations, form=filterForm, form2=newOperationForm, form3=editOperationForm, form4=userSettingsForm)
+        return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount= formattedAvailableAmount, spendAmount=formattedSpendAmount, spendAmountStatusColor=spendAmountStatusColor, availableAmount=formattedAvailableAmount, operationTypes=operationTypes, operationTypeIcons=operationTypeIcons, operationTypeIconsColor=operationTypeIconsColor, operations=operations, form=filterForm, form2=newOperationForm, form3=editOperationForm, form4=userSettingsForm)
 
     elif request.method == 'POST':
         filterForm = FiltersForm()
@@ -135,8 +143,10 @@ def dashboard():
             userConfig = UserConfiguration.query.filter_by(user_id=userSettingsForm.user_id.data).first()
 
             # Update the fields with the current values
-            userConfig.available_amount = float(userSettingsForm.available_amount.data.replace("$","").replace(",",""))
+            userConfig.available_amount = float(userSettingsForm.available_amount.data.replace("$","").replace(",", ""))
             userConfig.main_theme = userSettingsForm.main_theme.data
+            userConfig.spend_limit = float(userSettingsForm.spend_limit.data.replace("$", "").replace(",", ""))
+            userConfig.warning_percent = int(userSettingsForm.warning_percent.data)
 
             db.session.commit()
             

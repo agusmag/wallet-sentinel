@@ -154,6 +154,8 @@ function changeResponsiveElements(window) {
         $('.iconRow').addClass('justify-content-end');
         $('.iconContent').removeClass('col-4');
         $('.iconContent').addClass('col-2');
+        $('.customDashboardAmountSeparator').removeClass('d-none');
+        $('.customDashboardAmountSeparator').addClass('d-block');
     } else {
         $('.homeChoicesRow').addClass('mr-5');
         $('.homeChoicesRow').removeClass('pl-4');
@@ -175,5 +177,9 @@ function changeResponsiveElements(window) {
         $('.iconRow').addClass('justify-content-center');
         $('.iconContent').removeClass('col-2');
         $('.iconContent').addClass('col-4');
+        $('.customDashboardAmountCols').removeClass('col-6');
+        $('.customDashboardAmountCols').addClass('col-4');
+        $('.customDashboardAmountSeparator').removeClass('d-block');
+        $('.customDashboardAmountSeparator').addClass('d-none');
     }
 }
