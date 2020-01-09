@@ -1,6 +1,8 @@
 # Wallet-Sentinel
 Finantial App to manage Monthly Cash-in / Cash-out
 
+[![Build Status](https://travis-ci.org/agusmag/wallet-sentinel.svg?branch=master)](https://travis-ci.org/agusmag/wallet-sentinel)
+
 ## Learned/Enhanced Tecnologies
 * Python
 * Flask (Flask, Flask-Login, Flask-Migrate, Flask-WTForms)

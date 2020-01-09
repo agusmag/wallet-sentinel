@@ -54,10 +54,7 @@ def dashboard():
             if messages.get('type_id') is not None:
                 filter_type_id = messages.get('type_id')
 
-       
-
         filterForm = FiltersForm(month_id=filter_month_id, type_id=filter_type_id)
-        
         
         # Get User Data
         user = User.query.filter_by(username=current_user.username).first()
@@ -106,7 +103,7 @@ def dashboard():
         findMonth = Month.query.filter_by(id=month).first()
 
         # Format All the Amounts to Currency
-        formattedAvailableAmount = "$ {:,.2f}".format(userConfig.available_amount)
+        formattedTotalAmount = "$ {:,.2f}".format(userConfig.available_amount)
         formattedSpendAmount = "$ {:,.2f}".format(spendAmount)
         formattedAvailableAmount = "$ {:,.2f}".format(userConfig.available_amount - spendAmount)
 
@@ -125,7 +122,7 @@ def dashboard():
                                     month=findMonth.description,
                                     user_id=user.id,
                                     username=user.username,
-                                    totalAmount=formattedAvailableAmount,
+                                    totalAmount=formattedTotalAmount,
                                     spendAmount=formattedSpendAmount,
                                     spendAmountStatusColor=spendAmountStatusColor,
                                     availableAmount=formattedAvailableAmount,
@@ -212,19 +209,29 @@ def update_operation(id):
     editOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
 
     if editOperationForm.validate():
-        # Search the edited operation from DB to update it
-        edit_operation = Operation.query.filter_by(id=id).first()
+        # Parse amount string to decimal
+        convertedAmount = float(editOperationForm.amount.data.replace("$","").replace(",",""))
 
-        # Update the fields
-        edit_operation.description = editOperationForm.description.data
-        edit_operation.date = editOperationForm.date.data
-        edit_operation.amount = float(editOperationForm.amount.data.replace("$","").replace(",",""))
-        edit_operation.type_id = editOperationForm.type_id.data
+        # Search User Configuration to verify Spend Limit
+        userConfig = UserConfiguration.query.filter_by(user_id=editOperationForm.user_id.data).first()
 
-        db.session.commit()
+        if userConfig.spend_limit != 0 and convertedAmount > userConfig.spend_limit:
+                flash('El gasto supera el límite establecido en la configuración.', category="alert-danger")
+                return redirect(url_for('main.dashboard'))
+        else:
+            # Search the edited operation from DB to update it
+            edit_operation = Operation.query.filter_by(id=id).first()
 
-        flash('La operación fue actualizada con éxito', category='alert-success')
-        return redirect(url_for('main.dashboard'))
+            # Update the fields
+            edit_operation.description = editOperationForm.description.data
+            edit_operation.date = editOperationForm.date.data
+            edit_operation.amount = convertedAmount
+            edit_operation.type_id = editOperationForm.type_id.data
+
+            db.session.commit()
+
+            flash('La operación fue actualizada con éxito', category='alert-success')
+            return redirect(url_for('main.dashboard'))
 
     flash('Hubo un problema al actualizar la operación', category='alert-danger')
     return redirect(url_for('main.dashboard'))
