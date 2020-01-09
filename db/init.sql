@@ -154,6 +154,7 @@ CREATE TABLE `user_configuration` (
   `main_theme` tinyint(1) DEFAULT NULL,
   `spend_limit` float DEFAULT NULL,
   `warning_percent` int(11) DEFAULT 75,
+  `hide_amounts` tinyint(1) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),

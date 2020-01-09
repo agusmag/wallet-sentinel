@@ -1,10 +1,9 @@
 document.body.firstElementChild.tabIndex = 1
-
-/**
- * *******************************
- * AMOUNT INPUTS AND LABELS FORMAT
- * *******************************
- */
+    /**
+     * *******************************
+     * AMOUNT INPUTS AND LABELS FORMAT
+     *********************************
+     */
 
 $("input[data-type='currency']").on({
     keyup: function() {
@@ -126,6 +125,13 @@ $('#operations_table').DataTable({
 $(window).on({
     load: function() {
         changeResponsiveElements($(this));
+        $('.lds-dual-ring').show();
+        setTimeout(
+            () => {
+                $('.lds-dual-ring').hide();
+            },
+            950
+        );
     },
     resize: function() {
         changeResponsiveElements($(this));

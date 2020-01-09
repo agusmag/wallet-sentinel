@@ -19,6 +19,7 @@ class UserConfiguration(db.Model):
     main_theme = Column(Boolean)
     spend_limit = Column(Float)
     warning_percent = Column(Integer)
+    hide_amounts = Column(Boolean)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
 

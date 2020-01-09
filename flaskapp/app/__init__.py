@@ -49,4 +49,7 @@ def create_app(config=None):
     from app.views.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    from app.views.error import errors as errors_blueprint
+    app.register_blueprint(errors_blueprint)
+
     return app
