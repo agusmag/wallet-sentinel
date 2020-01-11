@@ -140,6 +140,8 @@ $(window).on({
 
 function changeResponsiveElements(window) {
     if (window.width() < 768) {
+        $('#mobileTitle').removeClass('d-none');
+        $('#mobileTitle').addClass('d-block');
         $('.homeChoicesRow').removeClass('mr-5');
         $('.homeChoicesRow').addClass('pl-4');
         $('#monthInfoTitle').removeClass('col-4');
@@ -163,6 +165,8 @@ function changeResponsiveElements(window) {
         $('.customDashboardAmountSeparator').removeClass('d-none');
         $('.customDashboardAmountSeparator').addClass('d-block');
     } else {
+        $('#mobileTitle').removeClass('d-block');
+        $('#mobileTitle').addClass('d-none');
         $('.homeChoicesRow').addClass('mr-5');
         $('.homeChoicesRow').removeClass('pl-4');
         $('#monthInfoTitle').removeClass('col-6');

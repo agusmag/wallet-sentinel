@@ -66,6 +66,7 @@ body {
 */
 
 #homeTitle {
+    display: block;
     margin-top: 40px;
 }
 
@@ -238,6 +239,9 @@ body {
 */
 
 @media (max-width: 768px) {
+    #homeTitle {
+        display: none;
+    }
     .my-footer {
         display: block;
     }

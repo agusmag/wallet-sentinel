@@ -1,10 +1,11 @@
 {% extends 'layout.html' %} {% block content %}
 
-<div class="row mb-5">
+<div class="row mb-5 mt-5">
     <div class="mx-auto">
-        <div class="card mt-4" style="width: 18rem;">
-            <img src="../static/assets/matrix_hunter.png" class="card-img-top" alt="Logo">
+        <div class="card mt-5 mb-1" style="width: 18rem;">
             <div class="card-body">
+                <h2 class="card-title">Ingresá tus datos!</h2>
+                <h2 class="mb-3"><i class="fas fa-pen-alt"></i></h2 clas>
                 {% with messages = get_flashed_messages() %} {% if messages %}
                 <div class="notification is-danger">
                     {{ messages[0] }} Ir a <a href="{{ url_for('auth.login')}}">Login Page</a>
