@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
+from sqlalchemy import or_
 
 # Forms 
 from app.forms import LoginForm, SignupForm
@@ -25,7 +26,7 @@ def login_post():
 
     if loginForm.validate():
         #Check if the user credentials are store in the DB
-        user = User.query.filter_by(username=loginForm.username.data).first()
+        user = User.query.filter(or_(User.username == loginForm.username.data, User.email == loginForm.username.data)).first()
 
         if not user or not check_password_hash(user.password, loginForm.password.data):
             flash('Por favor verificá los datos de ingreso nuevamente.')
@@ -50,24 +51,31 @@ def signup_post():
 
     if signupForm.validate():
         #Verify that the user doesn't exist in the DB
-        user = User.query.filter_by(email=signupForm.email.data, username=signupForm.username.data).first()
+        user = User.query.filter_by(email=signupForm.email.data).first()
 
         if user:
             flash('El email ya se encuentra registrado.')
             return redirect(url_for('auth.signup'))
 
+        user = User.query.filter_by(username=signupForm.username.data).first()
+
+        if user:
+            flash('El usuario ya se encuentra registrado.')
+            return redirect(url_for('auth.signup'))
+
         totalAmount = 0
         mainThemeEnabled = True
 
+
         #Create the object User to store it in the DB
-        new_user = User(email=signupForm.email.data, username=signupForm.username.data, password=generate_password_hash(signupForm.password.data, method='sha256'), totalAmount=totalAmount)
+        new_user = User(email=signupForm.email.data, username=signupForm.username.data, password=generate_password_hash(signupForm.password.data, method='sha256'))
 
         #Save both records in the DB
         db.session.add(new_user)
         db.session.commit()
 
         #Create the object UserConfiguration to store it in the BD
-        new_user_config = UserConfiguration(available_amount=totalAmount, main_theme=mainThemeEnabled, user_id=new_user.id)
+        new_user_config = UserConfiguration(available_amount=totalAmount, main_theme=mainThemeEnabled, spend_limit=totalAmount, warning_percent=75, user_id=new_user.id)
         
         db.session.add(new_user_config)
         db.session.commit()

@@ -36,9 +36,13 @@ def home():
 @login_required
 def dashboard():
     if request.method == 'GET':
-        filter_month_id = 0
-        filter_type_id = 0
+         # Calculate current month
+        month = datetime.date.today().month
 
+        # Fill Filter Fields with current date and None for Operation_Type
+        filter_month_id = month
+        filter_type_id = 0
+        
         # Check for cookies values from preview dashboard filter POST
         if request.args.get('messages') is not None:
             messages = request.args['messages']
@@ -51,10 +55,7 @@ def dashboard():
                 filter_type_id = messages.get('type_id')
 
         filterForm = FiltersForm(month_id=filter_month_id, type_id=filter_type_id)
-
-        # Calculate current month
-        month = datetime.date.today().month
-
+        
         # Get User Data
         user = User.query.filter_by(username=current_user.username).first()
 
@@ -62,7 +63,7 @@ def dashboard():
         userConfig = UserConfiguration.query.filter_by(user_id=user.id).first()
 
         # Set User Settings to UserSettingsForm
-        userSettingsForm = UserSettingsForm(available_amount=userConfig.available_amount, main_theme=userConfig.main_theme, user_id=userConfig.user_id)
+        userSettingsForm = UserSettingsForm(available_amount=userConfig.available_amount, main_theme=userConfig.main_theme, spend_limit=userConfig.spend_limit, warning_percent=userConfig.warning_percent, hide_amounts=userConfig.hide_amounts, user_id=userConfig.user_id)
 
         # Set hidden user_id to all the Forms in the Dashboard View
         newOperationForm = NewOperationForm(user_id=user.id)
@@ -102,17 +103,38 @@ def dashboard():
         findMonth = Month.query.filter_by(id=month).first()
 
         # Format All the Amounts to Currency
-        formattedAvailableAmount = "$ {:,.2f}".format(userConfig.available_amount)
+        formattedTotalAmount = "$ {:,.2f}".format(userConfig.available_amount)
         formattedSpendAmount = "$ {:,.2f}".format(spendAmount)
+        formattedAvailableAmount = "$ {:,.2f}".format(userConfig.available_amount - spendAmount)
 
         # Calculate Spend Amount Badge Status Color
         spendAmountStatusColor = 'badge-success'
-        if spendAmount >= (userConfig.available_amount * 0.25) and spendAmount < userConfig.available_amount:
+        if userConfig.warning_percent is None:
+            userConfig.warning_percent = 25
+
+        if spendAmount >= (userConfig.available_amount * ( userConfig.warning_percent / 100)) and spendAmount < userConfig.available_amount:
             spendAmountStatusColor = 'badge-warning'
         elif spendAmount >= userConfig.available_amount:
             spendAmountStatusColor = 'badge-danger'
 
-        return render_template('dashboard.html', curDate=datetime.date.today(), month=findMonth.description, user_id=user.id, username=user.username, totalAmount= formattedAvailableAmount, spendAmount=formattedSpendAmount, spendAmountStatusColor=spendAmountStatusColor, operationTypes=operationTypes, operationTypeIcons=operationTypeIcons, operationTypeIconsColor=operationTypeIconsColor, operations=operations, form=filterForm, form2=newOperationForm, form3=editOperationForm, form4=userSettingsForm)
+        return render_template('dashboard.html',
+                                    curDate=datetime.date.today(),
+                                    month=findMonth.description,
+                                    user_id=user.id,
+                                    username=user.username,
+                                    totalAmount=formattedTotalAmount,
+                                    spendAmount=formattedSpendAmount,
+                                    spendAmountStatusColor=spendAmountStatusColor,
+                                    availableAmount=formattedAvailableAmount,
+                                    hideAmounts=userConfig.hide_amounts,
+                                    operationTypes=operationTypes,
+                                    operationTypeIcons=operationTypeIcons,
+                                    operationTypeIconsColor=operationTypeIconsColor,
+                                    operations=operations,
+                                    form=filterForm,
+                                    form2=newOperationForm,
+                                    form3=editOperationForm,
+                                    form4=userSettingsForm)
 
     elif request.method == 'POST':
         filterForm = FiltersForm()
@@ -135,8 +157,11 @@ def dashboard():
             userConfig = UserConfiguration.query.filter_by(user_id=userSettingsForm.user_id.data).first()
 
             # Update the fields with the current values
-            userConfig.available_amount = float(userSettingsForm.available_amount.data.replace("$","").replace(",",""))
+            userConfig.available_amount = float(userSettingsForm.available_amount.data.replace("$","").replace(",", ""))
             userConfig.main_theme = userSettingsForm.main_theme.data
+            userConfig.spend_limit = float(userSettingsForm.spend_limit.data.replace("$", "").replace(",", ""))
+            userConfig.warning_percent = int(userSettingsForm.warning_percent.data)
+            userConfig.hide_amounts = userSettingsForm.hide_amounts.data
 
             db.session.commit()
             
@@ -157,14 +182,21 @@ def new_operation():
         # Parse amount string to decimal
         convertedAmount = float(formOperation.amount.data.replace("$","").replace(",",""))
 
-        # Save operation in DB
-        operation = Operation(description= formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data)
-        
-        db.session.add(operation)
-        db.session.commit()
+        # Search User Configuration to verify Spend Limit
+        userConfig = UserConfiguration.query.filter_by(user_id=formOperation.user_id.data).first()
 
-        flash('La operación fue creada con éxito!', category="alert-success")
-        return redirect(url_for('main.dashboard'))
+        if userConfig.spend_limit != 0 and convertedAmount > userConfig.spend_limit:
+                flash('El gasto supera el límite establecido en la configuración.', category="alert-danger")
+                return redirect(url_for('main.dashboard'))
+        else:
+            # Save operation in DB
+            operation = Operation(description= formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data)
+            
+            db.session.add(operation)
+            db.session.commit()
+
+            flash('La operación fue creada con éxito!', category="alert-success")
+            return redirect(url_for('main.dashboard'))
     
     flash('Hubo un problema al crear la operación', category="alert-danger")
     return redirect(url_for('main.dashboard', form2=formOperation, showNewModal=True))
@@ -177,19 +209,29 @@ def update_operation(id):
     editOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
 
     if editOperationForm.validate():
-        # Search the edited operation from DB to update it
-        edit_operation = Operation.query.filter_by(id=id).first()
+        # Parse amount string to decimal
+        convertedAmount = float(editOperationForm.amount.data.replace("$","").replace(",",""))
 
-        # Update the fields
-        edit_operation.description = editOperationForm.description.data
-        edit_operation.date = editOperationForm.date.data
-        edit_operation.amount = float(editOperationForm.amount.data.replace("$","").replace(",",""))
-        edit_operation.type_id = editOperationForm.type_id.data
+        # Search User Configuration to verify Spend Limit
+        userConfig = UserConfiguration.query.filter_by(user_id=editOperationForm.user_id.data).first()
 
-        db.session.commit()
+        if userConfig.spend_limit != 0 and convertedAmount > userConfig.spend_limit:
+                flash('El gasto supera el límite establecido en la configuración.', category="alert-danger")
+                return redirect(url_for('main.dashboard'))
+        else:
+            # Search the edited operation from DB to update it
+            edit_operation = Operation.query.filter_by(id=id).first()
 
-        flash('La operación fue actualizada con éxito', category='alert-success')
-        return redirect(url_for('main.dashboard'))
+            # Update the fields
+            edit_operation.description = editOperationForm.description.data
+            edit_operation.date = editOperationForm.date.data
+            edit_operation.amount = convertedAmount
+            edit_operation.type_id = editOperationForm.type_id.data
+
+            db.session.commit()
+
+            flash('La operación fue actualizada con éxito', category='alert-success')
+            return redirect(url_for('main.dashboard'))
 
     flash('Hubo un problema al actualizar la operación', category='alert-danger')
     return redirect(url_for('main.dashboard'))

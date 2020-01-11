@@ -17,8 +17,10 @@ def create_app(config=None):
 
     if os.environ.get('FLASK_ENV') == 'production':
         app.config.from_object('config.ProductionConfig')
-    else:
+    elif os.environ.get('FLASK_ENV') == 'development':
         app.config.from_object('config.DevConfig')
+    else:
+        app.config.from_object('config.TestConfig')
 
     #ORM to Manage DB Models
     db.init_app(app)
@@ -46,5 +48,8 @@ def create_app(config=None):
 
     from app.views.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
+
+    from app.views.error import errors as errors_blueprint
+    app.register_blueprint(errors_blueprint)
 
     return app

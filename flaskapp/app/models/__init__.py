@@ -10,9 +10,6 @@ class User(UserMixin, db.Model):
     username = Column(String(25), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
-    totalAmount = Column(Integer, nullable=False)
-    spendLimit = Column(Float)
-    warningPercent = Column(Integer)
     operations = relationship('Operation', backref='user', lazy=True)
     configuration = relationship('UserConfiguration', backref='user', lazy=True)
 
@@ -20,7 +17,11 @@ class UserConfiguration(db.Model):
     id = Column(Integer, primary_key=True)
     available_amount = Column(Float, nullable=False)
     main_theme = Column(Boolean)
+    spend_limit = Column(Float)
+    warning_percent = Column(Integer)
+    hide_amounts = Column(Boolean)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+
 
 class Operation(db.Model):
     id = Column(Integer, primary_key=True)

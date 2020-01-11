@@ -1,10 +1,9 @@
 document.body.firstElementChild.tabIndex = 1
-
-/**
- * *******************************
- * AMOUNT INPUTS AND LABELS FORMAT
- * *******************************
- */
+    /**
+     * *******************************
+     * AMOUNT INPUTS AND LABELS FORMAT
+     *********************************
+     */
 
 $("input[data-type='currency']").on({
     keyup: function() {
@@ -126,6 +125,13 @@ $('#operations_table').DataTable({
 $(window).on({
     load: function() {
         changeResponsiveElements($(this));
+        $('.lds-dual-ring').show();
+        setTimeout(
+            () => {
+                $('.lds-dual-ring').hide();
+            },
+            950
+        );
     },
     resize: function() {
         changeResponsiveElements($(this));
@@ -134,6 +140,8 @@ $(window).on({
 
 function changeResponsiveElements(window) {
     if (window.width() < 768) {
+        $('#mobileTitle').removeClass('d-none');
+        $('#mobileTitle').addClass('d-block');
         $('.homeChoicesRow').removeClass('mr-5');
         $('.homeChoicesRow').addClass('pl-4');
         $('#monthInfoTitle').removeClass('col-4');
@@ -154,7 +162,11 @@ function changeResponsiveElements(window) {
         $('.iconRow').addClass('justify-content-end');
         $('.iconContent').removeClass('col-4');
         $('.iconContent').addClass('col-2');
+        $('.customDashboardAmountSeparator').removeClass('d-none');
+        $('.customDashboardAmountSeparator').addClass('d-block');
     } else {
+        $('#mobileTitle').removeClass('d-block');
+        $('#mobileTitle').addClass('d-none');
         $('.homeChoicesRow').addClass('mr-5');
         $('.homeChoicesRow').removeClass('pl-4');
         $('#monthInfoTitle').removeClass('col-6');
@@ -175,5 +187,9 @@ function changeResponsiveElements(window) {
         $('.iconRow').addClass('justify-content-center');
         $('.iconContent').removeClass('col-2');
         $('.iconContent').addClass('col-4');
+        $('.customDashboardAmountCols').removeClass('col-6');
+        $('.customDashboardAmountCols').addClass('col-4');
+        $('.customDashboardAmountSeparator').removeClass('d-block');
+        $('.customDashboardAmountSeparator').addClass('d-none');
     }
 }

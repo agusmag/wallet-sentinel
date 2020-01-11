@@ -1,10 +1,13 @@
 {% extends 'layout.html' %} {% block content %}
 
-<div class="row mb-5">
+<div class="row mb-5 mt-5">
     <div class="mx-auto">
-        <div class="card mt-4" style="width: 18rem;">
-            <img src="../static/assets/matrix_hunter.png" class="card-img-top" alt="Logo">
+        <div class="card mt-5 mb-1" style="width: 18rem;">
             <div class="card-body">
+                <h2 class="card-title">Login</h2>
+                <h2 class="mb-3">
+                    <i class="far fa-arrow-alt-circle-right 5x"></i>
+                </h2>
                 {% with messages = get_flashed_messages() %} {% if messages %}
                 <div class="alert alert-danger" role="alert">
                     {{ messages[0] }}
@@ -32,6 +35,9 @@
                     <input type="submit" class="btn btn-primary" name="login" value="Ingresar">
                 </form>
             </div>
+        </div>
+        <div class="card-footer">
+            <p>¿No tenés cuenta? Registrate <a href="/signup" class="text-info">acá</a>.</p>
         </div>
     </div>
 </div>
