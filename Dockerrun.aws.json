@@ -1,110 +1,23 @@
 {
     "AWSEBDockerrunVersion": 2,
-    "volumes": [{
-            "name": "home-ec2-user-certs",
-            "host": {
-                "sourcePath": "/home/ec2-user/certs"
-            }
-        },
-        {
-            "name": "etc-nginx-vhost-d",
-            "host": {
-                "sourcePath": "/etc/nginx/vhost.d"
-            }
-        },
-        {
-            "name": "usr-share-nginx-html",
-            "host": {
-                "sourcePath": "/usr/share/nginx/html"
-            }
-        },
-        {
-            "name": "var-run-docker-sock",
-            "host": {
-                "sourcePath": "/var/run/docker.sock"
-            }
-        }
-    ],
     "containerDefinitions": [{
-            "name": "nginx-proxy",
-            "image": "jwilder/nginx-proxy",
-            "essential": true,
-            "memoryReservation": 128,
-            "dockerLabels": {
-                "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy": "true"
-            },
-            "portMappings": [{
-                    "containerPort": 80,
-                    "hostPort": 80
-                },
-                {
-                    "containerPort": 443,
-                    "hostPort": 443
-                }
-            ],
-            "links": ["flaskapp"],
-            "mountPoints": [{
-                    "sourceVolume": "home-ec2-user-certs",
-                    "containerPath": "/etc/nginx/certs",
-                    "readOnly": true
-                },
-                {
-                    "sourceVolume": "etc-nginx-vhost-d",
-                    "containerPath": "/etc/nginx/vhost.d"
-                },
-                {
-                    "sourceVolume": "usr-share-nginx-html",
-                    "containerPath": "/usr/share/nginx/html"
-                },
-                {
-                    "sourceVolume": "var-run-docker-sock",
-                    "containerPath": "/tmp/docker.sock",
-                    "readOnly": true
-                }
-            ]
-        },
-        {
-            "name": "letsencrypt-nginx-proxy-companion",
-            "image": "jrcs/letsencrypt-nginx-proxy-companion",
-            "essential": false,
-            "memoryReservation": 64,
-            "volumesFrom": [{
-                "sourceContainer": "nginx-proxy"
-            }],
-            "mountPoints": [{
-                    "sourceVolume": "home-ec2-user-certs",
-                    "containerPath": "/etc/nginx/certs"
-                },
-                {
-                    "sourceVolume": "var-run-docker-sock",
-                    "containerPath": "/var/run/docker.sock",
-                    "readOnly": true
-                }
-            ]
-        },
-        {
             "name": "flaskapp",
             "image": "agustinmag/flask-client",
             "hostname": "flask",
             "essential": false,
-            "memory": 128,
-            "environment": [{
-                    "name": "VIRTUAL_HOST",
-                    "value": "mywalletsentinel.com,www.mywalletsentinel.com"
-                },
-                {
-                    "name": "VIRTUAL_PROTO",
-                    "value": "uwsgi"
-                },
-                {
-                    "name": "LETSENCRYPT_HOST",
-                    "value": "mywalletsentinel.com,www.mywalletsentinel.com"
-                },
-                {
-                    "name": "LETSENCRYPT_EMAIL",
-                    "value": "mywalletsentinel@gmail.com"
-                }
-            ]
+            "memory": 128
+        },
+        {
+            "name": "nginx",
+            "image": "agustinmag/flask-nginx",
+            "hostname": "nginx",
+            "essential": true,
+            "portMappings": [{
+                "hostPort": 80,
+                "containerPort": 80
+            }],
+            "links": ["flaskapp"],
+            "memory": 128
         }
     ]
 }
