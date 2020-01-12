@@ -47,7 +47,7 @@ body {
     border: none !important;
 }
 
-.active {
+#navbarNavAltMarkup .active {
     border-bottom: 3px solid rgb(11, 168, 63) !important;
 }
 
