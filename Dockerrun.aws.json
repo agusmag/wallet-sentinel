@@ -1,6 +1,5 @@
 {
     "AWSEBDockerrunVersion": 2,
-
     "volumes": [{
             "name": "home-ec2-user-certs",
             "host": {
@@ -101,6 +100,19 @@
                     "value": "mywalletsentinel@gmail.com"
                 }
             ]
+        },
+        {
+            "name": "nginx",
+            "image": "agustinmag/flask-nginx",
+            "hostname": "nginx",
+            "essential": true,
+            "portMappings": [{
+                "hostPort": 80,
+                "containerPort": 80
+            }],
+            "links": ["flaskapp"],
+            "memory": 128
         }
+
     ]
 }
