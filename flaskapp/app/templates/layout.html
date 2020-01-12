@@ -22,16 +22,16 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary" id="customNavBar">
         <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='assets/wallet_sentinel_logo_v2.png')}}" alt="Wallet Logo" style="width: 75px; height: 75px;"></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                              <span class="navbar-toggler-icon"></span>
-                            </button>
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav mr-auto">
-                <a class="nav-item nav-link text-center" href="/home/dashboard">Dashboard</a>
+                <a class="{{ 'active nav-item nav-link text-center customNavBarLinks' if active_page == 'dashboard' else 'nav-item nav-link text-center customNavBarLinks' }}" href="/home/dashboard">Dashboard</a>
                 <!-- <a class="nav-item nav-link" href="/home/statistics">Estadísticas</a> -->
-                <a class="nav-item nav-link text-center" href="#" data-toggle="modal" data-target="#userSettingsModal" id="openUserConfig">Configuración</a>
-                <a class="nav-item nav-link text-center" href="/logout">Logout</a>
+                <a class="nav-item nav-link text-center customNavBarLinks" href="#" data-toggle="modal" data-target="#userSettingsModal" id="openUserConfig">Configuración</a>
+                <a class="nav-item nav-link text-center customNavBarLinks" href="/logout">Logout</a>
             </div>
-            <div class="my-lg-0 text-center">
+            <div id="currentUserNav" class="my-lg-0 text-center">
                 <a class="nav-item text-center"><i class="fas fa-user mr-3"></i>Hola! <strong>{{ current_user.username }}</strong></a>
             </div>
         </div>

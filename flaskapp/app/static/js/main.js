@@ -100,6 +100,9 @@ $('#operations_table').DataTable({
         [5, 10, 25, 50, -1],
         [5, 10, 25, 50, "All"]
     ],
+    "initComplete": function(settings, json) {
+        $('#loadingSpinner2').hide();
+    },
     "language": {
         "lengthMenu": "Mostrar _MENU_ registros por página",
         "zeroRecords": "No se han encontrado registros",
@@ -125,21 +128,25 @@ $('#operations_table').DataTable({
 $(window).on({
     load: function() {
         changeResponsiveElements($(this));
-        $('.lds-dual-ring').show();
-        setTimeout(
-            () => {
-                $('.lds-dual-ring').hide();
-            },
-            950
-        );
     },
     resize: function() {
         changeResponsiveElements($(this));
     }
 });
 
+$(document).ready(function() {
+    $(function() {
+        $('[data-toggle="popover"]').popover({
+            trigger: 'focus'
+        })
+
+        $("#loadingSpinner").hide()
+    })
+});
+
 function changeResponsiveElements(window) {
-    if (window.width() < 768) {
+    if (window.width() <= 768) {
+        $('#currentUserNav').addClass('mt-4 mb-2');
         $('#mobileTitle').removeClass('d-none');
         $('#mobileTitle').addClass('d-block');
         $('.homeChoicesRow').removeClass('mr-5');
@@ -164,7 +171,10 @@ function changeResponsiveElements(window) {
         $('.iconContent').addClass('col-2');
         $('.customDashboardAmountSeparator').removeClass('d-none');
         $('.customDashboardAmountSeparator').addClass('d-block');
+        $('[data-toggle="popover"]').removeAttr("data-placement");
+        $('[data-toggle="popover"]').attr("data-placement", "bottom");
     } else {
+        $('#currentUserNav').removeClass('mt-4 mb-2');
         $('#mobileTitle').removeClass('d-block');
         $('#mobileTitle').addClass('d-none');
         $('.homeChoicesRow').addClass('mr-5');
@@ -191,5 +201,7 @@ function changeResponsiveElements(window) {
         $('.customDashboardAmountCols').addClass('col-4');
         $('.customDashboardAmountSeparator').removeClass('d-block');
         $('.customDashboardAmountSeparator').addClass('d-none');
+        $('[data-toggle="popover"]').removeAttr("data-placement");
+        $('[data-toggle="popover"]').attr("data-placement", "right");
     }
 }
