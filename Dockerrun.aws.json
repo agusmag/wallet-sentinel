@@ -40,7 +40,7 @@
                 },
                 {
                     "sourceVolume": "letsenctrypt_cert",
-                    "containerPath": "/etc/letsencrypt/live/"
+                    "containerPath": "/usr/certs/"
                 }
             ],
             "links": ["flaskapp"],
