@@ -40,7 +40,7 @@
                 },
                 {
                     "sourceVolume": "letsenctrypt_cert",
-                    "containerPath": "/usr/certs/"
+                    "containerPath": "/"
                 }
             ],
             "links": ["flaskapp"],
