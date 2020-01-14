@@ -3,7 +3,7 @@
     "volumes": [{
         "name": "cert",
         "host": {
-            "sourcePath": "/etc/letsencrypt/live"
+            "sourcePath": "/etc/letsencrypt/live/mywalletsentinel.com"
         }
     }],
     "containerDefinitions": [{
@@ -31,7 +31,7 @@
             "links": ["flaskapp"],
             "mountPoints": [{
                 "sourceVolume": "cert",
-                "containerPath": "/etc/nginx/certs",
+                "containerPath": "/etc/nginx/ssl",
                 "readOnly": true
             }]
         }
