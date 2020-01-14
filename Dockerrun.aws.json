@@ -1,5 +1,11 @@
 {
     "AWSEBDockerrunVersion": 2,
+    "volumes": [{
+        "name": "cert",
+        "host": {
+            "sourcePath": "/etc/letsencrypt/live"
+        }
+    }],
     "containerDefinitions": [{
             "name": "flaskapp",
             "image": "agustinmag/flask-client",
@@ -11,6 +17,7 @@
             "name": "nginx",
             "image": "agustinmag/flask-nginx",
             "hostname": "nginx",
+            "memory": 128,
             "essential": true,
             "portMappings": [{
                     "hostPort": 80,
@@ -22,7 +29,11 @@
                 }
             ],
             "links": ["flaskapp"],
-            "memory": 128
+            "mountPoints": [{
+                "sourceVolume": "cert",
+                "containerPath": "/certs",
+                "readOnly": true
+            }]
         }
     ]
 }
