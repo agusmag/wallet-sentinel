@@ -3,7 +3,7 @@
     "volumes": [{
             "name": "cert",
             "host": {
-                "sourcePath": "/etc/letsencrypt/live/"
+                "sourcePath": "/etc/letsencrypt"
             }
         },
         {
@@ -38,11 +38,11 @@
             "links": ["flaskapp"],
             "mountPoints": [{
                     "sourceVolume": "cert",
-                    "containerPath": "/etc/nginx/ssl"
+                    "containerPath": "/etc/letsencrypt"
                 },
                 {
                     "sourceVolume": "dhparams",
-                    "containerPath": "/etc/nginx/dhparams"
+                    "containerPath": "/etc/pki/nginx"
                 }
             ]
         }
