@@ -1,11 +1,18 @@
 {
     "AWSEBDockerrunVersion": 2,
     "volumes": [{
-        "name": "cert",
-        "host": {
-            "sourcePath": "/etc/letsencrypt/live/mywalletsentinel.com"
+            "name": "cert",
+            "host": {
+                "sourcePath": "/etc/letsencrypt/live/"
+            }
+        },
+        {
+            "name": "dhparams",
+            "host": {
+                "sourcePath": "/etc/pki/nginx"
+            }
         }
-    }],
+    ],
     "containerDefinitions": [{
             "name": "flaskapp",
             "image": "agustinmag/flask-client",
@@ -30,10 +37,14 @@
             ],
             "links": ["flaskapp"],
             "mountPoints": [{
-                "sourceVolume": "cert",
-                "containerPath": "/etc/nginx/ssl",
-                "readOnly": true
-            }]
+                    "sourceVolume": "cert",
+                    "containerPath": "/etc/nginx/ssl"
+                },
+                {
+                    "sourceVolume": "dhparams",
+                    "containerPath": "/etc/nginx/dhparams"
+                }
+            ]
         }
     ]
 }
