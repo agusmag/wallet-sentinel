@@ -1,7 +1,8 @@
 # Wallet-Sentinel
-Finantial App to manage Monthly Cash-in / Cash-out
+[![Build Status](https://travis-ci.org/agusmag/wallet-sentinel.svg?branch=master)](https://travis-ci.org/agusmag/wallet-sentinel)
 
-*http://mywalletsentinel.com* [![Build Status](https://travis-ci.org/agusmag/wallet-sentinel.svg?branch=master)](https://travis-ci.org/agusmag/wallet-sentinel)
+Finantial App to manage Monthly Cash-in / Cash-out
+*https://mywalletsentinel.com* 
 
 ## Learned/Enhanced Tecnologies
 * Python
