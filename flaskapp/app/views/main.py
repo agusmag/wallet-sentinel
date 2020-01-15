@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, Markup, redirect, url_for, flash, request, session
 from flask_login import login_required, current_user
+from sqlalchemy import extract
 import datetime, calendar, json, locale
 
 # Forms
@@ -16,12 +17,12 @@ main = Blueprint('main', __name__)
 operationTypeIcons = [
     "fas fa-tshirt", "fas fa-hamburger", "fas fa-file-invoice-dollar", "fas fa-gift",
     "fas fa-laptop", "fas fa-couch", "fas fa-gas-pump", "fas fa-money-check-alt", "fas fa-eye",
-    "fas fa-bath", "fas fa-bus", "fas fa-suitcase-rolling"
+    "fas fa-bath", "fas fa-bus", "fas fa-suitcase-rolling", "fas fa-gamepad", "fas fa-list-ul", "fas fa-money-bill-wave", "fab fa-untappd"
 ]
 
 operationTypeIconsColor = [
     "tshirt", "hamburger", "file-invoice-dollar", "gift", "laptop",
-    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling"
+    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling", "gamepad", "list-ul", "money-bill-wave", "untappd"
 ]
 
 @main.route('/')
@@ -36,11 +37,11 @@ def home():
 @login_required
 def dashboard():
     if request.method == 'GET':
-         # Calculate current month
-        month = datetime.date.today().month
-
         # Fill Filter Fields with current date and None for Operation_Type
+        month = datetime.date.today().month
+        year = datetime.date.today().year
         filter_month_id = month
+        filter_year = year
         filter_type_id = 0
         
         # Check for cookies values from preview dashboard filter POST
@@ -50,11 +51,14 @@ def dashboard():
 
             if messages.get('month_id') is not None:
                 filter_month_id = messages.get('month_id')
+
+            if messages.get('year') is not None:
+                filter_year = messages.get('year')
             
             if messages.get('type_id') is not None:
                 filter_type_id = messages.get('type_id')
 
-        filterForm = FiltersForm(month_id=filter_month_id, type_id=filter_type_id)
+        filterForm = FiltersForm(month_id=filter_month_id, year=year - filter_year, type_id=filter_type_id)
         
         # Get User Data
         user = User.query.filter_by(username=current_user.username).first()
@@ -63,7 +67,7 @@ def dashboard():
         userConfig = UserConfiguration.query.filter_by(user_id=user.id).first()
 
         # Set User Settings to UserSettingsForm
-        userSettingsForm = UserSettingsForm(available_amount=userConfig.available_amount, main_theme=userConfig.main_theme, spend_limit=userConfig.spend_limit, warning_percent=userConfig.warning_percent, hide_amounts=userConfig.hide_amounts, user_id=userConfig.user_id)
+        userSettingsForm = UserSettingsForm(spend_limit=userConfig.spend_limit, warning_percent=userConfig.warning_percent, hide_amounts=userConfig.hide_amounts, user_id=userConfig.user_id)
 
         # Set hidden user_id to all the Forms in the Dashboard View
         newOperationForm = NewOperationForm(user_id=user.id)
@@ -72,6 +76,10 @@ def dashboard():
         # Set DataTypes to all the Selects of EveryForm in Dashboard View
         filterForm.month_id.choices = [(m.id, m.description) for m in Month.query.order_by('id')]
         filterForm.month_id.choices.insert(0, ('0', 'Todos'))
+
+        year = datetime.datetime.today().year
+        yearList = list(range(year, year - 21, -1))
+        filterForm.year.choices = [(index, description) for index, description in enumerate(yearList, start=0)]
         
         filterForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
         filterForm.type_id.choices.insert(0, ('0', 'Todos'))
@@ -79,22 +87,26 @@ def dashboard():
         newOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
         editOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
 
-        # Calculate SpendAmount ( user.totalAmount - SUM(user.operations.amount))
+        # Get Operation (Gained and Spend) by filter
         operations = None
         if filter_month_id != 0 and filter_type_id != 0:
-            currentYear = datetime.date.today().year
-            formatDate = datetime.datetime(currentYear, filter_month_id, calendar.monthrange(currentYear, filter_month_id)[1])
-            operations = Operation.query.filter(Operation.user_id == user.id, Operation.date <= formatDate, Operation.type_id == filter_type_id)
+            formatDateStart = datetime.datetime(filter_year, filter_month_id, 1)
+            formatDateEnd = datetime.datetime(filter_year, filter_month_id, calendar.monthrange(filter_year, filter_month_id)[1])
+            operations = Operation.query.filter(Operation.user_id == user.id, Operation.date <= formatDateEnd, Operation.date >= formatDateStart, Operation.type_id == filter_type_id)
         elif filter_month_id != 0 and filter_type_id == 0:
-            currentYear = datetime.date.today().year
-            formatDate = datetime.datetime(currentYear, filter_month_id, calendar.monthrange(currentYear, filter_month_id)[1])
-            operations = Operation.query.filter(Operation.user_id == user.id, Operation.date <= formatDate)
+            formatDateStart = datetime.datetime(filter_year, filter_month_id, 1)
+            formatDateEnd = datetime.datetime(filter_year, filter_month_id, calendar.monthrange(filter_year, filter_month_id)[1])
+            operations = Operation.query.filter(Operation.user_id == user.id, Operation.date <= formatDateEnd, Operation.date >= formatDateStart)
         elif filter_month_id == 0 and filter_type_id != 0:
-            operations = Operation.query.filter(Operation.user_id == user.id, Operation.type_id == filter_type_id)
+            operations = Operation.query.filter(Operation.user_id == user.id, Operation.type_id == filter_type_id, extract('year', Operation.date) == filter_year)
         else:
-            operations = Operation.query.filter_by(user_id=user.id)
+            operations = Operation.query.filter(Operation.user_id == user.id, extract('year', Operation.date) == filter_year)
 
-        spendAmount = sum(operation.amount for operation in operations)
+        # Calculate gainedAmount ( SUM(user.operations.amount type == Ganancia ))
+        gainedAmount = sum(operation.amount for operation in operations if operation.type_id == 15)
+        
+        # Calculate SpendAmount ( gainedAmount - SUM(user.operations.amount type != Ganancia ))
+        spendAmount = sum(operation.amount for operation in operations if operation.type_id != 15)
 
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
@@ -103,18 +115,18 @@ def dashboard():
         findMonth = Month.query.filter_by(id=month).first()
 
         # Format All the Amounts to Currency
-        formattedTotalAmount = "$ {:,.2f}".format(userConfig.available_amount)
+        formattedTotalAmount = "$ {:,.2f}".format(gainedAmount)
         formattedSpendAmount = "$ {:,.2f}".format(spendAmount)
-        formattedAvailableAmount = "$ {:,.2f}".format(userConfig.available_amount - spendAmount)
+        formattedAvailableAmount = "$ {:,.2f}".format(gainedAmount - spendAmount)
 
         # Calculate Spend Amount Badge Status Color
         spendAmountStatusColor = 'badge-success'
         if userConfig.warning_percent is None:
             userConfig.warning_percent = 25
 
-        if spendAmount >= (userConfig.available_amount * ( userConfig.warning_percent / 100)) and spendAmount < userConfig.available_amount:
+        if spendAmount >= (gainedAmount * ( userConfig.warning_percent / 100)) and spendAmount < gainedAmount:
             spendAmountStatusColor = 'badge-warning'
-        elif spendAmount >= userConfig.available_amount:
+        elif spendAmount >= gainedAmount:
             spendAmountStatusColor = 'badge-danger'
 
         return render_template('dashboard.html',
@@ -142,13 +154,17 @@ def dashboard():
         # Set DataTypes to all the Selects of EveryForm in Dashboard View
         filterForm.month_id.choices = [(m.id, m.description) for m in Month.query.order_by('id')]
         filterForm.month_id.choices.insert(0, ('0', 'Todos'))
+
+        year = datetime.datetime.today().year
+        yearList = list(range(year, year - 21, -1))
+        filterForm.year.choices = [(index, description) for index, description in enumerate(yearList, start=0)]
         
         filterForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
         filterForm.type_id.choices.insert(0, ('0', 'Todos'))
 
         userSettingsForm = UserSettingsForm()
 
-        if filterForm.type_id.data != 0 and filterForm.month_id.data != 0:
+        if filterForm.type_id.data != 0 and filterForm.year.data != 0 and filterForm.month_id.data != 0:
             if not filterForm.is_submitted() or not filterForm.validate():
                 flash('Los valores de los filtros son incorrectos', category="alert-danger")
 
@@ -157,8 +173,6 @@ def dashboard():
             userConfig = UserConfiguration.query.filter_by(user_id=userSettingsForm.user_id.data).first()
 
             # Update the fields with the current values
-            userConfig.available_amount = float(userSettingsForm.available_amount.data.replace("$","").replace(",", ""))
-            userConfig.main_theme = userSettingsForm.main_theme.data
             userConfig.spend_limit = float(userSettingsForm.spend_limit.data.replace("$", "").replace(",", ""))
             userConfig.warning_percent = int(userSettingsForm.warning_percent.data)
             userConfig.hide_amounts = userSettingsForm.hide_amounts.data
@@ -167,7 +181,7 @@ def dashboard():
             
             flash('La configuración fue actualizada con éxito', category='alert-success')
         
-        messages = json.dumps({'month_id': filterForm.month_id.data, 'type_id': filterForm.type_id.data})
+        messages = json.dumps({'month_id': filterForm.month_id.data,'year': datetime.datetime.today().year - filterForm.year.data, 'type_id': filterForm.type_id.data})
         
         return redirect(url_for('main.dashboard', messages=messages))
 
@@ -185,7 +199,7 @@ def new_operation():
         # Search User Configuration to verify Spend Limit
         userConfig = UserConfiguration.query.filter_by(user_id=formOperation.user_id.data).first()
 
-        if userConfig.spend_limit != 0 and convertedAmount > userConfig.spend_limit:
+        if userConfig.spend_limit != 0 and convertedAmount > userConfig.spend_limit and formOperation.type_id.data != 15:
                 flash('El gasto supera el límite establecido en la configuración.', category="alert-danger")
                 return redirect(url_for('main.dashboard'))
         else:
