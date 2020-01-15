@@ -145,7 +145,7 @@ body {
 }
 
 .icon-color-hamburger {
-    background-color: rgb(11, 168, 63);
+    background-color: rgb(8, 133, 50);
 }
 
 .icon-color-file-invoice-dollar {
@@ -161,7 +161,7 @@ body {
 }
 
 .icon-color-couch {
-    background-color: rgb(139, 63, 0);
+    background-color: rgb(167, 75, 0);
 }
 
 .icon-color-gas-pump {
@@ -181,11 +181,27 @@ body {
 }
 
 .icon-color-bus {
-    background-color: rgb(1, 109, 67);
+    background-color: rgb(41, 136, 99);
 }
 
 .icon-color-suitcase-rolling {
     background-color: coral;
+}
+
+.icon-color-gamepad {
+    background-color: rgb(0, 217, 255);
+}
+
+.icon-color-list-ul {
+    background-color: rgb(94, 50, 15);
+}
+
+.icon-color-money-bill-wave {
+    background-color: rgb(77, 209, 0);
+}
+
+.icon-color-untappd {
+    background-color: rgb(255, 80, 168);
 }
 
 

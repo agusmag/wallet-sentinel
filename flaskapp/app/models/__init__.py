@@ -15,8 +15,6 @@ class User(UserMixin, db.Model):
 
 class UserConfiguration(db.Model):
     id = Column(Integer, primary_key=True)
-    available_amount = Column(Float, nullable=False)
-    main_theme = Column(Boolean)
     spend_limit = Column(Float)
     warning_percent = Column(Integer)
     hide_amounts = Column(Boolean)

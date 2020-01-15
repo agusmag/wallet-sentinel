@@ -35,9 +35,6 @@ class LoginForm(FlaskForm):
     ])
 
 class UserSettingsForm(FlaskForm):
-    #'pattern':'^\$\d{1,3}(,\d{3})*(\.\d+)?$', 'data-type': 'currency', 
-    available_amount = StringField('Monto Disponible', validators=[ InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
-    main_theme = BooleanField('Apecto Oscuro', validators=[ Optional()], default="checked", render_kw={"data-toggle": "toggle", "data-onstyle": "success", "data-offstyle": "default"})
     spend_limit = StringField('Límite por Compra', validators=[ Optional()], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
     warning_percent = StringField('Porcentaje de advertencia', validators=[ Optional()])
     hide_amounts = BooleanField('Difuminar Totales', validators=[ Optional()], id="user_cfg_hide_amt", render_kw={"data-toggle": "toggle", "data-onstyle": "success", "data-offstyle": "default"})
@@ -46,10 +43,13 @@ class UserSettingsForm(FlaskForm):
 class FiltersForm(FlaskForm):
     month_id = SelectField('Mes', coerce=int, validators=[
         Optional()
-    ])
+    ], id="monthIdFilter")
+    year = SelectField('Año', coerce=int, validators=[
+        Optional()
+    ], id="yearFilter")
     type_id = SelectField('Tipo Operación', coerce=int, validators=[
         Optional()
-    ])
+    ], id="opTypeIdFilter")
 
 class NewOperationForm(FlaskForm):
     description = StringField('Descripción', validators=[
@@ -59,7 +59,6 @@ class NewOperationForm(FlaskForm):
     date = DateField('Fecha', validators=[
         InputRequired('Tenés que indicar una fecha')
     ], format='%Y-%m-%d')
-    #'pattern':'^\$\d{1,3}(,\d{3})*(\.\d+)?$', 'data-type': 'currency', 
     amount = StringField('Monto', validators=[InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
     type_id = SelectField('Tipo Operación', coerce=int)
     user_id = HiddenField('User Id') 
