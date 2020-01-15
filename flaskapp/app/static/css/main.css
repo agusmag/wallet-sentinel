@@ -81,7 +81,12 @@ body {
     margin-top: 40px;
 }
 
+#mobileTitle {
+    display: none;
+}
+
 .homeChoicesCol {
+    padding: 0px;
     margin-top: 200px;
     width: 215px;
     height: 275px;
@@ -280,6 +285,9 @@ body {
     }
     #homeTitle {
         display: none;
+    }
+    #mobileTitle {
+        display: block;
     }
     .my-footer {
         display: block;

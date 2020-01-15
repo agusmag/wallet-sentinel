@@ -41,24 +41,30 @@ def dashboard():
         month = datetime.date.today().month
         year = datetime.date.today().year
         filter_month_id = month
-        filter_year = year
+        filter_year_id = 0
         filter_type_id = 0
         
         # Check for cookies values from preview dashboard filter POST
+        print(request.args.get('messages'))
+
         if request.args.get('messages') is not None:
             messages = request.args['messages']
             messages=json.loads(messages)
 
+            print(messages.get('month_id'))
+            print(messages.get('year_id'))
+            print(messages.get('type_id'))
+
             if messages.get('month_id') is not None:
                 filter_month_id = messages.get('month_id')
 
-            if messages.get('year') is not None:
-                filter_year = messages.get('year')
+            if messages.get('year_id') is not None:
+                filter_year_id = messages.get('year_id')
             
             if messages.get('type_id') is not None:
                 filter_type_id = messages.get('type_id')
 
-        filterForm = FiltersForm(month_id=filter_month_id, year=year - filter_year, type_id=filter_type_id)
+        filterForm = FiltersForm(month_id=filter_month_id, year_id=filter_year_id, type_id=filter_type_id)
         
         # Get User Data
         user = User.query.filter_by(username=current_user.username).first()
@@ -77,9 +83,8 @@ def dashboard():
         filterForm.month_id.choices = [(m.id, m.description) for m in Month.query.order_by('id')]
         filterForm.month_id.choices.insert(0, ('0', 'Todos'))
 
-        year = datetime.datetime.today().year
         yearList = list(range(year, year - 21, -1))
-        filterForm.year.choices = [(index, description) for index, description in enumerate(yearList, start=0)]
+        filterForm.year_id.choices = [(index, description) for index, description in enumerate(yearList, start=0)]
         
         filterForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
         filterForm.type_id.choices.insert(0, ('0', 'Todos'))
@@ -89,18 +94,19 @@ def dashboard():
 
         # Get Operation (Gained and Spend) by filter
         operations = None
+        yearFilter = year - filter_year_id
         if filter_month_id != 0 and filter_type_id != 0:
-            formatDateStart = datetime.datetime(filter_year, filter_month_id, 1)
-            formatDateEnd = datetime.datetime(filter_year, filter_month_id, calendar.monthrange(filter_year, filter_month_id)[1])
+            formatDateStart = datetime.datetime(yearFilter, filter_month_id, 1)
+            formatDateEnd = datetime.datetime(yearFilter, filter_month_id, calendar.monthrange(yearFilter, filter_month_id)[1])
             operations = Operation.query.filter(Operation.user_id == user.id, Operation.date <= formatDateEnd, Operation.date >= formatDateStart, Operation.type_id == filter_type_id)
         elif filter_month_id != 0 and filter_type_id == 0:
-            formatDateStart = datetime.datetime(filter_year, filter_month_id, 1)
-            formatDateEnd = datetime.datetime(filter_year, filter_month_id, calendar.monthrange(filter_year, filter_month_id)[1])
+            formatDateStart = datetime.datetime(yearFilter, filter_month_id, 1)
+            formatDateEnd = datetime.datetime(yearFilter, filter_month_id, calendar.monthrange(yearFilter, filter_month_id)[1])
             operations = Operation.query.filter(Operation.user_id == user.id, Operation.date <= formatDateEnd, Operation.date >= formatDateStart)
         elif filter_month_id == 0 and filter_type_id != 0:
-            operations = Operation.query.filter(Operation.user_id == user.id, Operation.type_id == filter_type_id, extract('year', Operation.date) == filter_year)
+            operations = Operation.query.filter(Operation.user_id == user.id, Operation.type_id == filter_type_id, extract('year', Operation.date) == yearFilter)
         else:
-            operations = Operation.query.filter(Operation.user_id == user.id, extract('year', Operation.date) == filter_year)
+            operations = Operation.query.filter(Operation.user_id == user.id, extract('year', Operation.date) == yearFilter)
 
         # Calculate gainedAmount ( SUM(user.operations.amount type == Ganancia ))
         gainedAmount = sum(operation.amount for operation in operations if operation.type_id == 15)
@@ -157,14 +163,15 @@ def dashboard():
 
         year = datetime.datetime.today().year
         yearList = list(range(year, year - 21, -1))
-        filterForm.year.choices = [(index, description) for index, description in enumerate(yearList, start=0)]
+        filterForm.year_id.choices = [(index, description) for index, description in enumerate(yearList, start=0)]
         
+        print(filterForm.year_id.data)
         filterForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
         filterForm.type_id.choices.insert(0, ('0', 'Todos'))
 
         userSettingsForm = UserSettingsForm()
 
-        if filterForm.type_id.data != 0 and filterForm.year.data != 0 and filterForm.month_id.data != 0:
+        if filterForm.type_id.data != 0 and filterForm.month_id.data != 0:
             if not filterForm.is_submitted() or not filterForm.validate():
                 flash('Los valores de los filtros son incorrectos', category="alert-danger")
 
@@ -181,7 +188,7 @@ def dashboard():
             
             flash('La configuración fue actualizada con éxito', category='alert-success')
         
-        messages = json.dumps({'month_id': filterForm.month_id.data,'year': datetime.datetime.today().year - filterForm.year.data, 'type_id': filterForm.type_id.data})
+        messages = json.dumps({'month_id': filterForm.month_id.data,'year_id': filterForm.year_id.data, 'type_id': filterForm.type_id.data})
         
         return redirect(url_for('main.dashboard', messages=messages))
 

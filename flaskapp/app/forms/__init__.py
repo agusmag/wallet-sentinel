@@ -44,7 +44,7 @@ class FiltersForm(FlaskForm):
     month_id = SelectField('Mes', coerce=int, validators=[
         Optional()
     ], id="monthIdFilter")
-    year = SelectField('Año', coerce=int, validators=[
+    year_id = SelectField('Año', coerce=int, validators=[
         Optional()
     ], id="yearFilter")
     type_id = SelectField('Tipo Operación', coerce=int, validators=[
