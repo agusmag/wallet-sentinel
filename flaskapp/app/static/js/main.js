@@ -94,7 +94,7 @@ function formatCurrency(input, blur) {
  * ###########
  */
 
-$('#operations_table').DataTable({
+$('#operations_table_desktop').DataTable({
     searching: false,
     lengthMenu: [
         [5, 10, 25, 50, -1],
@@ -102,6 +102,35 @@ $('#operations_table').DataTable({
     ],
     "initComplete": function(settings, json) {
         $('#loadingSpinner2').hide();
+    },
+    "language": {
+        "lengthMenu": "Mostrar _MENU_ registros por página",
+        "zeroRecords": "No se han encontrado registros",
+        "info": "Página _PAGE_ de _PAGES_",
+        "infoEmpty": "",
+        "infoFiltered": "(filtrado de _MAX_ total registros)",
+        "oPaginate": {
+            "sFirst": "Primero",
+            "sLast": "Último",
+            "sNext": "Siguiente",
+            "sPrevious": "Anterior"
+        }
+    },
+    "dom": '<"row justify-content-start"<"col text-left"l>>rt<"row justify-content-between"<"col text-left"i><"col text-right"p>>'
+});
+
+$('#operations_table_mobile').DataTable({
+    searching: false,
+    ordering: false,
+    lengthMenu: [
+        [5, 10, 25, 50, -1],
+        [5, 10, 25, 50, "All"]
+    ],
+    "initComplete": function(settings, json) {
+        $('#loadingSpinner3').hide();
+    },
+    "drawCallback": function(settings) {
+        $("#operations_table_mobile thead").remove();
     },
     "language": {
         "lengthMenu": "Mostrar _MENU_ registros por página",
@@ -163,7 +192,6 @@ function changeResponsiveElements(window) {
         $('#customOpTypeField').addClass('col');
         $('#customFilterSubmit').removeClass('col-3 align-self-end');
         $('#customFilterSubmit').addClass('col');
-        $('#operations_table').removeClass('table-striped');
         $('.custom-info-buttons').removeClass('mr-3');
         $('.custom-info-buttons').addClass('text-center');
         $('.custom-danger-buttons').addClass('text-center');
@@ -193,7 +221,6 @@ function changeResponsiveElements(window) {
         $('#customOpTypeField').addClass('col-3');
         $('#customFilterSubmit').removeClass('col');
         $('#customFilterSubmit').addClass('col-3 align-self-end');
-        $('#operations_table').addClass('table-striped');
         $('.custom-info-buttons').removeClass('text-center');
         $('.custom-info-buttons').addClass('mr-3');
         $('.custom-danger-buttons').removeClass('text-center');

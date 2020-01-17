@@ -9,7 +9,7 @@
                 <h3 class="text-light">Mes actual <span class="badge badge-info">{{ month }} </span></h3>
             </div>
         </div>
-        <!-- User Amount Data -->
+        <!-- User Data -->
         <div class="row pb-4 justify-content-between customDashboardAmountsHeader">
             <div class="row pb-4">
                 <div class="col">
@@ -29,6 +29,7 @@
                     <h2><span class="badge {{ spendAmountStatusColor }} {% if hideAmounts %} blur-on-lose-focus {% endif %}">{{ spendAmount }}</span></h1>
                 </div>
             </div>
+
             <div class="row pb-4">
                 <div class="col">
                     <h2 class="text-light" id="availableAmountTitle">Disponible</h2>
@@ -38,6 +39,13 @@
                     <h2><span class="badge badge-info {% if hideAmounts %} blur-on-lose-focus {% endif %}">{{ availableAmount }}</span></h2>
                 </div>
             </div>
+        </div>
+
+    </div>
+
+    <div class="row pb-4 mt-4">
+        <div class="col">
+            <button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#userStatisticsModal" style="border-color: #62c462 !important;">Estadísticas</button>
         </div>
     </div>
 
@@ -95,9 +103,9 @@
         </div>
     </div>
 
-    <!-- Operations Table -->
-    <div class="row-full pb-4">
-        <table class="table table-striped table-bordered table-hover order-column" style="width:100%;" id="operations_table">
+    <!-- Operations Table Desktop -->
+    <div id="desktopOperationTable" class="row-full pb-4">
+        <table class="table table-striped table-bordered table-hover order-column" style="width:100%;" id="operations_table_desktop">
             <thead class="thead-light">
                 <tr>
                     <th>Detalle</th>
@@ -112,7 +120,7 @@
                 {% for op in operations %}
                 <tr class="table-dark">
                     <td>{{ op.description }}</td>
-                    <td>$ {{ op.amount }}</td>
+                    <td>{{ "$ {:,.2f}".format(op.amount) }}</td>
                     <td>
                         <div class="row justify-content-center iconRow">
                             <div class="col-6 align-self-center iconLabel">
@@ -202,6 +210,119 @@
         </table>
     </div>
 
+    <div id="mobileOperationTable" class="row-full pb-4 text-center">
+        <table id="operations_table_mobile" class="display" style="width:100%;">
+            <thead>
+                <tr>
+                    <th>Operaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <div id="loadingSpinner3" class="lds-dual-ring"></div>
+                {% for op in operations %}
+                <tr class="table-dark">
+                    <td data-toggle="modal" data-target="#showOperationModal{{loop.index0}}">
+                        <div class="row justify-content-center" style="padding: 10px;">
+                            <div class="col-5 text-right iconContent">
+                                <div class="icon-shape icon-color-{{ operationTypeIconsColor[op.type_id - 1]}}"><i class="{{ operationTypeIcons[op.type_id - 1] }}"></i></div>
+                            </div>
+                            <div class="col-6 text-right">{{ "$ {:,.2f}".format(op.amount) }}</div>
+                        </div>
+                    </td>
+                    <!-- Show Operation Detail Modal -->
+                    <div class="modal fade" id="showOperationModal{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="showOperationTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="showOperationTitle">Detalle Operación</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                </div>
+                                <div class="modal-body">
+                                    <h4>{{ op.description }}</h4>
+                                    <div class="row justify-content-center mb-4">
+                                        <div class="icon-shape icon-color-{{ operationTypeIconsColor[op.type_id - 1]}} text-center"><i class="{{ operationTypeIcons[op.type_id - 1] }}"></i></div>
+                                    </div>
+                                    <p>{{ operationTypes[op.type_id-1].description }}</p>
+                                    <p>{{ op.date.strftime('%d-%m-%Y') }}</p>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editOperationModalMobile{{loop.index0}}">Editar</button>
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteOperationModalMobile{{loop.index0}}">Eliminar</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Modal Mobile-->
+                    <div class="modal fade" id="editOperationModalMobile{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="editOperationMobileTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editOperationMobileTitle">Editar operación</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/home/dashboard/update_operation/{{ op.id }}" method="POST">
+                                        {{ form3.hidden_tag() }}
+                                        <div class="form-group">
+                                            {{ form3.description(class_="form-control", **{"value": op.description }) }}
+                                        </div>
+                                        <div class="form-group">
+                                            {{ form3.date(class_="form-control", **{"value": op.date.strftime('%Y-%m-%d') }) }}
+                                        </div>
+                                        <div class="form-group">
+                                            {{ form3.amount(class_="form-control", **{"value": op.amount }) }}
+                                        </div>
+                                        <div class="form-group">
+                                            <select class="form-control custom-select my-1 mr-sm-2" name="type_id" id="type_id">
+                                        {% for ot in operationTypes %}
+                                            <option value={{ ot.id }} {% if op.type_id == ot.id %}selected{% endif %}>{{ ot.description }}</option>
+                                        {% endfor %}
+                                    </select>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
+                                            <input type="submit" class="btn btn-success" value="Confirmar">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Modal Mobile -->
+                    <div class="modal fade" id="confirmDeleteOperationModalMobile{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="TitleModalMobileLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="TitleModalMobileLabel">Confirmación</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Si confirmas la eliminación se borrará de forma permanente la operación <i><strong>{{ op.description }}</strong></i>. <br> ¿Deseas eliminarla de todas formas?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <form action="/home/dashboard/delete_operation/{{ op.id }}" method="POST">
+                                        <button type="submit" class="btn btn-success">Confirmar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
     <!-- Create Operation Button-->
     <div class="row justify-content-center">
         <button type="button" class="btn btn-success mb-4" data-toggle="modal" data-target="#newOperationModal">Nuevo</button>
@@ -281,6 +402,57 @@
                             <input type="submit" class="btn btn-success" value="Actualizar">
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Statistics Modal -->
+    <div class="modal fade" id="userStatisticsModal" tabindex="-1" role="dialog" aria-labelledby="userStatisticsTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userStatisticsTitle">Estadísticas</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+                <div class="modal-body">
+                    <div class="div" style="padding-left: 10px; padding-right: 10px;">
+                        <div class="row justify-content-between mb-4 alert alert-dark">
+                            <div class="col-4 text-left" style="padding: 0px;">
+                                <strong>CATEGORIA</strong>
+                            </div>
+                            <div class="col-4 text-center" style="padding: 0px;">
+                                <strong>MONTO</strong>
+                            </div>
+                            <div class="col-4 text-right" style="padding: 0px;">
+                                <strong>PORCENTAJE</strong>
+                            </div>
+                        </div>
+                        {% for ops in operationStatistics %}
+                        <div id="iterationStatisticsTable" class="row justify-content-between mb-2 alert alert-{% if ops[2] == 0 %}secondary{% endif %}{% if ops[2] > 0 and ops[2] < 30 %}success{% endif %}{% if ops[2] >= 30 and ops[2] < 60 %}warning{% endif %}{% if ops[2] >= 60 %}danger{% endif %}"
+                            style="color: black; padding: 0px">
+                            <div class="col-4 text-left">
+                                {{ ops[0] }}
+                            </div>
+                            <div class="col-5 text-left">
+                                {{ " $ {:,.2f}".format(ops[1]) }}
+                            </div>
+                            <div class="col-3 text-right">
+                                {{ "{:05.2f} %".format(ops[2]) }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="row justify-content-center mt-4 alert alert-info" style="color: black; padding: 0px;">
+                            <div class="col-6 text-left"><strong>{{ spendAmount }}</strong></div>
+                            <div class="col-4 text-right"><strong>100.00 %</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
+                    </div>
                 </div>
             </div>
         </div>

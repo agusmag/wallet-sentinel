@@ -45,15 +45,9 @@ def dashboard():
         filter_type_id = 0
         
         # Check for cookies values from preview dashboard filter POST
-        print(request.args.get('messages'))
-
         if request.args.get('messages') is not None:
             messages = request.args['messages']
             messages=json.loads(messages)
-
-            print(messages.get('month_id'))
-            print(messages.get('year_id'))
-            print(messages.get('type_id'))
 
             if messages.get('month_id') is not None:
                 filter_month_id = messages.get('month_id')
@@ -117,6 +111,14 @@ def dashboard():
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
 
+        # Calculate Operation Type Statistics
+        # Get total amounts of all User's operation types loaded
+        userOperationTypesAmounts = [ (op.id, round(sum(operation.amount for operation in operations if operation.type_id == op.id ), 2)) for op in operationTypes if op.id != 15 ]
+
+        print(userOperationTypesAmounts)
+
+        operationStatistics = [ (operationTypes[uop[0]-1], uop[1], round((uop[1] * 100) / spendAmount, 2)) for uop in userOperationTypesAmounts ]
+
         # Find Month Name CHANGE TO DATETIME INSTED OF QUERY TO DB
         findMonth = Month.query.filter_by(id=month).first()
 
@@ -144,6 +146,7 @@ def dashboard():
                                     spendAmount=formattedSpendAmount,
                                     spendAmountStatusColor=spendAmountStatusColor,
                                     availableAmount=formattedAvailableAmount,
+                                    operationStatistics=operationStatistics,
                                     hideAmounts=userConfig.hide_amounts,
                                     operationTypes=operationTypes,
                                     operationTypeIcons=operationTypeIcons,
@@ -165,7 +168,6 @@ def dashboard():
         yearList = list(range(year, year - 21, -1))
         filterForm.year_id.choices = [(index, description) for index, description in enumerate(yearList, start=0)]
         
-        print(filterForm.year_id.data)
         filterForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
         filterForm.type_id.choices.insert(0, ('0', 'Todos'))
 
