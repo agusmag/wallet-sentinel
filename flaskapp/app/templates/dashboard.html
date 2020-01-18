@@ -5,8 +5,8 @@
     <div class="customDashboardMonthHeader">
         <!-- Month Info -->
         <div class="row mt-4 pb-4">
-            <div class="col-4" id="monthInfoTitle">
-                <h3 class="text-light">Mes actual <span class="badge badge-info">{{ month }} </span></h3>
+            <div class="col" id="monthInfoTitle">
+                <h3 class="text-light">Fecha actual <span class="badge badge-secondary">{{ curDate.strftime('%d-%m-%Y') }} </span></h3>
             </div>
         </div>
         <!-- User Data -->
@@ -239,17 +239,26 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                                 </div>
-                                <div class="modal-body">
+                                <div class="modal-body pl-2 pr-2">
                                     <h4>{{ op.description }}</h4>
                                     <div class="row justify-content-center mb-4">
                                         <div class="icon-shape icon-color-{{ operationTypeIconsColor[op.type_id - 1]}} text-center"><i class="{{ operationTypeIcons[op.type_id - 1] }}"></i></div>
                                     </div>
+                                    <p>{{ "$ {:,.2f}".format(op.amount) }}</p>
                                     <p>{{ operationTypes[op.type_id-1].description }}</p>
                                     <p>{{ op.date.strftime('%d-%m-%Y') }}</p>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editOperationModalMobile{{loop.index0}}">Editar</button>
-                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteOperationModalMobile{{loop.index0}}">Eliminar</button>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <div class="modal-footer justify-content-center pl-1 pr-1">
+                                        <div class="row justify-content-center">
+                                            <div class="col-4">
+                                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editOperationModalMobile{{loop.index0}}">Editar</button>
+                                            </div>
+                                            <div class="col-4">
+                                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteOperationModalMobile{{loop.index0}}">Eliminar</button>
+                                            </div>
+                                            <div class="col-4">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -431,15 +440,16 @@
                             </div>
                         </div>
                         {% for ops in operationStatistics %}
-                        <div id="iterationStatisticsTable" class="row justify-content-between mb-2 alert alert-{% if ops[2] == 0 %}secondary{% endif %}{% if ops[2] > 0 and ops[2] < 30 %}success{% endif %}{% if ops[2] >= 30 and ops[2] < 60 %}warning{% endif %}{% if ops[2] >= 60 %}danger{% endif %}"
-                            style="color: black; padding: 0px">
-                            <div class="col-4 text-left">
+                        <div id="iterationStatisticsTable" class="row justify-content-between mb-2 alert alert-{% if ops[2]==0 %}secondary{% endif %}{% if ops[2]> 0 and ops[2]
+                                        < 30 %}success{% endif %}{% if ops[2]>= 30 and ops[2]
+                                            < 60 %}warning{% endif %}{% if ops[2]>= 60 %}danger{% endif %}" style="color: black; padding: 0px">
+                            <div class="col-4 text-left pl-2 pr-0">
                                 {{ ops[0] }}
                             </div>
-                            <div class="col-5 text-left">
+                            <div class="col-5 text-left pl-0 pr-0">
                                 {{ " $ {:,.2f}".format(ops[1]) }}
                             </div>
-                            <div class="col-3 text-right">
+                            <div class="col-3 text-right pl-0 pr-2">
                                 {{ "{:05.2f} %".format(ops[2]) }}
                             </div>
                         </div>

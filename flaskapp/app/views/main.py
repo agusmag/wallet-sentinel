@@ -119,9 +119,6 @@ def dashboard():
 
         operationStatistics = [ (operationTypes[uop[0]-1], uop[1], round((uop[1] * 100) / spendAmount, 2)) for uop in userOperationTypesAmounts ]
 
-        # Find Month Name CHANGE TO DATETIME INSTED OF QUERY TO DB
-        findMonth = Month.query.filter_by(id=month).first()
-
         # Format All the Amounts to Currency
         formattedTotalAmount = "$ {:,.2f}".format(gainedAmount)
         formattedSpendAmount = "$ {:,.2f}".format(spendAmount)
@@ -139,7 +136,6 @@ def dashboard():
 
         return render_template('dashboard.html',
                                     curDate=datetime.date.today(),
-                                    month=findMonth.description,
                                     user_id=user.id,
                                     username=user.username,
                                     totalAmount=formattedTotalAmount,

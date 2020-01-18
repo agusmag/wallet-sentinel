@@ -180,8 +180,6 @@ function changeResponsiveElements(window) {
         $('#mobileTitle').addClass('d-block');
         $('.homeChoicesRow').removeClass('mr-5');
         $('.homeChoicesRow').addClass('pl-4');
-        $('#monthInfoTitle').removeClass('col-4');
-        $('#monthInfoTitle').addClass('col-6');
         $('#customFilterForm').removeClass('form-row');
         $('#customFilterForm').addClass('form');
         $('#customMonthField').removeClass('col-3');
@@ -209,8 +207,6 @@ function changeResponsiveElements(window) {
         $('#mobileTitle').addClass('d-none');
         $('.homeChoicesRow').addClass('mr-5');
         $('.homeChoicesRow').removeClass('pl-4');
-        $('#monthInfoTitle').removeClass('col-6');
-        $('#monthInfoTitle').addClass('col-4');
         $('#customFilterForm').removeClass('form');
         $('#customFilterForm').addClass('form-row');
         $('#customMonthField').removeClass('col');
