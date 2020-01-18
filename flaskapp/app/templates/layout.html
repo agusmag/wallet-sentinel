@@ -27,12 +27,17 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav mr-auto">
                 <a class="{{ 'active nav-item nav-link text-center customNavBarLinks' if active_page == 'dashboard' else 'nav-item nav-link text-center customNavBarLinks' }}" href="/home/dashboard">Dashboard</a>
-                <!-- <a class="nav-item nav-link" href="/home/statistics">Estadísticas</a> -->
+                <a class="nav-item nav-link text-center customNavBarLinks" href="#" data-toggle="modal" data-target="#userStatisticsModal" id="openUserStatistics">Estadísticas</a>
                 <a class="nav-item nav-link text-center customNavBarLinks" href="#" data-toggle="modal" data-target="#userSettingsModal" id="openUserConfig">Configuración</a>
-                <a class="nav-item nav-link text-center customNavBarLinks" href="/logout">Logout</a>
+
             </div>
             <div id="currentUserNav" class="my-lg-0 text-center">
-                <a class="nav-item text-center"><i class="fas fa-user mr-3"></i>Hola! <strong>{{ current_user.username }}</strong></a>
+                <a class="nav-item text-center">
+                    <h5>
+                        <span class="badge badge-secondary"><i class="fas fa-user mr-3"></i>Hola! <strong>{{ current_user.username }}</strong></span>
+                    </h5>
+                </a>
+                <a class="nav-item nav-link text-center customNavBarLinks" href="/logout">Logout</a>
             </div>
         </div>
     </nav>
@@ -60,7 +65,6 @@
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js')}}"></script>
-
 </body>
 
 </html>

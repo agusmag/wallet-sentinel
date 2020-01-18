@@ -51,6 +51,11 @@ body {
     border-bottom: 3px solid rgb(11, 168, 63) !important;
 }
 
+#currentUserNav,
+#currentUserNav a {
+    display: inline-block;
+}
+
 
 /*
 ***************
@@ -224,6 +229,17 @@ body {
 
 
 /*
+***********************
+* USER STATISTICS MODAL
+***********************
+*/
+
+#iterationStatisticsTable {
+    font-size: unset;
+}
+
+
+/*
 *********
 * SPINNER
 *********
@@ -266,6 +282,31 @@ body {
 
 
 /*
+*****************
+* OPERATION TABLE
+*****************
+*/
+
+#desktopOperationTable {
+    display: block;
+}
+
+#mobileOperationTable {
+    display: none;
+}
+
+#mobileOperationTable #operations_table_mobile {
+    border-collapse: separate;
+    border-spacing: 10px;
+    *border-collapse: expression('separate', cellSpacing='10px');
+}
+
+#mobileOperationTable #operations_table_mobile tr {
+    cursor: pointer;
+}
+
+
+/*
 *******************
 * RESPONSIVE STYLES
 *******************
@@ -282,6 +323,10 @@ body {
     .customNavBarLinks,
     .navbar-expand-lg .nav-link {
         border-bottom: 1px solid white !important;
+    }
+    #currentUserNav,
+    #currentUserNav a {
+        display: block;
     }
     #homeTitle {
         display: none;
@@ -304,41 +349,13 @@ body {
     .customDashboardAmountsHeader {
         display: inline-block;
     }
-    #operations_table {
-        border: 0;
-    }
-    #operations_table thead {
+    #desktopOperationTable {
         display: none;
     }
-    #operations_table tr {
-        margin-bottom: 20px;
+    #mobileOperationTable {
         display: block;
     }
-    #operations_table td {
-        display: block;
-        text-align: right;
-        font-size: 13px;
-    }
-    #operations_table tr th,
-    #operations_table tr td {
-        border-right-width: 0 !important;
-    }
-    #operations_table td:last-child {
-        border-bottom: 0;
-    }
-    #operations_table td::before {
-        content: attr(data-label);
-        float: left;
-        text-transform: uppercase;
-        font-weight: bold;
-    }
-    #operations_table th {
-        border-width: 1;
-    }
-    #operations_table .iconLabel {
-        display: none;
-    }
-    #operations_table .iconContent {
-        margin-right: 10px;
+    #iterationStatisticsTable {
+        font-size: small;
     }
 }
