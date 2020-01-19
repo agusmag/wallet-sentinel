@@ -64,8 +64,6 @@ def signup_post():
             return redirect(url_for('auth.signup'))
 
         totalAmount = 0
-        mainThemeEnabled = True
-
 
         #Create the object User to store it in the DB
         new_user = User(email=signupForm.email.data, username=signupForm.username.data, password=generate_password_hash(signupForm.password.data, method='sha256'))
@@ -75,7 +73,7 @@ def signup_post():
         db.session.commit()
 
         #Create the object UserConfiguration to store it in the BD
-        new_user_config = UserConfiguration(available_amount=totalAmount, main_theme=mainThemeEnabled, spend_limit=totalAmount, warning_percent=75, user_id=new_user.id)
+        new_user_config = UserConfiguration(spend_limit=totalAmount, warning_percent=75, hide_amounts=0, user_id=new_user.id)
         
         db.session.add(new_user_config)
         db.session.commit()

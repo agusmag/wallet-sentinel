@@ -107,7 +107,7 @@ def dashboard():
         
         # Calculate SpendAmount ( gainedAmount - SUM(user.operations.amount type != Ganancia ))
         spendAmount = sum(operation.amount for operation in operations if operation.type_id != 15)
-
+            
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
 
@@ -115,9 +115,8 @@ def dashboard():
         # Get total amounts of all User's operation types loaded
         userOperationTypesAmounts = [ (op.id, round(sum(operation.amount for operation in operations if operation.type_id == op.id ), 2)) for op in operationTypes if op.id != 15 ]
 
-        print(userOperationTypesAmounts)
-
-        operationStatistics = [ (operationTypes[uop[0]-1], uop[1], round((uop[1] * 100) / spendAmount, 2)) for uop in userOperationTypesAmounts ]
+        #Calculate 
+        operationStatistics = [ (operationTypes[uop[0]-1], uop[1], round((uop[1] * 100) / spendAmount if spendAmount > 0 else 0 , 2)) for uop in userOperationTypesAmounts ]
 
         # Format All the Amounts to Currency
         formattedTotalAmount = "$ {:,.2f}".format(gainedAmount)
@@ -200,7 +199,10 @@ def new_operation():
     if formOperation.validate():
         # Parse amount string to decimal
         convertedAmount = float(formOperation.amount.data.replace("$","").replace(",",""))
-
+        if convertedAmount <= 0:
+            flash('El gasto de la operación debe ser mayor a 0.', category="alert-danger")
+            return redirect(url_for('main.dashboard'))
+            
         # Search User Configuration to verify Spend Limit
         userConfig = UserConfiguration.query.filter_by(user_id=formOperation.user_id.data).first()
 

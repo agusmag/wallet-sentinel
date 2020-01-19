@@ -7,7 +7,7 @@
                 <h2 class="card-title">Ingresá tus datos!</h2>
                 <h2 class="mb-3"><i class="fas fa-pen-alt"></i></h2 clas>
                 {% with messages = get_flashed_messages() %} {% if messages %}
-                <div class="notification is-danger">
+                <div class="alert alert-danger">
                     {{ messages[0] }} Ir a <a href="{{ url_for('auth.login')}}">Login Page</a>
                 </div>
                 {% endif %} {% endwith %}
