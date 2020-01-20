@@ -20,5 +20,5 @@ def sendNewUserSlackMessage(channel, username):
 
     client.chat_postMessage(
         channel=channel,
-        text=":memo: New user has been created! Welcome {0} :hugging_face:".format(username)
+        text="*Production* -> :memo: New user has been created! Welcome *{0}* :hugging_face:".format(username)
     )
