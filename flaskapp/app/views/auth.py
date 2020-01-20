@@ -10,7 +10,8 @@ from app.forms import LoginForm, SignupForm
 from app.models import User, UserConfiguration
 
 # Database
-from app.extensions import db
+# Slack Bot
+from app.extensions import db, sendNewUserSlackMessage
 
 auth = Blueprint('auth', __name__)
 
@@ -78,6 +79,13 @@ def signup_post():
         db.session.add(new_user_config)
         db.session.commit()
 
+        #Send Slack Message notifying the new registration
+        try:    
+            wsChannel = 'CSWSV4LLF' #walletsentinel channel
+            sendNewUserSlackMessage(wsChannel, signupForm.username.data)
+        except:
+            print('Ha ocurrido un error al enviar la notifiación a slack..')
+        
         return redirect(url_for('auth.login'))
     else:
         return render_template('signup.html', form=signupForm)

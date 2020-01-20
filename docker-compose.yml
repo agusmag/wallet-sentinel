@@ -36,6 +36,7 @@ services:
             - FLASK_ENV=development
             - FLASK_APP=run.py
             - SECRET_KEY
+            - SLACK_API_TOKEN
             - MYSQL_USER=root
             - MYSQL_PASSWORD=root
             - MYSQL_HOST=db
