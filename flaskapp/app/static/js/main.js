@@ -132,6 +132,7 @@ $('#operations_table_mobile').DataTable({
     "drawCallback": function(settings) {
         $("#operations_table_mobile thead").remove();
     },
+    "pagingType": "full",
     "language": {
         "lengthMenu": "Mostrar _MENU_ registros por página",
         "zeroRecords": "No se han encontrado registros",
