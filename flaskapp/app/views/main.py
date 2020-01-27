@@ -36,9 +36,8 @@ def home():
 @main.route('/home/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    timezone = pytz.timezone("America/Buenos_Aires")
     today = datetime.datetime.today()
-    today_localize = timezone.localize(today)
+    today_localize = today.astimezone(pytz.timezone('America/Buenos_Aires'))
 
     if request.method == 'GET':
         # Fill Filter Fields with current date and None for Operation_Type
@@ -138,7 +137,7 @@ def dashboard():
             spendAmountStatusColor = 'badge-danger'
 
         return render_template('dashboard.html',
-                                    curDate=datetime.date.today(),
+                                    curDate=today_localize.today(),
                                     user_id=user.id,
                                     username=user.username,
                                     totalAmount=formattedTotalAmount,
