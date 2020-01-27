@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, Markup, redirect, url_for, flash, request, session
 from flask_login import login_required, current_user
 from sqlalchemy import extract
-import datetime, calendar, json, locale
+import datetime, pytz, calendar, json, locale
 
 # Forms
 from app.forms import FiltersForm, NewOperationForm, UserSettingsForm
@@ -36,10 +36,14 @@ def home():
 @main.route('/home/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
+    timezone = pytz.timezone("America/Buenos_Aires")
+    today = datetime.datetime.today()
+    today_localize = timezone.localize(today)
+
     if request.method == 'GET':
         # Fill Filter Fields with current date and None for Operation_Type
-        month = datetime.date.today().month
-        year = datetime.date.today().year
+        month = today_localize.month
+        year = today_localize.year
         filter_month_id = month
         filter_year_id = 0
         filter_type_id = 0
@@ -159,7 +163,7 @@ def dashboard():
         filterForm.month_id.choices = [(m.id, m.description) for m in Month.query.order_by('id')]
         filterForm.month_id.choices.insert(0, ('0', 'Todos'))
 
-        year = datetime.datetime.today().year
+        year = today_localize.year
         yearList = list(range(year, year - 21, -1))
         filterForm.year_id.choices = [(index, description) for index, description in enumerate(yearList, start=0)]
         
