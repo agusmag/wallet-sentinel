@@ -7,8 +7,12 @@
       <b>Finantial App to manage Monthly Cash-in / Cash-out</b>
   </p>
   <p>
-      [![Build Status](https://travis-ci.org/agusmag/wallet-sentinel.svg?branch=master)](https://travis-ci.org/agusmag/wallet-sentinel)
+    <sub>Built by
+      <a href="https://github.com/agusmag">agusmag</a>
+    </sub>
   </p>
+  
+  [![Travis Build Status](https://travis-ci.org/agusmag/wallet-sentinel.svg?branch=master)](https://travis-ci.org/agusmag/wallet-sentinel)
 </div>
 
 ---
