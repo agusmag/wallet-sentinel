@@ -1,8 +1,21 @@
 # Wallet-Sentinel
-[![Build Status](https://travis-ci.org/agusmag/wallet-sentinel.svg?branch=master)](https://travis-ci.org/agusmag/wallet-sentinel)
+<div align="center">
+  <a href="https://mywalletsentinel.com"><img src="flaskapp/app/static/assets/wallet_sentinel_logo_v2.png" alt="Wallet Sentinel logo" height="160"></a>
+  <br>
+  <br>
+  <p>
+      <b>Finantial App to manage Monthly Cash-in / Cash-out</b>
+  </p>
+  <p>
+    <sub>Built by
+      <a href="https://github.com/agusmag">agusmag</a>
+    </sub>
+  </p>
+  
+  [![Travis Build Status](https://travis-ci.org/agusmag/wallet-sentinel.svg?branch=master)](https://travis-ci.org/agusmag/wallet-sentinel)
+</div>
 
-Finantial App to manage Monthly Cash-in / Cash-out
-*https://mywalletsentinel.com* 
+---
 
 ## Learned/Enhanced Tecnologies
 * Python
