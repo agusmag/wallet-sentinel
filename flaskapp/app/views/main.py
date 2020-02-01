@@ -137,7 +137,7 @@ def dashboard():
             spendAmountStatusColor = 'badge-danger'
 
         return render_template('dashboard.html',
-                                    curDate=today_localize.today(),
+                                    curDate=today_localize.today().date(),
                                     user_id=user.id,
                                     username=user.username,
                                     totalAmount=formattedTotalAmount,
@@ -270,7 +270,3 @@ def delete_operation(id):
 
     flash('La operación fue eliminada con éxito', category='alert-success')
     return redirect(url_for('main.dashboard'))
-
-# @app.errorhandler(404)
-# def page_not_found(error):
-# 	return render_template("error.html",error="Página no encontrada...")
