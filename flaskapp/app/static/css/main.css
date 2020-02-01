@@ -90,6 +90,10 @@ body {
     display: none;
 }
 
+.sigupCol {
+    margin-right: 90px;
+}
+
 .homeChoicesCol {
     padding: 0px;
     margin-top: 200px;
@@ -305,6 +309,11 @@ body {
     cursor: pointer;
 }
 
+#mobileOperationTable #operations_table_mobile_wrapper .row .col {
+    text-align: center !important;
+    padding: 0px !important;
+}
+
 
 /*
 *******************
@@ -312,14 +321,17 @@ body {
 *******************
 */
 
-@media (max-width: 992px) {
+@media (max-width: 992px) and (min-width: 425px) {
     .customNavBarLinks,
     .navbar-expand-lg .nav-link .customNavBarLinks {
         border-bottom: 1px solid white !important;
     }
+    .sigupCol {
+        margin-right: 90px;
+    }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 424px) {
     .customNavBarLinks,
     .navbar-expand-lg .nav-link {
         border-bottom: 1px solid white !important;
@@ -342,6 +354,9 @@ body {
     }
     .homeChoicesCol {
         margin-top: 25px;
+    }
+    .sigupCol {
+        margin-right: -15px;
     }
     .customDashboardHeader .row {
         justify-content: center;

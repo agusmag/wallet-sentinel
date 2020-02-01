@@ -179,7 +179,6 @@ function changeResponsiveElements(window) {
         $('#currentUserNav').addClass('mt-4 mb-2');
         $('#mobileTitle').removeClass('d-none');
         $('#mobileTitle').addClass('d-block');
-        $('.homeChoicesRow').removeClass('mr-5');
         $('.homeChoicesRow').addClass('pl-4');
         $('#customFilterForm').removeClass('form-row');
         $('#customFilterForm').addClass('form');
@@ -206,7 +205,6 @@ function changeResponsiveElements(window) {
         $('#currentUserNav').removeClass('mt-4 mb-2');
         $('#mobileTitle').removeClass('d-block');
         $('#mobileTitle').addClass('d-none');
-        $('.homeChoicesRow').addClass('mr-5');
         $('.homeChoicesRow').removeClass('pl-4');
         $('#customFilterForm').removeClass('form');
         $('#customFilterForm').addClass('form-row');

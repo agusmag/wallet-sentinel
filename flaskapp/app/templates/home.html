@@ -1,11 +1,11 @@
 {% extends 'layout.html' %} {% block content %}
 <aside id="pageContent">
     <div class="row justify-content-center">
-        <h2 id="homeTitle">Bienvenido a Wallet Sentinel</h2>
+        <h2 id="homeTitle" class="align-self-center">Bienvenido a Wallet Sentinel</h2>
         <h2 id="mobileTitle" class="pl-4"><img src="{{ url_for('static', filename='assets/wallet_sentinel_logo_v2.png')}}" alt="Wallet Logo" style="width: 225px; height: 225px;"></h2>
     </div>
     <div class="row justify-content-center">
-        <div class="row mr-5 homeChoicesRow">
+        <div class="row homeChoicesRow sigupCol">
             <div class="col homeChoicesCol">
                 <a href="/signup" class="text-center" style="display: block; text-decoration: none; height: 100%; width: 100%;">
                     <div>
@@ -26,12 +26,12 @@
             </div>
         </div>
     </div>
-    <div class="row homeChoicesRow justify-content-center">
+    <div class="row justify-content-center">
         <div class="col">
             <h5 class="mt-5">¿Para que sirvo?</h5>
         </div>
     </div>
-    <div class="row homeChoicesRow mb-5 justify-content-center" style="border: 1px solid white;">
+    <div class="row mb-5 justify-content-center" style="border: 1px solid white;">
         <div class="col">
             <p>Wallet Sentinel te va a ayudar a tener un registro de lo que gastas y ganás por mes diferenciado por categoría. Ver un historial de gastos y especificar límites de compras.</p>
             <p>Te recomiendo que te registres y le dés una oportunidad, es gratis!</p>
