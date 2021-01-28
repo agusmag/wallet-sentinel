@@ -17,12 +17,12 @@ main = Blueprint('main', __name__)
 operationTypeIcons = [
     "fas fa-tshirt", "fas fa-hamburger", "fas fa-file-invoice-dollar", "fas fa-gift",
     "fas fa-laptop", "fas fa-couch", "fas fa-gas-pump", "fas fa-money-check-alt", "fas fa-eye",
-    "fas fa-bath", "fas fa-bus", "fas fa-suitcase-rolling", "fas fa-gamepad", "fas fa-list-ul", "fas fa-money-bill-wave", "fab fa-untappd"
+    "fas fa-bath", "fas fa-bus", "fas fa-suitcase-rolling", "fas fa-gamepad", "fas fa-list-ul", "fas fa-money-bill-wave", "fab fa-untappd", "fas fa-university"
 ]
 
 operationTypeIconsColor = [
     "tshirt", "hamburger", "file-invoice-dollar", "gift", "laptop",
-    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling", "gamepad", "list-ul", "money-bill-wave", "untappd"
+    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling", "gamepad", "list-ul", "money-bill-wave", "untappd", "university"
 ]
 
 @main.route('/')

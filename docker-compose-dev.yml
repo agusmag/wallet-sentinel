@@ -1,0 +1,64 @@
+version: "3.7"
+
+services:
+    db:
+        image: mysql:5.7
+        restart: always
+        container_name: db
+        ports:
+            - "32000:3306"
+        environment:
+            MYSQL_DATABASE: wallet_sentinel_db
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - ./db:/docker-entrypoint-initdb.d/:ro
+
+    migrations:
+        build: ./flaskapp
+        container_name: migrations
+        environment:
+            - FLASK_ENV=development
+            - FLASK_APP=run.py
+            - MYSQL_USER=root
+            - MYSQL_PASSWORD=root
+            - MYSQL_HOST=db
+            - MYSQL_PORT=3306
+            - MYSQL_DATABASE=wallet_sentinel_db
+        command: flask db upgrade
+        depends_on:
+            - db
+        links:
+            - db
+
+    flask:
+        build: ./flaskapp
+        container_name: flask
+        restart: always
+        environment:
+            - FLASK_ENV=development
+            - FLASK_APP=run.py
+            - SECRET_KEY=B0849467FE81F850D634DDD1CE985EECFB6666E07BC4129FBB641ECBA54AE7CE
+            - SLACK_API_TOKEN
+            - MYSQL_DATABASE_USER=root
+            - MYSQL_DATABASE_PASSWORD=root
+            - MYSQL_DATABASE_HOST=db
+            - MYSQL_PORT=3306
+            - MYSQL_DATABASE_DB=wallet_sentinel_db
+        expose:
+            - 8080
+        depends_on:
+            - db
+        links:
+            - db
+
+    nginx:
+        
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile_dev
+        container_name: nginx
+        restart: always
+        ports:
+            - "3050:80"
+        depends_on:
+            - flask

@@ -7,7 +7,7 @@ from sqlalchemy import or_
 from app.forms import LoginForm, SignupForm
 
 # Models
-from app.models import User, UserConfiguration
+from app.models import User, UserConfiguration, Saving
 
 # Database
 # Slack Bot
@@ -77,6 +77,12 @@ def signup_post():
         new_user_config = UserConfiguration(spend_limit=totalAmount, warning_percent=75, hide_amounts=0, user_id=new_user.id)
         
         db.session.add(new_user_config)
+        db.session.commit()
+
+        #Create the object Saving to store it in the DB, by default is ARS (Pesos) with amount 0
+        new_user_default_saving = Saving(user_id=new_user.id, currency_id=1, amount=0)
+
+        db.session.add(new_user_default_saving)
         db.session.commit()
 
         #Send Slack Message notifying the new registration
