@@ -23,6 +23,9 @@ def create_app(config=None):
         app.config.from_object('config.TestConfig')
 
     #ORM to Manage DB Models
+    # flask db stamp head  -> To set the revision in the database to the head, without performing any migrations. You can change head to the required change you want.
+    # flask db migrate     -> To detect automatically all the changes.
+    # flask db upgrade     -> To apply all the changes.
     db.init_app(app)
 
     #Enabled migrations

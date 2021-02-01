@@ -7,7 +7,7 @@ import datetime, pytz, calendar, json, locale
 from app.forms import FiltersForm, NewOperationForm, UserSettingsForm
 
 # Models
-from app.models import User, UserConfiguration, Operation, OperationType, Month
+from app.models import User, UserConfiguration, Operation, OperationType, Month, Saving, Currency
 
 # Database
 from app.extensions import db
@@ -136,6 +136,12 @@ def dashboard():
         elif spendAmount >= gainedAmount:
             spendAmountStatusColor = 'badge-danger'
 
+        # Load all Currencies
+        currencies = Currency.query.order_by(Currency.id).all()
+
+        # Get all the Savings
+        savings = Saving.query.filter_by(user_id=user.id)
+
         return render_template('dashboard.html',
                                     curDate=today_localize.today().date(),
                                     user_id=user.id,
@@ -145,6 +151,8 @@ def dashboard():
                                     spendAmountStatusColor=spendAmountStatusColor,
                                     availableAmount=formattedAvailableAmount,
                                     operationStatistics=operationStatistics,
+                                    currencies=currencies,
+                                    savings=savings,
                                     hideAmounts=userConfig.hide_amounts,
                                     operationTypes=operationTypes,
                                     operationTypeIcons=operationTypeIcons,

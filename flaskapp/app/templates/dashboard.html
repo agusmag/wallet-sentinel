@@ -48,6 +48,11 @@
             <button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#userStatisticsModal" style="border-color: #62c462 !important;">Estadísticas</button>
         </div>
     </div>
+    <div class="row pb-4 mt-4">
+        <div class="col">
+            <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#userSavingModal" style="border-color: #3db6de !important;">Ahorros</button>
+        </div>
+    </div>
 
     <div class="row justify-content-center pb-4">
         {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
@@ -457,6 +462,54 @@
                         <div class="row justify-content-center mt-4 alert alert-info" style="color: black; padding: 0px;">
                             <div class="col-6 text-left"><strong>{{ spendAmount }}</strong></div>
                             <div class="col-4 text-right"><strong>100.00 %</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="userSavingModal" tabindex="-1" role="dialog" aria-labelledby="userSavingTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userSavingTitle">Ahorros</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+                <div class="modal-body">
+                    <div class="div" style="padding-left: 10px; padding-right: 10px; margin-bottom: 10px;">
+                        <div class="row justify-content-center">
+                            {% for saving in savings %}
+                                <div class="col-4 align-self-center">
+                                    <div style="background-color: rgb(202, 202, 202); width: 150px; height: 100px; border-radius: 10%; padding: 5px;">
+                                        <div class="currencyCard">
+                                            {{ saving.amount }} {{ currencies[saving.currency_id - 1].description }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        <div class="row justify-content-center">
+                            <div class="col-12 align-self-center">
+                                <div class="editSavingsForm">
+                                    Agregar monedas, como las saco? como resto precios? como lo acoplo con las operaciones actuales?
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="div" style="padding-left: 10px; padding-right: 10px;">
+                        <div class="row justify-content-center">
+                            <!-- {% for currency in currencies %}
+                                <div class="col-4 align-self-center">
+                                    {{ currency.description }}
+                                </div>
+                            {% endfor %} -->
                         </div>
                     </div>
 

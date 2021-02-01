@@ -246,6 +246,20 @@ body {
     font-size: unset;
 }
 
+/*
+***********************
+* USER SAVING MODAL
+***********************
+*/
+
+.currencyCard {
+    border-left: 4px solid rgb(11, 168, 63);
+    color: black;
+    font-size: 1.5rem !important;
+    width: 140px;
+    height: 90px;
+}
+
 
 /*
 *********

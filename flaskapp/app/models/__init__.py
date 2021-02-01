@@ -31,7 +31,7 @@ class Operation(db.Model):
 class Saving(db.Model):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-    currency_id = Column(Integer, ForeignKey('currency.id'), nullable=false)
+    currency_id = Column(Integer, ForeignKey('currency.id'), nullable=False)
     amount = Column(Float, nullable=False)
 
 class OperationType(db.Model):
@@ -50,9 +50,9 @@ class Month(db.Model):
 
 class Currency(db.Model):
     id = Column(Integer, primary_key=True)
-    code = Column(Integer, nullable=false)
-    description = Column(String(50), nullable=false)
-    symbol = Column(String(3), nullable=true)
+    code = Column(Integer, nullable=False)
+    description = Column(String(50), nullable=False)
+    symbol = Column(String(3), nullable=True)
 
     def __repr__(self):
         return '{}'.format(self.description)

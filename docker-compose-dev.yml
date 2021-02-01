@@ -8,7 +8,7 @@ services:
         ports:
             - "32000:3306"
         environment:
-            MYSQL_DATABASE: wallet_sentinel_db
+            MYSQL_DATABASE: wallet_sentinel_db_test
             MYSQL_ROOT_PASSWORD: root
         volumes:
             - ./db:/docker-entrypoint-initdb.d/:ro
@@ -23,7 +23,7 @@ services:
             - MYSQL_PASSWORD=root
             - MYSQL_HOST=db
             - MYSQL_PORT=3306
-            - MYSQL_DATABASE=wallet_sentinel_db
+            - MYSQL_DATABASE=wallet_sentinel_db_test
         command: flask db upgrade
         depends_on:
             - db
@@ -43,7 +43,9 @@ services:
             - MYSQL_DATABASE_PASSWORD=root
             - MYSQL_DATABASE_HOST=db
             - MYSQL_PORT=3306
-            - MYSQL_DATABASE_DB=wallet_sentinel_db
+            - MYSQL_DATABASE_DB=wallet_sentinel_db_test
+        volumes: 
+            - app_data:/app
         expose:
             - 8080
         depends_on:
@@ -52,7 +54,6 @@ services:
             - db
 
     nginx:
-        
         build:
             context: ./nginx
             dockerfile: Dockerfile_dev
@@ -62,3 +63,11 @@ services:
             - "3050:80"
         depends_on:
             - flask
+
+volumes:
+    app_data:
+        driver: local
+        driver_opts: 
+            device: "/mnt/d/Development/Web\ Development/Flask/wallet-sentinel/flaskapp/"
+            o: bind
+            type: none
