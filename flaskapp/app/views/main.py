@@ -4,7 +4,7 @@ from sqlalchemy import extract
 import datetime, pytz, calendar, json, locale
 
 # Forms
-from app.forms import FiltersForm, NewOperationForm, UserSettingsForm
+from app.forms import FiltersForm, NewOperationForm, UserSettingsForm, AddCurrencyForm
 
 # Models
 from app.models import User, UserConfiguration, Operation, OperationType, Month, Saving, Currency
@@ -17,12 +17,12 @@ main = Blueprint('main', __name__)
 operationTypeIcons = [
     "fas fa-tshirt", "fas fa-hamburger", "fas fa-file-invoice-dollar", "fas fa-gift",
     "fas fa-laptop", "fas fa-couch", "fas fa-gas-pump", "fas fa-money-check-alt", "fas fa-eye",
-    "fas fa-bath", "fas fa-bus", "fas fa-suitcase-rolling", "fas fa-gamepad", "fas fa-list-ul", "fas fa-money-bill-wave", "fab fa-untappd", "fas fa-university"
+    "fas fa-bath", "fas fa-bus", "fas fa-suitcase-rolling", "fas fa-gamepad", "fas fa-list-ul", "flas fa-flag", "fab fa-untappd", "fas fa-university", "fas fa-money-bill-wave"
 ]
 
 operationTypeIconsColor = [
     "tshirt", "hamburger", "file-invoice-dollar", "gift", "laptop",
-    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling", "gamepad", "list-ul", "money-bill-wave", "untappd", "university"
+    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling", "gamepad", "list-ul", "flag", "untappd", "university", "money-bill-wave"
 ]
 
 @main.route('/')
@@ -75,6 +75,7 @@ def dashboard():
         # Set hidden user_id to all the Forms in the Dashboard View
         newOperationForm = NewOperationForm(user_id=user.id)
         editOperationForm = NewOperationForm(user_id=user.id)
+        addCurrencyForm = AddCurrencyForm(user_id=user.id)
 
         # Set DataTypes to all the Selects of EveryForm in Dashboard View
         filterForm.month_id.choices = [(m.id, m.description) for m in Month.query.order_by('id')]
@@ -88,6 +89,12 @@ def dashboard():
 
         newOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
         editOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
+
+        # Set Left Currencies for user_id to the addCurrencyForm
+        userCurrencies = Saving.query.filter_by(user_id=user.id).with_entities(Saving.currency_id)
+        leftCurrencies = Currency.query.filter(Currency.id.notin_(userCurrencies))
+
+        addCurrencyForm.currency_id.choices = [(c.id, c.description) for c in leftCurrencies]
 
         # Get Operation (Gained and Spend) by filter
         operations = None
@@ -109,7 +116,7 @@ def dashboard():
         gainedAmount = sum(operation.amount for operation in operations if operation.type_id == 15)
         
         # Calculate SpendAmount ( gainedAmount - SUM(user.operations.amount type != Ganancia ))
-        spendAmount = sum(operation.amount for operation in operations if operation.type_id != 15)
+        spendAmount = sum(operation.amount for operation in operations if operation.type_id != 15 and operation.type_id != 17)
             
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
@@ -152,6 +159,7 @@ def dashboard():
                                     availableAmount=formattedAvailableAmount,
                                     operationStatistics=operationStatistics,
                                     currencies=currencies,
+                                    leftCurrencies=leftCurrencies,
                                     savings=savings,
                                     hideAmounts=userConfig.hide_amounts,
                                     operationTypes=operationTypes,
@@ -161,7 +169,8 @@ def dashboard():
                                     form=filterForm,
                                     form2=newOperationForm,
                                     form3=editOperationForm,
-                                    form4=userSettingsForm)
+                                    form4=userSettingsForm,
+                                    form5=addCurrencyForm)
 
     elif request.method == 'POST':
         filterForm = FiltersForm()
@@ -277,4 +286,39 @@ def delete_operation(id):
     db.session.commit()
 
     flash('La operación fue eliminada con éxito', category='alert-success')
+    return redirect(url_for('main.dashboard'))
+
+
+@main.route('/home/dashboard/add_curency', methods=['POST'])
+@login_required
+def add_currency():
+    addCurrencyForm = AddCurrencyForm()
+
+    # Load left user currencies
+    userCurrencies = Saving.query.filter_by(user_id=addCurrencyForm.user_id.data).with_entities(Saving.currency_id)
+    leftCurrencies = Currency.query.filter(Currency.id.notin_(userCurrencies))
+    addCurrencyForm.currency_id.choices = [(c.id, c.description) for c in leftCurrencies]
+
+    if addCurrencyForm.validate():
+        # Save saving in DB
+        saving = Saving(user_id=addCurrencyForm.user_id.data, currency_id=addCurrencyForm.currency_id.data, amount=0)
+        
+        db.session.add(saving)
+        db.session.commit()
+
+        flash('La moneda fue agregada correctamente', category='alert-success')
+        return redirect(url_for('main.dashboard'))
+        
+    flash('Hubo un problema al agregar la moneda', category="alert-danger")
+    return redirect(url_for('main.dashboard'))
+
+@main.route('/home/dashboard/delete_saving/<string:id>', methods=['POST'])
+@login_required
+def delete_saving(id):
+    # Detele operation from DB
+    Saving.query.filter_by(id=id).delete()
+
+    db.session.commit()
+
+    flash('La moneda fue eliminada con éxito', category='alert-success')
     return redirect(url_for('main.dashboard'))

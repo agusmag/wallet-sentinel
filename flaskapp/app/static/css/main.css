@@ -167,7 +167,7 @@ body {
 }
 
 .icon-color-gift {
-    background-color: rgb(199, 59, 180);
+    background-color: rgb(199, 59, 134);
 }
 
 .icon-color-laptop {
@@ -210,8 +210,8 @@ body {
     background-color: rgb(94, 50, 15);
 }
 
-.icon-color-money-bill-wave {
-    background-color: rgb(77, 209, 0);
+.icon-flag {
+    background-color: rgb(206, 191, 207);
 }
 
 .icon-color-untappd {
@@ -220,6 +220,10 @@ body {
 
 .icon-color-university {
     background-color: rgb(201, 228, 112);
+}
+
+.icon-color-money-bill-wave {
+    background-color: rgb(77, 209, 0);
 }
 
 
@@ -258,6 +262,27 @@ body {
     font-size: 1.5rem !important;
     width: 140px;
     height: 90px;
+    padding-top: 30px;
+}
+
+#deleteCurrencyBtn {
+    position: relative;
+    float: right;
+    top: -10px;
+    right: -10px;
+    width: 23px;
+    height: 23px;
+    background:rgb(248, 54, 54);
+    color: #fff;
+    border-radius: 30%;
+    cursor: pointer;
+}
+
+.customDivider {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+    margin-top: 50px;
 }
 
 

@@ -136,7 +136,7 @@ CREATE TABLE `operation_type` (
 
 LOCK TABLES `operation_type` WRITE;
 /*!40000 ALTER TABLE `operation_type` DISABLE KEYS */;
-INSERT INTO `operation_type` VALUES (1,'Indumentaria'),(2,'Comida'),(3,'Impuesto'),(4,'Regalo'),(5,'Tecnología'),(6,'Mueble'),(7,'Nafta'),(8,'Cuota'),(9,'Belleza'),(10,'Higiene'),(11,'Transporte'),(12,'Viaje'),(13,'Entretenimiento'),(14,'Otros'),(15,'Ganancia'),(16,'Salida'),(17,'Ahorro');
+INSERT INTO `operation_type` VALUES (1,'Indumentaria'),(2,'Comida'),(3,'Impuesto'),(4,'Regalo'),(5,'Tecnología'),(6,'Mueble'),(7,'Nafta'),(8,'Cuota'),(9,'Belleza'),(10,'Higiene'),(11,'Transporte'),(12,'Viaje'),(13,'Entretenimiento'),(14,'Otros'),(15,'Ingreso'),(16,'Salida'),(17,'Ahorro'), (18, 'Servicio');
 /*!40000 ALTER TABLE `operation_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
