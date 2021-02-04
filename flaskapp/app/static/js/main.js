@@ -150,6 +150,20 @@ $('#operations_table_mobile').DataTable({
 });
 
 /**
+ * ###########
+ * SAVING DROPDOWN IN OPERATION FORMS
+ * ###########
+ */
+
+$('.operationTypeDropdown').change(function() {
+    if ($(this).children("option:selected").val() == '17') {
+        $('.savingDisplay').show();
+    } else {
+        $('.savingDisplay').hide();
+    }
+})
+
+/**
  ********************
  * RESPONSIVE CLASSES
  ********************
@@ -201,6 +215,8 @@ function changeResponsiveElements(window) {
         $('.customDashboardAmountSeparator').addClass('d-block');
         $('[data-toggle="popover"]').removeAttr("data-placement");
         $('[data-toggle="popover"]').attr("data-placement", "bottom");
+        $('.savingCard').addClass('col-6');
+        $('.savingCard').removeClass('col-4');
     } else {
         $('#currentUserNav').removeClass('mt-4 mb-2');
         $('#mobileTitle').removeClass('d-block');
@@ -229,5 +245,7 @@ function changeResponsiveElements(window) {
         $('.customDashboardAmountSeparator').addClass('d-none');
         $('[data-toggle="popover"]').removeAttr("data-placement");
         $('[data-toggle="popover"]').attr("data-placement", "right");
+        $('.savingCard').removeClass('col-6');
+        $('.savingCard').addClass('col-4');
     }
 }

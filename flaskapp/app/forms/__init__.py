@@ -61,7 +61,8 @@ class NewOperationForm(FlaskForm):
     ], format='%Y-%m-%d')
     amount = StringField('Monto', validators=[InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
     type_id = SelectField('Tipo Operación', coerce=int)
-    user_id = HiddenField('User Id') 
+    user_id = HiddenField('User Id')
+    currency_id = SelectField('Moneda', coerce=int, id="currencyId")
 
 class AddCurrencyForm(FlaskForm):
     currency_id = SelectField('Moneda', coerce=int, id="currencyId")

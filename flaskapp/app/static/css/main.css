@@ -256,7 +256,16 @@ body {
 ***********************
 */
 
-.currencyCard {
+.savingCard {
+    margin: 10px;
+    padding-left: 0px !important;
+}
+
+.savingCardMobile {
+    display: none;
+}
+
+.currencyCardText {
     border-left: 4px solid rgb(11, 168, 63);
     color: black;
     font-size: 1.5rem !important;
@@ -265,7 +274,7 @@ body {
     padding-top: 30px;
 }
 
-#deleteCurrencyBtn {
+.deleteCurrencyBtn {
     position: relative;
     float: right;
     top: -10px;
@@ -372,7 +381,19 @@ body {
     .sigupCol {
         margin-right: 90px;
     }
+    .savingCardMobile {
+        display: none;
+    }
 }
+
+@media (max-width: 768px) and (min-width: 425px) {
+    .savingCard {
+        margin-bottom: 20px;
+        padding-left: 50px !important;
+    }
+    
+}
+
 
 @media (max-width: 424px) {
     .customNavBarLinks,
@@ -415,5 +436,12 @@ body {
     }
     #iterationStatisticsTable {
         font-size: small;
+    }
+    .savingCard {
+        margin-bottom: 20px;
+        padding-left: 15px !important;
+    }
+    .savingCardMobile {
+        display: block;
     }
 }

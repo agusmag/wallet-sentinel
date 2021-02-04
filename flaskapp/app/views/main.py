@@ -90,11 +90,17 @@ def dashboard():
         newOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
         editOperationForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
 
-        # Set Left Currencies for user_id to the addCurrencyForm
+        # Set Left Currencies for user_id to the addCurrencyForm and newOperationForm
         userCurrencies = Saving.query.filter_by(user_id=user.id).with_entities(Saving.currency_id)
         leftCurrencies = Currency.query.filter(Currency.id.notin_(userCurrencies))
+        haveCurrencies = Currency.query.filter(Currency.id.in_(userCurrencies))
 
         addCurrencyForm.currency_id.choices = [(c.id, c.description) for c in leftCurrencies]
+        leftCurrencies = leftCurrencies.all()
+
+        newOperationForm.currency_id.choices = [(c.id, c.description) for c in haveCurrencies]
+        haveCurrencies = haveCurrencies.all()
+        userCurrencies = userCurrencies.all()
 
         # Get Operation (Gained and Spend) by filter
         operations = None
@@ -159,7 +165,9 @@ def dashboard():
                                     availableAmount=formattedAvailableAmount,
                                     operationStatistics=operationStatistics,
                                     currencies=currencies,
+                                    userCurrencies=userCurrencies,
                                     leftCurrencies=leftCurrencies,
+                                    haveCurrencies=haveCurrencies,
                                     savings=savings,
                                     hideAmounts=userConfig.hide_amounts,
                                     operationTypes=operationTypes,
