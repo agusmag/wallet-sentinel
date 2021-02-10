@@ -44,8 +44,6 @@ services:
             - MYSQL_DATABASE_HOST=db
             - MYSQL_PORT=3306
             - MYSQL_DATABASE_DB=wallet_sentinel_db_test
-        volumes: 
-            - app_data:/app
         expose:
             - 8080
         depends_on:
@@ -63,11 +61,3 @@ services:
             - "3050:80"
         depends_on:
             - flask
-
-volumes:
-    app_data:
-        driver: local
-        driver_opts: 
-            device: "/mnt/d/Development/Web\ Development/Flask/wallet-sentinel/flaskapp/"
-            o: bind
-            type: none

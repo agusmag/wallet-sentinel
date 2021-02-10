@@ -219,7 +219,7 @@ body {
 }
 
 .icon-color-university {
-    background-color: rgb(201, 228, 112);
+    background-color: rgb(158 181 81);
 }
 
 .icon-color-money-bill-wave {
@@ -269,7 +269,6 @@ body {
     border-left: 4px solid rgb(11, 168, 63);
     color: black;
     font-size: 1.5rem !important;
-    width: 140px;
     height: 90px;
     padding-top: 30px;
 }

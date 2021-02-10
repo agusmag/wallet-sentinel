@@ -155,7 +155,7 @@
                                             <div class="modal-body">
                                                 <form action="/home/dashboard/update_operation/{{ op.id }}" method="POST">
                                                     {{ form3.user_id(id="user_id_{}".format(loop.index0)) }}
-                                                    {{ form3.csrf_token(id = "csrf_token_form_3") }}
+                                                    {{ form3.csrf_token(id = "csrf_token_form_3_{}".format(loop.index0)) }}
                                                     <div class="form-group">
                                                         {{ form3.description(id="description_{}".format(loop.index0), class_="form-control", **{"value": op.description }) }}
                                                     </div>
@@ -173,9 +173,11 @@
                                                         </select>
                                                     </div>
                                                     {% if haveCurrencies|length > 0 %}
-                                                    <div class="form-group">
-                                                        {{ form2.currency_id(id='currencyIdOpEd', class_="form-control custom-select my-1 mr-sm-2 savingDisplay") }}
-                                                    </div>
+                                                        <select class="form-control custom-select my-1 mr-sm-2 savingDisplay" name="currency_id" id="currency_id_{{loop.index0}}">
+                                                            {% for cu in haveCurrencies %}
+                                                                <option value={{ cu.id }} {% if op.currency_id == cu.id %}selected{% endif %}>{{ cu.description }}</option>
+                                                            {% endfor %}
+                                                        </select>
                                                     {% endif %}
                                                     <div class="modal-footer">
                                                         <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
@@ -289,7 +291,7 @@
                                 <div class="modal-body">
                                     <form action="/home/dashboard/update_operation/{{ op.id }}" method="POST">
                                         {{ form3.user_id(id="user_id_{}_mobile".format(loop.index0)) }}
-                                        {{ form3.csrf_token(id = "csrf_token_form_3_mobile") }}
+                                        {{ form3.csrf_token(id = "csrf_token_form_3_mobile_{}".format(loop.index0)) }}
                                         <div class="form-group">
                                             {{ form3.description(id="description_{}_mobile".format(loop.index0), class_="form-control", **{"value": op.description }) }}
                                         </div>
@@ -308,7 +310,7 @@
                                         </div>
                                         {% if haveCurrencies|length > 0 %}
                                         <div class="form-group">
-                                            {{ form2.currency_id(id='currencyIdOpEdMobile', class_="form-control custom-select my-1 mr-sm-2 savingDisplay") }}
+                                            {{ form2.currency_id(id="currencyIdOpEdMobile_{}".format(loop.index0), class_="form-control custom-select my-1 mr-sm-2 savingDisplay") }}
                                         </div>
                                         {% endif %}
                                         <div class="modal-footer">
@@ -382,7 +384,7 @@
                         </div>
                         {% if haveCurrencies|length > 0 %}
                         <div class="form-group">
-                            {{ form2.currency_id(id='currencyIdOp', class_="form-control custom-select my-1 mr-sm-2 savingDisplay") }}
+                            {{ form2.currency_id(class_="form-control custom-select my-1 mr-sm-2 savingDisplay") }}
                         </div>
                         {% endif %}
                         <div class="modal-footer">
@@ -492,7 +494,7 @@
         </div>
     </div>
     <div class="modal fade" id="userSavingModal" tabindex="-1" role="dialog" aria-labelledby="userSavingTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 750px !important;">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="userSavingTitle">Ahorros</h5>
@@ -504,8 +506,8 @@
                     <div class="div" style="padding-left: 10px; padding-right: 10px; margin-bottom: 10px;">
                         <div class="row justify-content-center">
                             {% for saving in savings %}
-                                <div class="col-4 align-self-center savingCard">
-                                    <div style="background-color: rgb(202, 202, 202); width: 150px; height: 100px; border-radius: 10%; padding: 5px;">
+                                <div class="col-6 align-self-center savingCard">
+                                    <div style="background-color: rgb(202, 202, 202); height: 100px; border-radius: 5%; padding: 5px;">
                                         {% if saving.amount == 0 %} 
                                             <span id="deleteCurrencyBtn{{loop.index0}}" class="deleteCurrencyBtn" data-toggle="modal" data-target="#confirmDeleteSavingModal{{loop.index0}}">x</span>
                                         {% endif %}

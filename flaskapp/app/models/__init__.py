@@ -25,8 +25,9 @@ class Operation(db.Model):
     description = Column(String(100), nullable=False)
     date = Column(DateTime, nullable=False)
     amount = Column(Float, nullable=False)
-    type_id = Column(Integer, nullable=False)
+    type_id = Column(Integer, ForeignKey('operation_type.id'), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    currency_id = Column(Integer, ForeignKey('currency.id'), nullable=True)
 
 class Saving(db.Model):
     id = Column(Integer, primary_key=True)
