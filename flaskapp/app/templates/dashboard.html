@@ -512,7 +512,7 @@
                                             <span id="deleteCurrencyBtn{{loop.index0}}" class="deleteCurrencyBtn" data-toggle="modal" data-target="#confirmDeleteSavingModal{{loop.index0}}">x</span>
                                         {% endif %}
                                         <div class="currencyCardText">
-                                            {{ saving.amount }} {{ currencies[saving.currency_id - 1].description }}
+                                            {{ saving.amount }} <strong>{{ currencies[saving.currency_id - 1].description }}</strong>
                                         </div>
                                     </div>
                                 </div>
@@ -539,6 +539,47 @@
                                 </div>
                                 <div class="col-6 align-self-end" id="addCurrencySubmit">
                                     <input type="submit" class="btn btn-success my-1" value="Agregar">
+                                </div>
+                            </form>
+                        </div>
+                    {% endif %}
+                    {% if haveCurrencies|length > 1 %}
+                        <hr class="customDivider">
+                        <div class="row justify-content-left pb-4">
+                            <div class="col-6 align-self-left">
+                                <h5>Intercambiar monedas</h5>
+                            </div>
+                        </div>
+                        <div class="div" style="padding-left: 10px; padding-right: 10px; margin-bottom: 30px;">
+                            <form class="form" id="exchangeCurrencyForm" action="/home/dashboard/exchange_curency" method="POST">
+                                {{ form6.user_id(id="user_id_saving") }}
+                                {{ form6.csrf_token(id = "csrf_token_form_6") }}
+                                <div class="row justify-content-left mb-3">
+                                    <div class="col-6">
+                                        <label class="my-1 mr-2" for="originDropdownId">Origen</label> {{ form6.origin_currency_id(id='originDropdownId', class_="form-control custom-select") }}
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="my-1 mr-2" for="destinationDropdownId">Destino</label> {{ form6.destination_currency_id(id='destinationDropdownId',class_="form-control custom-select") }}
+                                    </div>
+                                </div>
+                                <div class="row justify-content-left mb-5">
+                                    <div class="col-3">
+                                        <label class="my-1 mr-2" for="originAmountId">Monto a cambiar</label> {{ form6.origin_amount(id='originAmountId', class_="form-control") }}
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="my-1 mr-2" for="exchangeValueId">Valor de cambio</label> {{ form6.exchange_value(id='exchangeValueId', class_="form-control") }}
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="my-1 mr-2" for="totalExchangedId">Total obtenido</label>
+                                        <div class="form-control totalLabel">
+                                            <span id="totalExchangedId"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <div class="col-12 align-self-center" id="exchangeCurrencySubmit">
+                                        <input type="submit" class="btn btn-success my-1" value="Confirmar">
+                                    </div>
                                 </div>
                             </form>
                         </div>

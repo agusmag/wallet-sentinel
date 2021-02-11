@@ -101,9 +101,12 @@ CREATE TABLE `operation` (
   `amount` float NOT NULL,
   `type_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `currency_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `operation_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+  CONSTRAINT `operation_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+  KEY `currency_id` (`currency_id`),
+  CONSTRAINT `operation_ibfk_2` FOREIGN KEY (`currency_id`) REFERENCES `currency` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -136,7 +139,7 @@ CREATE TABLE `operation_type` (
 
 LOCK TABLES `operation_type` WRITE;
 /*!40000 ALTER TABLE `operation_type` DISABLE KEYS */;
-INSERT INTO `operation_type` VALUES (1,'Indumentaria'),(2,'Comida'),(3,'Impuesto'),(4,'Regalo'),(5,'Tecnología'),(6,'Mueble'),(7,'Nafta'),(8,'Cuota'),(9,'Belleza'),(10,'Higiene'),(11,'Transporte'),(12,'Viaje'),(13,'Entretenimiento'),(14,'Otros'),(15,'Ingreso'),(16,'Salida'),(17,'Ahorro'), (18, 'Servicio');
+INSERT INTO `operation_type` VALUES (1,'Indumentaria'),(2,'Comida'),(3,'Impuesto'),(4,'Regalo'),(5,'Tecnología'),(6,'Mueble'),(7,'Nafta'),(8,'Cuota'),(9,'Belleza'),(10,'Higiene'),(11,'Transporte'),(12,'Viaje'),(13,'Entretenimiento'),(14,'Otros'),(15,'Ingreso'),(16,'Salida'),(17,'Ahorro'), (18, 'Servicio'), (19, 'Alquiler');
 /*!40000 ALTER TABLE `operation_type` ENABLE KEYS */;
 UNLOCK TABLES;
 

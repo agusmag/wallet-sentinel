@@ -161,7 +161,105 @@ $('.operationTypeDropdown').change(function() {
     } else {
         $('.savingDisplay').hide();
     }
-})
+});
+
+/**
+ * ###########
+ * EXCHANGE FORM
+ * ###########
+ */
+
+ /***
+  * Calculate the amount of the current exchange
+  */
+ $('#exchangeValueId').keyup(function() {
+        var originAmount = 0.0;
+        var destinationAmount = 0.0;
+
+        if ($("#originAmountId").val() != "" && $("#originAmountId").val() != undefined &&
+            $("#exchangeValueId").val() != "" && $("#exchangeValueId").val() != undefined) {
+            originAmount = parseFloat($("#originAmountId").val().replace("$","").replace(",",""));
+            destinationAmount = parseFloat($("#exchangeValueId").val().replace("$","").replace(",",""));
+    
+            if ($("#originDropdownId option:selected").html() == 'ARS' && $("#destinationDropdownId option:selected").html() != 'ARS')  {
+                // Divido por que el peso argentino es menor que todo el resto de monedas
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "/"));
+    
+            } else if (($("#originDropdownId option:selected").html() == 'USD' && $("#destinationDropdownId option:selected").html() == 'EUR') ||
+                        ($("#originDropdownId option:selected").html() == 'USD' && $("#destinationDropdownId option:selected").html() == 'GBP')) {
+                // Divido por el que dolar es menor al euro y a la libra
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "/"));
+    
+            } else if (($("#originDropdownId option:selected").html() == 'USD' && $("#destinationDropdownId option:selected").html() == 'ARS')) {
+                // Multiplico por que el dolar es mayor al peso argentino
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "*"));
+    
+            } else if (($("#originDropdownId option:selected").html() == 'EUR' && $("#destinationDropdownId option:selected").html() == 'USD') ||
+                        ($("#originDropdownId option:selected").html() == 'EUR' && $("#destinationDropdownId option:selected").html() == 'ARS')) {
+                // Multiplico por que el euro es mayor al dolar y al peso
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "*"));
+    
+            } else if ($("#originDropdownId option:selected").html() == 'EUR' && $("#destinationDropdownId option:selected").html() != 'GBP') {
+                // Divido por que el euro es menor a la libra
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "/"));
+    
+            } else if ($("#originDropdownId option:selected").html() == 'GBP' && $("#destinationDropdownId option:selected").html() != 'GBP') {
+                // Multiplico por que la libra es mas grande que todas las monedas
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "*"));
+            }
+        } else {
+            $("#totalExchangedId").text(0.0);
+        }
+
+        if ($("#totalExchangedId").text() != "0") {
+            $(".totalLabel").css("border", "1px solid rgb(11, 168, 63)");
+        } else {
+            $(".totalLabel").css("border", "none");
+        }
+ });
+
+ /***
+  * Make operation with 2 numbers based on specific operator
+  * @returns String formatted with 2 decimals
+  */
+ function operateAndFormat(number1, number2, operator) {
+    var result = 0.0; 
+
+    switch(operator) {
+         case "*":
+             result = number1 * number2;
+             break;
+        case "/":
+            if (number1 > 0) {
+                result = number1 / number2;
+            }
+            break;
+     }
+
+     return result.toFixed(2);
+ }
+
+ /***
+  * Check that both dropdown have different currencies
+  */
+ $('#originDropdownId').change(function() {
+    controlCurrenciesForExchange();
+ });
+
+ $('#destinationDropdownId').change(function() {
+    controlCurrenciesForExchange();
+});
+
+/***
+ * Make exchange currency button disabled if the condition is true
+ */
+function controlCurrenciesForExchange() {
+    if ($("#originDropdownId option:selected").html() == $("#destinationDropdownId option:selected").html()) {
+        $("#exchangeCurrencySubmit").prop('disabled', true);
+    } else {
+        $("#exchangeCurrencySubmit").prop('disabled', false);
+    }
+}
 
 /**
  ********************

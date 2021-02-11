@@ -4,7 +4,7 @@ from sqlalchemy import extract
 import datetime, pytz, calendar, json, locale
 
 # Forms
-from app.forms import FiltersForm, NewOperationForm, UserSettingsForm, AddCurrencyForm
+from app.forms import FiltersForm, NewOperationForm, UserSettingsForm, AddCurrencyForm, ChangeCurrencyForm
 
 # Models
 from app.models import User, UserConfiguration, Operation, OperationType, Month, Saving, Currency
@@ -17,12 +17,13 @@ main = Blueprint('main', __name__)
 operationTypeIcons = [
     "fas fa-tshirt", "fas fa-hamburger", "fas fa-file-invoice-dollar", "fas fa-gift",
     "fas fa-laptop", "fas fa-couch", "fas fa-gas-pump", "fas fa-money-check-alt", "fas fa-eye",
-    "fas fa-bath", "fas fa-bus", "fas fa-suitcase-rolling", "fas fa-gamepad", "fas fa-list-ul", "fas fa-money-bill-wave", "fab fa-untappd", "fas fa-university", "fas fa-flag"
+    "fas fa-bath", "fas fa-bus", "fas fa-suitcase-rolling", "fas fa-gamepad", "fas fa-list-ul", "fas fa-money-bill-wave", "fab fa-untappd", "fas fa-university", "fas fa-flag",
+    "fas fa-building"
 ]
 
 operationTypeIconsColor = [
     "tshirt", "hamburger", "file-invoice-dollar", "gift", "laptop",
-    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling", "gamepad", "list-ul", "money-bill-wave", "untappd", "university", "flag"
+    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling", "gamepad", "list-ul", "money-bill-wave", "untappd", "university", "flag", "building"
 ]
 
 @main.route('/')
@@ -76,6 +77,7 @@ def dashboard():
         newOperationForm = NewOperationForm(user_id=user.id)
         editOperationForm = NewOperationForm(user_id=user.id)
         addCurrencyForm = AddCurrencyForm(user_id=user.id)
+        changeCurrencyForm = ChangeCurrencyForm(user_id=user.id)
 
         # Set DataTypes to all the Selects of EveryForm in Dashboard View
         filterForm.month_id.choices = [(m.id, m.description) for m in Month.query.order_by('id')]
@@ -100,6 +102,9 @@ def dashboard():
 
         newOperationForm.currency_id.choices = [(c.id, c.description) for c in haveCurrencies]
         editOperationForm.currency_id.choices = [(c.id, c.description) for c in haveCurrencies]
+        changeCurrencyForm.origin_currency_id.choices = [(c.id, c.description) for c in haveCurrencies]
+        changeCurrencyForm.destination_currency_id.choices = [(c.id, c.description) for c in haveCurrencies]
+
         haveCurrencies = haveCurrencies.all()
         userCurrencies = userCurrencies.all()
 
@@ -179,7 +184,8 @@ def dashboard():
                                     form2=newOperationForm,
                                     form3=editOperationForm,
                                     form4=userSettingsForm,
-                                    form5=addCurrencyForm)
+                                    form5=addCurrencyForm,
+                                    form6=changeCurrencyForm)
 
     elif request.method == 'POST':
         filterForm = FiltersForm()
@@ -211,11 +217,9 @@ def dashboard():
             userConfig.hide_amounts = userSettingsForm.hide_amounts.data
 
             db.session.commit()
-            
             flash('La configuración fue actualizada con éxito', category='alert-success')
         
         messages = json.dumps({'month_id': filterForm.month_id.data,'year_id': filterForm.year_id.data, 'type_id': filterForm.type_id.data})
-        
         return redirect(url_for('main.dashboard', messages=messages))
 
 @main.route('/home/dashboard/new_operation', methods=['POST'])
@@ -240,7 +244,7 @@ def new_operation():
         userConfig = UserConfiguration.query.filter_by(user_id=formOperation.user_id.data).first()
 
         # Set currency_id to null in case that is not type 17
-        currencyId = null
+        currencyId = None
         if (formOperation.type_id.data != 15 and formOperation.type_id != 17 and userConfig.spend_limit != 0 and convertedAmount > userConfig.spend_limit):
                 flash('El gasto supera el límite establecido en la configuración.', category="alert-danger")
                 return redirect(url_for('main.dashboard'))
@@ -292,32 +296,31 @@ def update_operation(id):
 
             # Update the fields
             previousCurrencyType = -1
-            previousCurrencyDesc = ""
+            previousCurrencyDesc = None
             previousAmount = edit_operation.amount
             edit_operation.description = editOperationForm.description.data
             edit_operation.date = editOperationForm.date.data
             edit_operation.amount = convertedAmount
             edit_operation.type_id = editOperationForm.type_id.data
-            if editOperationForm.type_id == 17:
+            if editOperationForm.type_id.data == 17:
                 previousCurrencyType = edit_operation.currency_id
                 previousCurrencyDesc = Currency.query.filter_by(id=edit_operation.currency_id).first()
                 edit_operation.currency_id = editOperationForm.currency_id.data
             
-            db.session.commit()
-
-            if editOperationForm.currency_id.data == 17:
-                saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType)
+            
+            if editOperationForm.type_id.data == 17:
+                saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
                 if saving.amount - previousAmount >= 0:
                     saving.amount = saving.amount - previousAmount
-                    db.session.commit()
 
-                    saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data)
+                    saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
                     saving.amount = saving.amount + convertedAmount
                     db.session.commit()
                 else:
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
             
+            db.session.commit()
             flash('La operación fue actualizada con éxito', category='alert-success')
             return redirect(url_for('main.dashboard'))
 
@@ -331,7 +334,6 @@ def delete_operation(id):
     Operation.query.filter_by(id=id).delete()
 
     db.session.commit()
-
     flash('La operación fue eliminada con éxito', category='alert-success')
     return redirect(url_for('main.dashboard'))
 
@@ -357,6 +359,15 @@ def add_currency():
         return redirect(url_for('main.dashboard'))
         
     flash('Hubo un problema al agregar la moneda', category="alert-danger")
+    return redirect(url_for('main.dashboard'))
+
+@main.route('/home/dashboard/exchange_curency', methods=['POST'])
+@login_required
+def exchange_currency():
+    #     flash('Se han convertido X [moneda_origen] a Y [moneda_destino] correctamente', category='alert-success')
+    #     return redirect(url_for('main.dashboard'))
+
+    # flash('Hubo un problema al intercambiar las monedas', category="alert-danger")
     return redirect(url_for('main.dashboard'))
 
 @main.route('/home/dashboard/delete_saving/<string:id>', methods=['POST'])
