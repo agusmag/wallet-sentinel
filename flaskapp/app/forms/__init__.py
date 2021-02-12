@@ -73,4 +73,5 @@ class ChangeCurrencyForm(FlaskForm):
     destination_currency_id = SelectField('Moneda', coerce=int, id="desCurrencyId")
     origin_amount = StringField('Monto', validators=[InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
     exchange_value = StringField('Monto', validators=[InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
+    total_amount = HiddenField('Monto Total')
     user_id = HiddenField('User Id')

@@ -364,10 +364,34 @@ def add_currency():
 @main.route('/home/dashboard/exchange_curency', methods=['POST'])
 @login_required
 def exchange_currency():
-    #     flash('Se han convertido X [moneda_origen] a Y [moneda_destino] correctamente', category='alert-success')
-    #     return redirect(url_for('main.dashboard'))
+    changeCurrencyForm = ChangeCurrencyForm()
+    
+    # load have user currencies
+    userCurrencies = Saving.query.filter_by(user_id=changeCurrencyForm.user_id.data).with_entities(Saving.currency_id)
+    haveCurrencies = Currency.query.filter(Currency.id.in_(userCurrencies))
+    changeCurrencyForm.origin_currency_id.choices = [(c.id, c.description) for c in haveCurrencies]
+    changeCurrencyForm.destination_currency_id.choices = [(c.id, c.description) for c in haveCurrencies]
+    haveCurrencies = haveCurrencies.all()
 
-    # flash('Hubo un problema al intercambiar las monedas', category="alert-danger")
+    if changeCurrencyForm.validate():
+        originSaving = Saving.query.filter_by(user_id=changeCurrencyForm.user_id.data, currency_id=changeCurrencyForm.origin_currency_id.data).first()
+        destinationSaving = Saving.query.filter_by(user_id=changeCurrencyForm.user_id.data, currency_id=changeCurrencyForm.destination_currency_id.data).first()
+        
+        originAmount = float(changeCurrencyForm.origin_amount.data.replace("$","").replace(",",""))
+        
+        if originSaving.amount - originAmount >= 0:
+            originSaving.amount = originSaving.amount - originAmount
+            print(changeCurrencyForm.total_amount.data)
+            destinationSaving.amount = destinationSaving.amount + float(changeCurrencyForm.total_amount.data)
+
+            db.session.commit()
+            flash('Se han convertido {0} {1} a {2} {3} correctamente'.format(changeCurrencyForm.origin_amount.data, haveCurrencies[originSaving.currency_id -1].description, changeCurrencyForm.total_amount.data, haveCurrencies[destinationSaving.currency_id -1].description), category='alert-success')
+            return redirect(url_for('main.dashboard'))
+        else:
+            flash("No tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede intercambiar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(haveCurrencies[originSaving.currency_id -1].description), category="alert-danger")
+            return redirect(url_for('main.dashboard'))
+
+    flash('Hubo un error al realizar la conversión de monedas', category='alert-danger')
     return redirect(url_for('main.dashboard'))
 
 @main.route('/home/dashboard/delete_saving/<string:id>', methods=['POST'])

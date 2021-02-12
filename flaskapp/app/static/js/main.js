@@ -207,6 +207,8 @@ $('.operationTypeDropdown').change(function() {
                 // Multiplico por que la libra es mas grande que todas las monedas
                 $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "*"));
             }
+
+            $("#totalAmountExchanged").val($("#totalExchangedId").text());
         } else {
             $("#totalExchangedId").text(0.0);
         }
@@ -259,6 +261,8 @@ function controlCurrenciesForExchange() {
     } else {
         $("#exchangeCurrencySubmit").prop('disabled', false);
     }
+    $("#originAmountId").val("");
+    $("#exchangeValueId").val("");
 }
 
 /**

@@ -572,13 +572,14 @@
                                     <div class="col-6">
                                         <label class="my-1 mr-2" for="totalExchangedId">Total obtenido</label>
                                         <div class="form-control totalLabel">
+                                            {{ form6.total_amount(id='totalAmountExchanged') }}
                                             <span id="totalExchangedId"></span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row justify-content-center">
-                                    <div class="col-12 align-self-center" id="exchangeCurrencySubmit">
-                                        <input type="submit" class="btn btn-success my-1" value="Confirmar">
+                                    <div class="col-12 align-self-center">
+                                        <input type="submit" id="exchangeCurrencySubmit" class="btn btn-success my-1" value="Confirmar" disabled>
                                     </div>
                                 </div>
                             </form>
