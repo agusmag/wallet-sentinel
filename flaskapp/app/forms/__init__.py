@@ -63,6 +63,7 @@ class NewOperationForm(FlaskForm):
     type_id = SelectField('Tipo Operación', coerce=int)
     user_id = HiddenField('User Id')
     currency_id = SelectField('Moneda', coerce=int, id="opCurrencyId")
+    from_saving = BooleanField('Usar ahorro', validators=[ Optional()], id="new_op_use_saving", render_kw={"data-toggle": "toggle", "data-onstyle": "success", "data-offstyle": "default"})
 
 class AddCurrencyForm(FlaskForm):
     currency_id = SelectField('Moneda', coerce=int, id="currencyId")

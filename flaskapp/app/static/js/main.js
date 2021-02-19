@@ -1,10 +1,9 @@
 document.body.firstElementChild.tabIndex = 1
-    /**
-     * *******************************
-     * AMOUNT INPUTS AND LABELS FORMAT
-     *********************************
-     */
-
+/**
+*#################################
+* AMOUNT INPUTS AND LABELS FORMAT
+*#################################
+*/
 $("input[data-type='currency']").on({
     keyup: function() {
         formatCurrency($(this));
@@ -89,11 +88,10 @@ function formatCurrency(input, blur) {
 }
 
 /**
- * ###########
+ * ############
  * DATA TABLES
- * ###########
+ * ############
  */
-
 $('#operations_table_desktop').DataTable({
     searching: false,
     lengthMenu: [
@@ -150,28 +148,47 @@ $('#operations_table_mobile').DataTable({
 });
 
 /**
- * ###########
- * SAVING DROPDOWN IN OPERATION FORMS
- * ###########
+ * #################
+ *  OPERATION FORMS
+ * #################
+ * 
+ * New Operation saving dropdown visible for operation type = 15 (Ingreso)
+ * New Operation saving checkbox visible for opeartion type = 15 (Ingreso)
  */
-
 $('.operationTypeDropdown').change(function() {
     if ($(this).children("option:selected").val() == '17') {
         $('.savingDisplay').show();
+        $('.savingCheck').hide();
+    } else if ($(this).children("option:selected").val() == '15') {
+        $('.savingCheck').show();
+        $('.savingDisplay').hide();
     } else {
         $('.savingDisplay').hide();
+        $('.savingCheck').hide();
     }
 });
 
 /**
- * ###########
- * EXCHANGE FORM
- * ###########
+ * Checking for checkbox true to display currency dropdown
  */
+$('.savingCheck').on({
+    click: function() {
+        if ($(this).parent().hasClass('btn-success')) {
+            $('.savingDisplay').show();
+        } else {
+            $('.savingDisplay').hide();
+        }
+    }
+});
 
- /***
-  * Calculate the amount of the current exchange
-  */
+/**
+ * ##############
+ * EXCHANGE FORM
+ * ##############
+ * 
+ * 
+* Calculate the amount of the current exchange
+*/
  $('#exchangeValueId').keyup(function() {
         var originAmount = 0.0;
         var destinationAmount = 0.0;
