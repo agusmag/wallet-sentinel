@@ -375,6 +375,10 @@ body {
     padding: 0px !important;
 }
 
+.generalFromSavingSection {
+    display: none;
+}
+
 /*
 *******************
 * RESPONSIVE STYLES

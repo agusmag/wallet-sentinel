@@ -132,6 +132,7 @@ def dashboard():
             
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
+        operationTypesForEdit = OperationType.query.order_by('description')
 
         # Calculate Operation Type Statistics
         # Get total amounts of all User's operation types loaded
@@ -177,6 +178,7 @@ def dashboard():
                                     savings=savings,
                                     hideAmounts=userConfig.hide_amounts,
                                     operationTypes=operationTypes,
+                                    operationTypesForEdit=operationTypesForEdit,
                                     operationTypeIcons=operationTypeIcons,
                                     operationTypeIconsColor=operationTypeIconsColor,
                                     operations=operations,

@@ -152,32 +152,53 @@ $('#operations_table_mobile').DataTable({
  *  OPERATION FORMS
  * #################
  * 
- * New Operation saving dropdown visible for operation type = 15 (Ingreso)
- * New Operation saving checkbox visible for opeartion type = 15 (Ingreso)
+ * New Operation saving dropdown visible for operation type = 17 (Ahorro)
+ * New Operation saving section visible for operation type = 15 (Ingreso)
  */
-$('.operationTypeDropdown').change(function() {
-    if ($(this).children("option:selected").val() == '17') {
-        $('.savingDisplay').show();
-        $('.savingCheck').hide();
-    } else if ($(this).children("option:selected").val() == '15') {
-        $('.savingCheck').show();
-        $('.savingDisplay').hide();
-    } else {
-        $('.savingDisplay').hide();
-        $('.savingCheck').hide();
-    }
-});
+// $('.operationTypeDropdown').change(function() {
+//     if ($(this).children("option:selected").val() == '17') {
+//         $('.savingDisplay').show();
+//         $('.generalFromSavingSection').hide();
+//     } else if ($(this).children("option:selected").val() == '15') {
+//         $('.generalFromSavingSection').show();
+//         if ($(".savingCheck").parent().hasClass('btn-success')) {
+//             $('.savingDisplay').show();
+//         } else {
+//             $('.savingDisplay').hide();
+//         }
+//     } else {
+//         $('.savingDisplay').hide();
+//         $('.generalFromSavingSection').hide();
+//     }
+// });
 
-/**
- * Checking for checkbox true to display currency dropdown
- */
-$('.savingCheck').on({
-    click: function() {
-        if ($(this).parent().hasClass('btn-success')) {
+function verifyOperationTypeDropdown(e) {
+    console.log("Entré");
+    if (e.children("option:selected").val() == '17') {
+        $('.savingDisplay').show();
+        $('.generalFromSavingSection').hide();
+    } else if (e.children("option:selected").val() == '15') {
+        $('.generalFromSavingSection').show();
+        if ($(".savingCheck").parent().hasClass('btn-success')) {
             $('.savingDisplay').show();
         } else {
             $('.savingDisplay').hide();
         }
+    } else {
+        $('.savingDisplay').hide();
+        $('.generalFromSavingSection').hide();
+    }
+};
+
+/**
+ * Checking for checkbox true to display currency dropdown
+ */
+$(".savingCheck").parent().click(function() {
+    // The classes are before the click, so the condition is negative
+    if (!$(".savingCheck").parent().hasClass('btn-success')) {
+        $('.savingDisplay').show();
+    } else {
+        $('.savingDisplay').hide();
     }
 });
 
