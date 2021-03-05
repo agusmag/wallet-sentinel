@@ -330,14 +330,14 @@ def update_operation(id):
                 savingOld = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
                 if savingOld.amount - previousAmount >= 0:
                     savingOld.amount = savingOld.amount - previousAmount
-                    println("Saving Old: {0}".format(savingOld.amount))
+                    print("Saving Old: {0}".format(savingOld.amount))
                     savingNew = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
                     savingNew.amount = savingNew.amount + convertedAmount
-                    println("Saving New: {0}".format(savingNew.amount))
+                    print("Saving New: {0}".format(savingNew.amount))
                 else:
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
-                    
+
             elif editOperationForm.type_id.data == 15 and editOperationForm.from_saving.data:
                 previousCurrencyType = edit_operation.currency_id
                 previousCurrencyDesc = Currency.query.filter_by(id=edit_operation.currency_id).first()
@@ -346,10 +346,10 @@ def update_operation(id):
                 savingOld = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
                 if savingOld.amount - convertedAmount >= 0:
                     savingOld.amount = savingOld.amount + previousAmount
-                    println("Saving Old: {0}".format(savingOld.amount))
+                    print("Saving Old: {0}".format(savingOld.amount))
                     savingNew = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
                     savingNew.amount = savingNew.amount - convertedAmount
-                    println("Saving New: {0}".format(savingNew.amount))
+                    print("Saving New: {0}".format(savingNew.amount))
                 else:
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
