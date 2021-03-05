@@ -265,8 +265,8 @@ def new_operation():
                 selectedCurrencyType = saving.currency_id
                 selectedCurrencyDesc = Currency.query.filter_by(id=saving.currency_id).first()
                 currencyId = formOperation.currency_id.data
-
-                operation = Operation(description=formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data, currency_id=currencyId)
+                
+                operation = Operation(description=formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data, currency_id=currencyId, from_saving=formOperation.from_saving.data)
                 
                 db.session.add(operation)
                 db.session.commit()
@@ -278,7 +278,7 @@ def new_operation():
                 return redirect(url_for('main.dashboard'))
 
         # Save operation in DB
-        operation = Operation(description= formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data, currency_id=currencyId)
+        operation = Operation(description= formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data, currency_id=currencyId, from_saving=formOperation.from_saving.data)
         
         db.session.add(operation)
         db.session.commit()
@@ -327,29 +327,33 @@ def update_operation(id):
                 previousCurrencyDesc = Currency.query.filter_by(id=edit_operation.currency_id).first()
                 edit_operation.currency_id = editOperationForm.currency_id.data
             
-                saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
-                if saving.amount - previousAmount >= 0:
-                    saving.amount = saving.amount - previousAmount
-
-                    saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
-                    saving.amount = saving.amount + convertedAmount
+                savingOld = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
+                if savingOld.amount - previousAmount >= 0:
+                    savingOld.amount = savingOld.amount - previousAmount
+                    println("Saving Old: {0}".format(savingOld.amount))
+                    savingNew = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
+                    savingNew.amount = savingNew.amount + convertedAmount
+                    println("Saving New: {0}".format(savingNew.amount))
                 else:
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
+                    
             elif editOperationForm.type_id.data == 15 and editOperationForm.from_saving.data:
                 previousCurrencyType = edit_operation.currency_id
                 previousCurrencyDesc = Currency.query.filter_by(id=edit_operation.currency_id).first()
                 edit_operation.currency_id = editOperationForm.currency_id.data
             
-                saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
-                if saving.amount - convertedAmount >= 0:
-                    saving.amount = saving.amount + previousAmount
-
-                    saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
-                    saving.amount = saving.amount - convertedAmount
+                savingOld = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
+                if savingOld.amount - convertedAmount >= 0:
+                    savingOld.amount = savingOld.amount + previousAmount
+                    println("Saving Old: {0}".format(savingOld.amount))
+                    savingNew = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
+                    savingNew.amount = savingNew.amount - convertedAmount
+                    println("Saving New: {0}".format(savingNew.amount))
                 else:
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
+                    
             elif edit_operation.currency_id == None and editOperationForm.from_saving.data:
                 # Tengo que sumarle el monto al disponible y sacarselo al saving
                 edit_operation.currency_id = editOperationForm.currency_id.data
@@ -361,6 +365,7 @@ def update_operation(id):
                 else:
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
+
             elif edit_operation.currency_id != None and not editOperationForm.from_saving.data:
                 # Tengo que sumarle al saving el monto y sacarlo del disponible
                 edit_operation.currency_id = editOperationForm.currency_id.data

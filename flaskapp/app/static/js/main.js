@@ -155,29 +155,11 @@ $('#operations_table_mobile').DataTable({
  * New Operation saving dropdown visible for operation type = 17 (Ahorro)
  * New Operation saving section visible for operation type = 15 (Ingreso)
  */
-// $('.operationTypeDropdown').change(function() {
-//     if ($(this).children("option:selected").val() == '17') {
-//         $('.savingDisplay').show();
-//         $('.generalFromSavingSection').hide();
-//     } else if ($(this).children("option:selected").val() == '15') {
-//         $('.generalFromSavingSection').show();
-//         if ($(".savingCheck").parent().hasClass('btn-success')) {
-//             $('.savingDisplay').show();
-//         } else {
-//             $('.savingDisplay').hide();
-//         }
-//     } else {
-//         $('.savingDisplay').hide();
-//         $('.generalFromSavingSection').hide();
-//     }
-// });
-
 function verifyOperationTypeDropdown(e) {
-    console.log("Entré");
-    if (e.children("option:selected").val() == '17') {
+    if ($(e).children("option:selected").val() == '17') {
         $('.savingDisplay').show();
         $('.generalFromSavingSection').hide();
-    } else if (e.children("option:selected").val() == '15') {
+    } else if ($(e).children("option:selected").val() == '15') {
         $('.generalFromSavingSection').show();
         if ($(".savingCheck").parent().hasClass('btn-success')) {
             $('.savingDisplay').show();
@@ -201,6 +183,30 @@ $(".savingCheck").parent().click(function() {
         $('.savingDisplay').hide();
     }
 });
+
+/**
+ * Check if the checkbox from_saving is not null to show it.
+ * @param {boolean} isFromSaving 
+ */
+function checkSaving(typeId, isFromSaving, loopIndex, isMobile) {
+    if (typeId == 15) {
+        $('.generalFromSavingSection').show();
+        let locator = "";
+        if (isMobile) {
+            locator = "#fromSavingIdMobileEd_" + loopIndex;
+        } else {
+            locator = "#fromSavingIdEd_" + loopIndex;
+        }
+
+        if (isFromSaving) {
+            $(locator).bootstrapToggle('on');
+        } else {
+            $(locator).bootstrapToggle('off');
+        }
+    } else {
+        $('.generalFromSavingSection').hide();
+    }
+}
 
 /**
  * ##############

@@ -28,6 +28,7 @@ class Operation(db.Model):
     type_id = Column(Integer, ForeignKey('operation_type.id'), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     currency_id = Column(Integer, ForeignKey('currency.id'), nullable=True)
+    from_saving = Column(Boolean)
 
 class Saving(db.Model):
     id = Column(Integer, primary_key=True)

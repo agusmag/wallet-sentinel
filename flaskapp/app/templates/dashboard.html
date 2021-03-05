@@ -140,8 +140,11 @@
                     <td>
                         <div class="row justify-content-center">
                             <div class="col-4 mr-3 custom-info-buttons">
-                                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editOperationModal{{loop.index0}}">Editar</button>
-
+                                {% if op.from_saving %}
+                                    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editOperationModal{{loop.index0}}" onclick="checkSaving({{op.type_id}}, true, {{loop.index0}}, false)">Editar</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editOperationModal{{loop.index0}}" onclick="checkSaving({{op.type_id}}, false, {{loop.index0}}, false)">Editar</button>
+                                {% endif %}
                                 <!-- Edit Modal -->
                                 <div class="modal fade" id="editOperationModal{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="editOperationTitle" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -166,7 +169,7 @@
                                                         {{ form3.amount(id="amount_{}".format(loop.index0), class_="form-control", **{"value": op.amount }) }}
                                                     </div>
                                                     <div class="form-group">
-                                                        <select class="form-control custom-select my-1 mr-sm-2 operationTypeDropdown" onclick="verifyOperationTypeDropdown(this)" name="type_id" id="type_id_{{loop.index0}}">
+                                                        <select class="form-control custom-select my-1 mr-sm-2 operationTypeDropdown" onchange="verifyOperationTypeDropdown(this)" name="type_id" id="type_id_{{loop.index0}}">
                                                             {% for ot in operationTypesForEdit %}
                                                                 <option value={{ ot.id }} {% if op.type_id == ot.id %}selected{% endif %}>{{ ot.description }}</option>
                                                             {% endfor %}
@@ -275,7 +278,11 @@
                                     <div class="modal-footer justify-content-center pl-1 pr-1">
                                         <div class="row justify-content-center">
                                             <div class="col-4">
-                                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editOperationModalMobile{{loop.index0}}">Editar</button>
+                                                {% if op.from_saving %}
+                                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editOperationModalMobile{{loop.index0}}" onclick="checkSaving({{op.type_id}}, true, {{loop.index0}}, true)">Editar</button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editOperationModalMobile{{loop.index0}}" onclick="checkSaving({{op.type_id}}, false, {{loop.index0}}, true)">Editar</button>
+                                                {% endif %}
                                             </div>
                                             <div class="col-4">
                                                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteOperationModalMobile{{loop.index0}}">Eliminar</button>
@@ -314,7 +321,7 @@
                                             {{ form3.amount(id="amount_{}_mobile".format(loop.index0), class_="form-control", **{"value": op.amount }) }}
                                         </div>
                                         <div class="form-group">
-                                            <select class="form-control custom-select my-1 mr-sm-2 operationTypeDropdown" name="type_id" id="type_id_{{loop.index0}}_mobile">
+                                            <select class="form-control custom-select my-1 mr-sm-2 operationTypeDropdown" onchange="verifyOperationTypeDropdown(this)" name="type_id" id="type_id_{{loop.index0}}_mobile">
                                                 {% for ot in operationTypes %}
                                                     <option value={{ ot.id }} {% if op.type_id == ot.id %}selected{% endif %}>{{ ot.description }}</option>
                                                 {% endfor %}
@@ -406,7 +413,7 @@
                             {{ form2.amount(class_="form-control") }}
                         </div>
                         <div class="form-group">
-                            {{ form2.type_id(class_="form-control custom-select my-1 mr-sm-2 operationTypeDropdown") }}
+                            {{ form2.type_id(class_="form-control custom-select my-1 mr-sm-2 operationTypeDropdown", **{"onchange": "verifyOperationTypeDropdown(this)"}) }}
                         </div>
                         {% if haveCurrencies|length > 0 %}
                         <div class="generalFromSavingSection">
