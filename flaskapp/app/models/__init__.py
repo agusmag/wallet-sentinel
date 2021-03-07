@@ -20,14 +20,21 @@ class UserConfiguration(db.Model):
     hide_amounts = Column(Boolean)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
-
 class Operation(db.Model):
     id = Column(Integer, primary_key=True)
     description = Column(String(100), nullable=False)
     date = Column(DateTime, nullable=False)
     amount = Column(Float, nullable=False)
-    type_id = Column(Integer, nullable=False)
+    type_id = Column(Integer, ForeignKey('operation_type.id'), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    currency_id = Column(Integer, ForeignKey('currency.id'), nullable=True)
+    from_saving = Column(Boolean)
+
+class Saving(db.Model):
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    currency_id = Column(Integer, ForeignKey('currency.id'), nullable=False)
+    amount = Column(Float, nullable=False)
 
 class OperationType(db.Model):
     id = Column(Integer, primary_key=True)
@@ -39,6 +46,15 @@ class OperationType(db.Model):
 class Month(db.Model):
     id = Column(Integer, primary_key=True)
     description = Column(String(50), nullable=False)
+
+    def __repr__(self):
+        return '{}'.format(self.description)
+
+class Currency(db.Model):
+    id = Column(Integer, primary_key=True)
+    code = Column(Integer, nullable=False)
+    description = Column(String(50), nullable=False)
+    symbol = Column(String(3), nullable=True)
 
     def __repr__(self):
         return '{}'.format(self.description)

@@ -1,10 +1,9 @@
 document.body.firstElementChild.tabIndex = 1
-    /**
-     * *******************************
-     * AMOUNT INPUTS AND LABELS FORMAT
-     *********************************
-     */
-
+/**
+*#################################
+* AMOUNT INPUTS AND LABELS FORMAT
+*#################################
+*/
 $("input[data-type='currency']").on({
     keyup: function() {
         formatCurrency($(this));
@@ -89,11 +88,10 @@ function formatCurrency(input, blur) {
 }
 
 /**
- * ###########
+ * ############
  * DATA TABLES
- * ###########
+ * ############
  */
-
 $('#operations_table_desktop').DataTable({
     searching: false,
     lengthMenu: [
@@ -150,6 +148,187 @@ $('#operations_table_mobile').DataTable({
 });
 
 /**
+ * #################
+ *  OPERATION FORMS
+ * #################
+ * 
+ * New Operation saving dropdown visible for operation type = 17 (Ahorro)
+ * New Operation saving section visible for operation type = 15 (Ingreso)
+ */
+function verifyOperationTypeDropdown(e, index, version) {
+    if ($(e).children("option:selected").val() == '17') {
+        $('.savingDisplay').show();
+        $('.generalFromSavingSection').hide();
+    } else if ($(e).children("option:selected").val() == '15') {
+        $('.generalFromSavingSection').show();
+        if ($(".savingCheck").parent().hasClass('btn-success')) {
+            $('.savingDisplay').show();
+        } else {
+            $('.savingDisplay').hide();
+        }
+    } else {
+        if (version == 'mobile') {
+            $("#fromSavingIdMobileEd_" + index).parent().click();
+        } else if (version == 'desktop_edit') {
+            $("#fromSavingIdEd_" + index).parent().click();
+        } else if (version == 'desktop_create') {
+            $("#fromSavingId").parent().click();
+        }
+        $('.savingDisplay').hide();
+        $('.generalFromSavingSection').hide();
+    }
+};
+
+/**
+ * Checking for checkbox true to display currency dropdown
+ */
+$(".savingCheck").parent().click(function() {
+    // The classes are before the click, so the condition is negative
+    if (!$(".savingCheck").parent().hasClass('btn-success')) {
+        $('.operationCurrencySection').show();
+        $('.savingDisplay').show();
+    } else {
+        $('.operationCurrencySection').hide();
+        $('.savingDisplay').hide();
+    }
+});
+
+/**
+ * Check if the checkbox from_saving is not null to show it.
+ * @param {boolean} isFromSaving 
+ */
+function checkSaving(typeId, isFromSaving, loopIndex, isMobile) {
+    let locator = "";
+    if (isMobile) {
+        $("#type_id_" + loopIndex + "_mobile").val(typeId);
+        locator = "#fromSavingIdMobileEd_" + loopIndex;
+    } else {
+        $("#type_id_" + loopIndex).val(typeId);
+        locator = "#fromSavingIdEd_" + loopIndex;
+    }
+
+    if (isFromSaving) {
+        $(locator).bootstrapToggle('on');
+    } else {
+        $(locator).bootstrapToggle('off');
+    }
+    
+    if (typeId == 15) {
+        $('.generalFromSavingSection').show();
+    } else {
+        if (typeId == 17) {
+            $('.operationCurrencySection').show();
+        } else {
+            $('.operationCurrencySection').hide();
+
+        }
+
+        $('.generalFromSavingSection').hide();
+    }
+}
+
+/**
+ * ##############
+ * EXCHANGE FORM
+ * ##############
+ * 
+ * 
+* Calculate the amount of the current exchange
+*/
+ $('#exchangeValueId').keyup(function() {
+        var originAmount = 0.0;
+        var destinationAmount = 0.0;
+
+        if ($("#originAmountId").val() != "" && $("#originAmountId").val() != undefined &&
+            $("#exchangeValueId").val() != "" && $("#exchangeValueId").val() != undefined) {
+            originAmount = parseFloat($("#originAmountId").val().replace("$","").replace(",",""));
+            destinationAmount = parseFloat($("#exchangeValueId").val().replace("$","").replace(",",""));
+    
+            if ($("#originDropdownId option:selected").html() == 'ARS' && $("#destinationDropdownId option:selected").html() != 'ARS')  {
+                // Divido por que el peso argentino es menor que todo el resto de monedas
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "/"));
+    
+            } else if (($("#originDropdownId option:selected").html() == 'USD' && $("#destinationDropdownId option:selected").html() == 'EUR') ||
+                        ($("#originDropdownId option:selected").html() == 'USD' && $("#destinationDropdownId option:selected").html() == 'GBP')) {
+                // Divido por el que dolar es menor al euro y a la libra
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "/"));
+    
+            } else if (($("#originDropdownId option:selected").html() == 'USD' && $("#destinationDropdownId option:selected").html() == 'ARS')) {
+                // Multiplico por que el dolar es mayor al peso argentino
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "*"));
+    
+            } else if (($("#originDropdownId option:selected").html() == 'EUR' && $("#destinationDropdownId option:selected").html() == 'USD') ||
+                        ($("#originDropdownId option:selected").html() == 'EUR' && $("#destinationDropdownId option:selected").html() == 'ARS')) {
+                // Multiplico por que el euro es mayor al dolar y al peso
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "*"));
+    
+            } else if ($("#originDropdownId option:selected").html() == 'EUR' && $("#destinationDropdownId option:selected").html() != 'GBP') {
+                // Divido por que el euro es menor a la libra
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "/"));
+    
+            } else if ($("#originDropdownId option:selected").html() == 'GBP' && $("#destinationDropdownId option:selected").html() != 'GBP') {
+                // Multiplico por que la libra es mas grande que todas las monedas
+                $("#totalExchangedId").text(operateAndFormat(originAmount, destinationAmount, "*"));
+            }
+
+            $("#totalAmountExchanged").val($("#totalExchangedId").text());
+        } else {
+            $("#totalExchangedId").text(0.0);
+        }
+
+        if ($("#totalExchangedId").text() != "0") {
+            $(".totalLabel").css("border", "1px solid rgb(11, 168, 63)");
+        } else {
+            $(".totalLabel").css("border", "none");
+        }
+ });
+
+ /***
+  * Make operation with 2 numbers based on specific operator
+  * @returns String formatted with 2 decimals
+  */
+ function operateAndFormat(number1, number2, operator) {
+    var result = 0.0; 
+
+    switch(operator) {
+         case "*":
+             result = number1 * number2;
+             break;
+        case "/":
+            if (number1 > 0) {
+                result = number1 / number2;
+            }
+            break;
+     }
+
+     return result.toFixed(2);
+ }
+
+ /***
+  * Check that both dropdown have different currencies
+  */
+ $('#originDropdownId').change(function() {
+    controlCurrenciesForExchange();
+ });
+
+ $('#destinationDropdownId').change(function() {
+    controlCurrenciesForExchange();
+});
+
+/***
+ * Make exchange currency button disabled if the condition is true
+ */
+function controlCurrenciesForExchange() {
+    if ($("#originDropdownId option:selected").html() == $("#destinationDropdownId option:selected").html()) {
+        $("#exchangeCurrencySubmit").prop('disabled', true);
+    } else {
+        $("#exchangeCurrencySubmit").prop('disabled', false);
+    }
+    $("#originAmountId").val("");
+    $("#exchangeValueId").val("");
+}
+
+/**
  ********************
  * RESPONSIVE CLASSES
  ********************
@@ -201,6 +380,8 @@ function changeResponsiveElements(window) {
         $('.customDashboardAmountSeparator').addClass('d-block');
         $('[data-toggle="popover"]').removeAttr("data-placement");
         $('[data-toggle="popover"]').attr("data-placement", "bottom");
+        $('.savingCard').addClass('col-6');
+        $('.savingCard').removeClass('col-4');
     } else {
         $('#currentUserNav').removeClass('mt-4 mb-2');
         $('#mobileTitle').removeClass('d-block');
@@ -229,5 +410,7 @@ function changeResponsiveElements(window) {
         $('.customDashboardAmountSeparator').addClass('d-none');
         $('[data-toggle="popover"]').removeAttr("data-placement");
         $('[data-toggle="popover"]').attr("data-placement", "right");
+        $('.savingCard').removeClass('col-6');
+        $('.savingCard').addClass('col-4');
     }
 }

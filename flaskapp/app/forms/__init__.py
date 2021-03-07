@@ -61,4 +61,18 @@ class NewOperationForm(FlaskForm):
     ], format='%Y-%m-%d')
     amount = StringField('Monto', validators=[InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
     type_id = SelectField('Tipo Operación', coerce=int)
-    user_id = HiddenField('User Id') 
+    user_id = HiddenField('User Id')
+    currency_id = SelectField('Moneda', coerce=int, id="opCurrencyId")
+    from_saving = BooleanField('Usar ahorro', validators=[ Optional()], id="new_op_use_saving", render_kw={"data-toggle": "toggle", "data-onstyle": "success", "data-offstyle": "default"})
+
+class AddCurrencyForm(FlaskForm):
+    currency_id = SelectField('Moneda', coerce=int, id="currencyId")
+    user_id = HiddenField('User Id')
+
+class ChangeCurrencyForm(FlaskForm):
+    origin_currency_id = SelectField('Moneda', coerce=int, id="orCurrencyId")
+    destination_currency_id = SelectField('Moneda', coerce=int, id="desCurrencyId")
+    origin_amount = StringField('Monto', validators=[InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
+    exchange_value = StringField('Monto', validators=[InputRequired('Tenés que indicar un monto')], render_kw={'pattern':'^\d{1,3}(\d{3})*(\.\d+)?$', 'placeholder': '$ 0,00'})
+    total_amount = HiddenField('Monto Total')
+    user_id = HiddenField('User Id')

@@ -6,7 +6,7 @@
         <!-- Month Info -->
         <div class="row mt-4 pb-4">
             <div class="col" id="monthInfoTitle">
-                <h3 class="text-light">Fecha actual <span class="badge badge-secondary">{{ curDate.strftime('%d-%m-%Y') }} </span></h3>
+                <h3 class="text-light">Fecha Actual <span class="badge badge-secondary">{{ curDate.strftime('%d-%m-%Y') }} </span></h3>
             </div>
         </div>
         <!-- User Data -->
@@ -46,6 +46,11 @@
     <div class="row pb-4 mt-4">
         <div class="col">
             <button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#userStatisticsModal" style="border-color: #62c462 !important;">Estadísticas</button>
+        </div>
+    </div>
+    <div class="row pb-4 mt-4">
+        <div class="col">
+            <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#userSavingModal" style="border-color: #3db6de !important;">Ahorros</button>
         </div>
     </div>
 
@@ -135,8 +140,11 @@
                     <td>
                         <div class="row justify-content-center">
                             <div class="col-4 mr-3 custom-info-buttons">
-                                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editOperationModal{{loop.index0}}">Editar</button>
-
+                                {% if op.from_saving %}
+                                    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editOperationModal{{loop.index0}}" onclick="checkSaving({{op.type_id}}, true, {{loop.index0}}, false)">Editar</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editOperationModal{{loop.index0}}" onclick="checkSaving({{op.type_id}}, false, {{loop.index0}}, false)">Editar</button>
+                                {% endif %}
                                 <!-- Edit Modal -->
                                 <div class="modal fade" id="editOperationModal{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="editOperationTitle" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -149,23 +157,43 @@
                                             </div>
                                             <div class="modal-body">
                                                 <form action="/home/dashboard/update_operation/{{ op.id }}" method="POST">
-                                                    {{ form3.hidden_tag() }}
+                                                    {{ form3.user_id(id="user_id_{}".format(loop.index0)) }}
+                                                    {{ form3.csrf_token(id = "csrf_token_form_3_{}".format(loop.index0)) }}
                                                     <div class="form-group">
-                                                        {{ form3.description(class_="form-control", **{"value": op.description }) }}
+                                                        {{ form3.description(id="description_{}".format(loop.index0), class_="form-control", **{"value": op.description }) }}
                                                     </div>
                                                     <div class="form-group">
-                                                        {{ form3.date(class_="form-control", **{"value": op.date.strftime('%Y-%m-%d') }) }}
+                                                        {{ form3.date(id="date_{}".format(loop.index0), class_="form-control", **{"value": op.date.strftime('%Y-%m-%d') }) }}
                                                     </div>
                                                     <div class="form-group">
-                                                        {{ form3.amount(class_="form-control", **{"value": op.amount }) }}
+                                                        {{ form3.amount(id="amount_{}".format(loop.index0), class_="form-control", **{"value": op.amount }) }}
                                                     </div>
                                                     <div class="form-group">
-                                                        <select class="form-control custom-select my-1 mr-sm-2" name="type_id" id="type_id">
-                                                            {% for ot in operationTypes %}
+                                                        <select class="form-control custom-select my-1 mr-sm-2 operationTypeDropdown" onchange="verifyOperationTypeDropdown(this, {{loop.index0}}, 'desktop')" name="type_id" id="type_id_{{loop.index0}}">
+                                                            {% for ot in operationTypesForEdit %}
                                                                 <option value={{ ot.id }} {% if op.type_id == ot.id %}selected{% endif %}>{{ ot.description }}</option>
                                                             {% endfor %}
                                                         </select>
                                                     </div>
+                                                    {% if haveCurrencies|length > 0 %}
+                                                        <div class="generalFromSavingSection">
+                                                            <hr class="customDivider">
+                                                            <div class="row justify-content-start pl-4 savingSection">
+                                                                {{ form3.from_saving.label }}
+                                                                <a href="#" data-toggle="popover" data-trigger="focus" data-content="Podés ingresar el dinero retirándolo del ahorro acumulado."><small class="ml-2"> <i class="far fa-question-circle"></i></small></a>
+                                                            </div>
+                                                            <div class="form-group savingSection">
+                                                                {{ form3.from_saving(id="fromSavingIdEd_{}".format(loop.index0), class_="form-control savingCheck") }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group operationCurrencySection">
+                                                            <select class="form-control custom-select my-1 mr-sm-2 savingDisplay" name="currency_id" id="currencyIdEd_{{loop.index0}}">
+                                                                {% for cu in haveCurrencies %}
+                                                                    <option value={{ cu.id }} {% if op.currency_id == cu.id %}selected{% endif %}>{{ cu.description }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    {% endif %}
                                                     <div class="modal-footer">
                                                         <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
                                                         <input type="submit" class="btn btn-success" value="Confirmar">
@@ -250,7 +278,11 @@
                                     <div class="modal-footer justify-content-center pl-1 pr-1">
                                         <div class="row justify-content-center">
                                             <div class="col-4">
-                                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editOperationModalMobile{{loop.index0}}">Editar</button>
+                                                {% if op.from_saving %}
+                                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editOperationModalMobile{{loop.index0}}" onclick="checkSaving({{op.type_id}}, true, {{loop.index0}}, true)">Editar</button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editOperationModalMobile{{loop.index0}}" onclick="checkSaving({{op.type_id}}, false, {{loop.index0}}, true)">Editar</button>
+                                                {% endif %}
                                             </div>
                                             <div class="col-4">
                                                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteOperationModalMobile{{loop.index0}}">Eliminar</button>
@@ -277,23 +309,43 @@
                                 </div>
                                 <div class="modal-body">
                                     <form action="/home/dashboard/update_operation/{{ op.id }}" method="POST">
-                                        {{ form3.hidden_tag() }}
+                                        {{ form3.user_id(id="user_id_{}_mobile".format(loop.index0)) }}
+                                        {{ form3.csrf_token(id = "csrf_token_form_3_mobile_{}".format(loop.index0)) }}
                                         <div class="form-group">
-                                            {{ form3.description(class_="form-control", **{"value": op.description }) }}
+                                            {{ form3.description(id="description_{}_mobile".format(loop.index0), class_="form-control", **{"value": op.description }) }}
                                         </div>
                                         <div class="form-group">
-                                            {{ form3.date(class_="form-control", **{"value": op.date.strftime('%Y-%m-%d') }) }}
+                                            {{ form3.date(id="date_{}_mobile".format(loop.index0), class_="form-control", **{"value": op.date.strftime('%Y-%m-%d') }) }}
                                         </div>
                                         <div class="form-group">
-                                            {{ form3.amount(class_="form-control", **{"value": op.amount }) }}
+                                            {{ form3.amount(id="amount_{}_mobile".format(loop.index0), class_="form-control", **{"value": op.amount }) }}
                                         </div>
                                         <div class="form-group">
-                                            <select class="form-control custom-select my-1 mr-sm-2" name="type_id" id="type_id">
-                                        {% for ot in operationTypes %}
-                                            <option value={{ ot.id }} {% if op.type_id == ot.id %}selected{% endif %}>{{ ot.description }}</option>
-                                        {% endfor %}
-                                    </select>
+                                            <select class="form-control custom-select my-1 mr-sm-2 operationTypeDropdown" onchange="verifyOperationTypeDropdown(this, {{loop.index0}}, 'mobile')" name="type_id" id="type_id_{{loop.index0}}_mobile">
+                                                {% for ot in operationTypes %}
+                                                    <option value={{ ot.id }} {% if op.type_id == ot.id %}selected{% endif %}>{{ ot.description }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
+                                        {% if haveCurrencies|length > 0 %}
+                                            <div class="generalFromSavingSection">
+                                                <hr class="customDivider">
+                                                <div class="row justify-content-start pl-4 savingSection">
+                                                    {{ form3.from_saving.label }}
+                                                    <a href="#" data-toggle="popover" data-trigger="focus" data-content="Podés ingresar el dinero retirándolo del ahorro acumulado."><small class="ml-2"> <i class="far fa-question-circle"></i></small></a>
+                                                </div>
+                                                <div class="form-group savingSection">
+                                                    {{ form3.from_saving(id="fromSavingIdMobileEd_{}".format(loop.index0), class_="form-control savingCheck") }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <select class="form-control custom-select my-1 mr-sm-2 savingDisplay" name="currency_id" id="currencyIdOpEdMobile_{{loop.index0}}">
+                                                    {% for cu in haveCurrencies %}
+                                                        <option value={{ cu.id }} {% if op.currency_id == cu.id %}selected{% endif %}>{{ cu.description }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        {% endif %}
                                         <div class="modal-footer">
                                             <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
                                             <input type="submit" class="btn btn-success" value="Confirmar">
@@ -334,7 +386,7 @@
 
     <!-- Create Operation Button-->
     <div class="row justify-content-center">
-        <button type="button" class="btn btn-success mb-4" data-toggle="modal" data-target="#newOperationModal">Nuevo</button>
+        <button type="button" class="btn btn-success mb-4" data-toggle="modal" data-target="#newOperationModal" onclick="checkSaving(-1, false, null, false)">Nuevo</button>
     </div>
 
     <!-- New Operation Modal -->
@@ -349,7 +401,8 @@
                 </div>
                 <div class="modal-body">
                     <form action="/home/dashboard/new_operation" method="POST">
-                        {{ form2.hidden_tag() }}
+                        {{ form2.user_id() }}
+                        {{ form2.csrf_token(id = "csrf_token_form_2") }}
                         <div class="form-group">
                             <input type="text" class="form-control" name="description" placeholder="Ingresar una descripción..." />
                         </div>
@@ -360,8 +413,23 @@
                             {{ form2.amount(class_="form-control") }}
                         </div>
                         <div class="form-group">
-                            {{ form2.type_id(class_="form-control custom-select my-1 mr-sm-2") }}
+                            {{ form2.type_id(class_="form-control custom-select my-1 mr-sm-2 operationTypeDropdown", **{"onchange": "verifyOperationTypeDropdown(this, -1, 'desktop')"}) }}
                         </div>
+                        {% if haveCurrencies|length > 0 %}
+                        <div class="generalFromSavingSection">
+                            <hr class="customDivider">
+                            <div class="row justify-content-start pl-4 savingSection">
+                                {{ form2.from_saving.label }}
+                                <a href="#" data-toggle="popover" data-trigger="focus" data-content="Podés ingresar el dinero retirándolo del ahorro acumulado."><small class="ml-2"> <i class="far fa-question-circle"></i></small></a>
+                            </div>
+                            <div class="form-group savingSection">
+                                {{ form2.from_saving(id="fromSavingId", class_="form-control savingCheck") }}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            {{ form2.currency_id(class_="form-control custom-select my-1 mr-sm-2 savingDisplay") }}
+                        </div>
+                        {% endif %}
                         <div class="modal-footer">
                             <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
                             <input type="submit" class="btn btn-success" value="Crear">
@@ -384,7 +452,8 @@
                 </div>
                 <div class="modal-body">
                     <form action="/home/dashboard" method="POST">
-                        {{ form4.hidden_tag() }}
+                        {{ form4.user_id(id="user_id_settings") }}
+                        {{ form4.csrf_token(id = "csrf_token_form_4") }}
                         <div class="row justify-content-start pl-4">
                             {{ form4.spend_limit.label }}
                             <a href="#" data-toggle="popover" data-trigger="focus" data-content="Podés indicar un límite por compra, para no ingresar operaciones mayores a ese monto."><small class="ml-2"> <i class="far fa-question-circle"></i></small></a>
@@ -467,6 +536,131 @@
             </div>
         </div>
     </div>
+
+    <!-- User Saving Modal -->
+    <div class="modal fade" id="userSavingModal" tabindex="-1" role="dialog" aria-labelledby="userSavingTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 750px !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userSavingTitle">Ahorros</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="div" style="padding-left: 10px; padding-right: 10px; margin-bottom: 10px;">
+                        <div class="row justify-content-center">
+                            {% for saving in savings %}
+                                <div class="col-6 align-self-center savingCard">
+                                    <div style="background-color: rgb(202, 202, 202); height: 100px; border-radius: 5%; padding: 5px;">
+                                        {% if saving.amount == 0 %} 
+                                            <span id="deleteCurrencyBtn{{loop.index0}}" class="deleteCurrencyBtn" data-toggle="modal" data-target="#confirmDeleteSavingModal{{loop.index0}}">x</span>
+                                        {% endif %}
+                                        <div class="currencyCardText">
+                                            {{ saving.amount }} <strong>{{ currencies[saving.currency_id - 1].description }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Force next columns to break to new line -->
+                                <div class="w-100 savingCardMobile"></div>
+                            {% endfor %}
+                        </div>
+                        {% if leftCurrencies|length > 0 %}
+                            <hr class="customDivider">
+                            <div class="row justify-content-left pb-4">
+                                <div class="col-6 align-self-left">
+                                    <h5>Agregar monedas</h5>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if leftCurrencies|length > 0 %}
+                        <div class="div" style="padding-left: 10px; padding-right: 10px; margin-bottom: 30px;">
+                            <form class="form-row" id="addCurrencyForm" action="/home/dashboard/add_curency" method="POST">
+                                {{ form5.user_id(id="user_id_saving_form_5") }}
+                                {{ form5.csrf_token(id = "csrf_token_form_5") }}
+                                <div class="col-6" id="addCurrencyField">
+                                    <label class="my-1 mr-2" for="currencyId">Moneda</label> {{ form5.currency_id(class_="form-control custom-select my-1 mr-sm-2") }}
+                                </div>
+                                <div class="col-6 align-self-end" id="addCurrencySubmit">
+                                    <input type="submit" class="btn btn-success my-1" value="Agregar">
+                                </div>
+                            </form>
+                        </div>
+                    {% endif %}
+                    {% if haveCurrencies|length > 1 %}
+                        <hr class="customDivider">
+                        <div class="row justify-content-left pb-4">
+                            <div class="col-6 align-self-left">
+                                <h5>Intercambiar monedas</h5>
+                            </div>
+                        </div>
+                        <div class="div" style="padding-left: 10px; padding-right: 10px; margin-bottom: 30px;">
+                            <form class="form" id="exchangeCurrencyForm" action="/home/dashboard/exchange_curency" method="POST">
+                                {{ form6.user_id(id="user_id_saving_form_6") }}
+                                {{ form6.csrf_token(id = "csrf_token_form_6") }}
+                                <div class="row justify-content-left mb-3">
+                                    <div class="col-6">
+                                        <label class="my-1 mr-2" for="originDropdownId">Origen</label> {{ form6.origin_currency_id(id='originDropdownId', class_="form-control custom-select") }}
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="my-1 mr-2" for="destinationDropdownId">Destino</label> {{ form6.destination_currency_id(id='destinationDropdownId',class_="form-control custom-select") }}
+                                    </div>
+                                </div>
+                                <div class="row justify-content-left mb-5">
+                                    <div class="col-3">
+                                        <label class="my-1 mr-2" for="originAmountId">Monto a cambiar</label> {{ form6.origin_amount(id='originAmountId', class_="form-control") }}
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="my-1 mr-2" for="exchangeValueId">Valor de cambio</label> {{ form6.exchange_value(id='exchangeValueId', class_="form-control") }}
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="my-1 mr-2" for="totalExchangedId">Total obtenido</label>
+                                        <div class="form-control totalLabel">
+                                            {{ form6.total_amount(id='totalAmountExchanged') }}
+                                            <span id="totalExchangedId"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <div class="col-12 align-self-center">
+                                        <input type="submit" id="exchangeCurrencySubmit" class="btn btn-success my-1" value="Confirmar" disabled>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    {% endif %}
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% for saving in savings %}
+        <!-- Confirmation Modal -->
+        <div class="modal fade" id="confirmDeleteSavingModal{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="DeleteSavingTitleModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="DeleteSavingTitleModal">Confirmación</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Si confirmas la eliminación se borrará de forma permanente la moneda <i><strong>{{ currencies[saving.currency_id - 1].description }}</strong></i>, pero puedes agregarla nuevamente cuando desees. <br> ¿Deseas eliminarla de todas formas?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <form action="/home/dashboard/delete_saving/{{ saving.id }}" method="POST">
+                            <button type="submit" class="btn btn-success">Confirmar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 </div>
 
 {% endblock %}
