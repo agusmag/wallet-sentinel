@@ -155,7 +155,7 @@ $('#operations_table_mobile').DataTable({
  * New Operation saving dropdown visible for operation type = 17 (Ahorro)
  * New Operation saving section visible for operation type = 15 (Ingreso)
  */
-function verifyOperationTypeDropdown(e) {
+function verifyOperationTypeDropdown(e, index, version) {
     if ($(e).children("option:selected").val() == '17') {
         $('.savingDisplay').show();
         $('.generalFromSavingSection').hide();
@@ -167,6 +167,13 @@ function verifyOperationTypeDropdown(e) {
             $('.savingDisplay').hide();
         }
     } else {
+        if (version == 'mobile') {
+            $("#fromSavingIdMobileEd_" + index).parent().click();
+        } else if (version == 'desktop_edit') {
+            $("#fromSavingIdEd_" + index).parent().click();
+        } else if (version == 'desktop_create') {
+            $("#fromSavingId").parent().click();
+        }
         $('.savingDisplay').hide();
         $('.generalFromSavingSection').hide();
     }
@@ -178,8 +185,10 @@ function verifyOperationTypeDropdown(e) {
 $(".savingCheck").parent().click(function() {
     // The classes are before the click, so the condition is negative
     if (!$(".savingCheck").parent().hasClass('btn-success')) {
+        $('.operationCurrencySection').show();
         $('.savingDisplay').show();
     } else {
+        $('.operationCurrencySection').hide();
         $('.savingDisplay').hide();
     }
 });
@@ -189,21 +198,31 @@ $(".savingCheck").parent().click(function() {
  * @param {boolean} isFromSaving 
  */
 function checkSaving(typeId, isFromSaving, loopIndex, isMobile) {
+    let locator = "";
+    if (isMobile) {
+        $("#type_id_" + loopIndex + "_mobile").val(typeId);
+        locator = "#fromSavingIdMobileEd_" + loopIndex;
+    } else {
+        $("#type_id_" + loopIndex).val(typeId);
+        locator = "#fromSavingIdEd_" + loopIndex;
+    }
+
+    if (isFromSaving) {
+        $(locator).bootstrapToggle('on');
+    } else {
+        $(locator).bootstrapToggle('off');
+    }
+    
     if (typeId == 15) {
         $('.generalFromSavingSection').show();
-        let locator = "";
-        if (isMobile) {
-            locator = "#fromSavingIdMobileEd_" + loopIndex;
+    } else {
+        if (typeId == 17) {
+            $('.operationCurrencySection').show();
         } else {
-            locator = "#fromSavingIdEd_" + loopIndex;
+            $('.operationCurrencySection').hide();
+
         }
 
-        if (isFromSaving) {
-            $(locator).bootstrapToggle('on');
-        } else {
-            $(locator).bootstrapToggle('off');
-        }
-    } else {
         $('.generalFromSavingSection').hide();
     }
 }

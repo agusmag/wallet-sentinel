@@ -6,7 +6,7 @@
         <!-- Month Info -->
         <div class="row mt-4 pb-4">
             <div class="col" id="monthInfoTitle">
-                <h3 class="text-light">Fecha actual <span class="badge badge-secondary">{{ curDate.strftime('%d-%m-%Y') }} </span></h3>
+                <h3 class="text-light">Fecha Actual <span class="badge badge-secondary">{{ curDate.strftime('%d-%m-%Y') }} </span></h3>
             </div>
         </div>
         <!-- User Data -->
@@ -169,7 +169,7 @@
                                                         {{ form3.amount(id="amount_{}".format(loop.index0), class_="form-control", **{"value": op.amount }) }}
                                                     </div>
                                                     <div class="form-group">
-                                                        <select class="form-control custom-select my-1 mr-sm-2 operationTypeDropdown" onchange="verifyOperationTypeDropdown(this)" name="type_id" id="type_id_{{loop.index0}}">
+                                                        <select class="form-control custom-select my-1 mr-sm-2 operationTypeDropdown" onchange="verifyOperationTypeDropdown(this, {{loop.index0}}, 'desktop')" name="type_id" id="type_id_{{loop.index0}}">
                                                             {% for ot in operationTypesForEdit %}
                                                                 <option value={{ ot.id }} {% if op.type_id == ot.id %}selected{% endif %}>{{ ot.description }}</option>
                                                             {% endfor %}
@@ -186,7 +186,7 @@
                                                                 {{ form3.from_saving(id="fromSavingIdEd_{}".format(loop.index0), class_="form-control savingCheck") }}
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
+                                                        <div class="form-group operationCurrencySection">
                                                             <select class="form-control custom-select my-1 mr-sm-2 savingDisplay" name="currency_id" id="currencyIdEd_{{loop.index0}}">
                                                                 {% for cu in haveCurrencies %}
                                                                     <option value={{ cu.id }} {% if op.currency_id == cu.id %}selected{% endif %}>{{ cu.description }}</option>
@@ -321,7 +321,7 @@
                                             {{ form3.amount(id="amount_{}_mobile".format(loop.index0), class_="form-control", **{"value": op.amount }) }}
                                         </div>
                                         <div class="form-group">
-                                            <select class="form-control custom-select my-1 mr-sm-2 operationTypeDropdown" onchange="verifyOperationTypeDropdown(this)" name="type_id" id="type_id_{{loop.index0}}_mobile">
+                                            <select class="form-control custom-select my-1 mr-sm-2 operationTypeDropdown" onchange="verifyOperationTypeDropdown(this, {{loop.index0}}, 'mobile')" name="type_id" id="type_id_{{loop.index0}}_mobile">
                                                 {% for ot in operationTypes %}
                                                     <option value={{ ot.id }} {% if op.type_id == ot.id %}selected{% endif %}>{{ ot.description }}</option>
                                                 {% endfor %}
@@ -386,7 +386,7 @@
 
     <!-- Create Operation Button-->
     <div class="row justify-content-center">
-        <button type="button" class="btn btn-success mb-4" data-toggle="modal" data-target="#newOperationModal">Nuevo</button>
+        <button type="button" class="btn btn-success mb-4" data-toggle="modal" data-target="#newOperationModal" onclick="checkSaving(-1, false, null, false)">Nuevo</button>
     </div>
 
     <!-- New Operation Modal -->
@@ -413,7 +413,7 @@
                             {{ form2.amount(class_="form-control") }}
                         </div>
                         <div class="form-group">
-                            {{ form2.type_id(class_="form-control custom-select my-1 mr-sm-2 operationTypeDropdown", **{"onchange": "verifyOperationTypeDropdown(this)"}) }}
+                            {{ form2.type_id(class_="form-control custom-select my-1 mr-sm-2 operationTypeDropdown", **{"onchange": "verifyOperationTypeDropdown(this, -1, 'desktop')"}) }}
                         </div>
                         {% if haveCurrencies|length > 0 %}
                         <div class="generalFromSavingSection">
@@ -423,7 +423,7 @@
                                 <a href="#" data-toggle="popover" data-trigger="focus" data-content="Podés ingresar el dinero retirándolo del ahorro acumulado."><small class="ml-2"> <i class="far fa-question-circle"></i></small></a>
                             </div>
                             <div class="form-group savingSection">
-                                {{ form2.from_saving(class_="form-control savingCheck") }}
+                                {{ form2.from_saving(id="fromSavingId", class_="form-control savingCheck") }}
                             </div>
                         </div>
                         <div class="form-group">
@@ -536,14 +536,16 @@
             </div>
         </div>
     </div>
+
+    <!-- User Saving Modal -->
     <div class="modal fade" id="userSavingModal" tabindex="-1" role="dialog" aria-labelledby="userSavingTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 750px !important;">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="userSavingTitle">Ahorros</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="div" style="padding-left: 10px; padding-right: 10px; margin-bottom: 10px;">

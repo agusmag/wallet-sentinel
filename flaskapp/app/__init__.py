@@ -7,10 +7,15 @@ from app.extensions import db
 # Flask_Migrate
 from app.extensions import migrations
 
+# Flask Debugger
+from app.extensions import initialize_flask_server_debugger_if_needed
+
 from config import TestConfig
 
 # Flask_Login
 from app.extensions import login_manager
+
+initialize_flask_server_debugger_if_needed()
 
 def create_app(config=None):
     app = Flask(__name__)

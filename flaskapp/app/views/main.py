@@ -129,7 +129,7 @@ def dashboard():
         
         # Calculate SpendAmount ( gainedAmount - SUM(user.operations.amount type != Ganancia ))
         spendAmount = sum(operation.amount for operation in operations if operation.type_id != 15 and operation.type_id != 17)
-            
+        
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
         operationTypesForEdit = OperationType.query.order_by('description')
@@ -322,6 +322,7 @@ def update_operation(id):
             edit_operation.date = editOperationForm.date.data
             edit_operation.amount = convertedAmount
             edit_operation.type_id = editOperationForm.type_id.data
+            edit_operation.from_saving = editOperationForm.from_saving.data
             if editOperationForm.type_id.data == 17:
                 previousCurrencyType = edit_operation.currency_id
                 previousCurrencyDesc = Currency.query.filter_by(id=edit_operation.currency_id).first()
@@ -330,10 +331,8 @@ def update_operation(id):
                 savingOld = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
                 if savingOld.amount - previousAmount >= 0:
                     savingOld.amount = savingOld.amount - previousAmount
-                    print("Saving Old: {0}".format(savingOld.amount))
                     savingNew = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
                     savingNew.amount = savingNew.amount + convertedAmount
-                    print("Saving New: {0}".format(savingNew.amount))
                 else:
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
@@ -344,12 +343,13 @@ def update_operation(id):
                 edit_operation.currency_id = editOperationForm.currency_id.data
             
                 savingOld = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
-                if savingOld.amount - convertedAmount >= 0:
-                    savingOld.amount = savingOld.amount + previousAmount
-                    print("Saving Old: {0}".format(savingOld.amount))
-                    savingNew = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
+
+                savingNew = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
+                if savingNew.amount - convertedAmount >= 0:
+                    if savingOld != None:
+                        savingOld.amount = savingOld.amount + previousAmount
+
                     savingNew.amount = savingNew.amount - convertedAmount
-                    print("Saving New: {0}".format(savingNew.amount))
                 else:
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
@@ -358,7 +358,6 @@ def update_operation(id):
                 # Tengo que sumarle el monto al disponible y sacarselo al saving
                 edit_operation.currency_id = editOperationForm.currency_id.data
                 currencyDesc = Currency.query.filter_by(id=editOperationForm.currency_id.data).first()
-                edit_operation.amount *= -1 #Invierto el signo para que pase de negativo a positivo
                 saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
                 if saving.amount - convertedAmount >= 0:
                     saving.amount = saving.amount - convertedAmount
@@ -368,9 +367,9 @@ def update_operation(id):
 
             elif edit_operation.currency_id != None and not editOperationForm.from_saving.data:
                 # Tengo que sumarle al saving el monto y sacarlo del disponible
-                edit_operation.currency_id = editOperationForm.currency_id.data
+                edit_operation.currency_id = None
                 currencyDesc = Currency.query.filter_by(id=editOperationForm.currency_id.data).first()
-                edit_operation.amount *= -1 #Invierto el signo para que pase de positivo a negativo
+                edit_operation.from_saving = editOperationForm.from_saving.data
                 saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
                 saving.amount = saving.amount + convertedAmount
                 
@@ -393,10 +392,12 @@ def delete_operation(id):
         if operation.type_id == 17:
             saving.amount = saving.amount - operation.amount
 
-        elif operation.type_id == 15:
+        elif operation.type_id == 15 and operation.from_saving:
             saving.amount = saving.amount + operation.amount
 
-    operation.delete()
+    operation = Operation.query.filter_by(id=id).first()
+
+    db.session.delete(operation)
     db.session.commit()
 
     flash('La operación fue eliminada con éxito', category='alert-success')
@@ -446,7 +447,6 @@ def exchange_currency():
         
         if originSaving.amount - originAmount >= 0:
             originSaving.amount = originSaving.amount - originAmount
-            print(changeCurrencyForm.total_amount.data)
             destinationSaving.amount = destinationSaving.amount + float(changeCurrencyForm.total_amount.data)
 
             db.session.commit()
@@ -463,8 +463,9 @@ def exchange_currency():
 @login_required
 def delete_saving(id):
     # Detele operation from DB
-    Saving.query.filter_by(id=id).delete()
+    saving = Saving.query.filter_by(id=id).first()
 
+    db.session.delete(saving)
     db.session.commit()
 
     flash('La moneda fue eliminada con éxito', category='alert-success')
