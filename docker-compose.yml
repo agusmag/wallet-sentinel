@@ -12,7 +12,7 @@ services:
             - MYSQL_HOST
             - MYSQL_PORT
             - MYSQL_DATABASE
-        command: flask db upgrade
+        command: bash -c "flask db stamp head && flask db migrate && flask db upgrade"
 
     flask:
         build: ./flaskapp
