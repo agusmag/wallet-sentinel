@@ -31,11 +31,16 @@ services:
         expose:
             - 8080
 
-    nginx:
+     nginx:
         build: ./nginx
-        container_name: nginx
+        container_name: nginx_wallet_sentinel
         restart: always
         ports:
-            - "3050:80"
+            - "80:80"
+            - "443:443"
+        volumes:
+            - /etc/letsencrypt/live/mywalletsentinel.com/fullchain.pem:/etc/letsencrypt/live/mywalletsentinel.com/fullchain.pem
+            - /etc/letsencrypt/live/mywalletsentinel.com/privkey.pem:/etc/letsencrypt/live/mywalletsentinel.com/privkey.pem
+            - /etc/ssl/certs/dhparam.pem:/etc/ssl/certs/dhparam.pem
         depends_on:
             - flask
