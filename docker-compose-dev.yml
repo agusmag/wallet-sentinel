@@ -44,14 +44,14 @@ services:
             - MYSQL_DATABASE_HOST=db
             - MYSQL_PORT=3306
             - MYSQL_DATABASE_DB=wallet_sentinel_db_test
-            - DEBUGGER=True
+            # - DEBUGGER=True --> For development time :D 
         expose:
             - 8080
-        ports:
-            - 5000:5000
-            - 10001:10001
-        volumes:
-            - ./flaskapp/:/app:cached
+        # ports:
+        #     - 5000:5000   --> For development time :D 
+        #     - 10001:10001 --> For development time :D 
+        # volumes:
+        #     - ./flaskapp/:/app:cached --> For development time :D 
         depends_on:
             - db
         links:
