@@ -132,3 +132,6 @@ dmypy.json
 
 #Vs Code
 .vscode
+
+# Dev Environment
+*dev*
