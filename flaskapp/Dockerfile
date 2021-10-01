@@ -8,11 +8,17 @@ WORKDIR /app
 ADD . /app
 
 # Set the locale in the container
-RUN apt-get clean && apt-get update && apt-get install -y locales && locale-gen en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+RUN apt-get clean && apt-get update && apt-get install -y locales && locale-gen es_AR.UTF-8
+ENV LANG es_AR.UTF-8
+ENV LANGUAGE es_AR:en
+ENV LC_ALL es_AR.UTF-8
 RUN dpkg-reconfigure locales
+
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE 1
+
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED 1
 
 # Install All the Flask App dependencies
 RUN pip install -r requirements.txt

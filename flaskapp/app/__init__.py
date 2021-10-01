@@ -7,10 +7,15 @@ from app.extensions import db
 # Flask_Migrate
 from app.extensions import migrations
 
+# Flask Debugger
+from app.extensions import initialize_flask_server_debugger_if_needed
+
 from config import TestConfig
 
 # Flask_Login
 from app.extensions import login_manager
+
+initialize_flask_server_debugger_if_needed()
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -23,6 +28,9 @@ def create_app(config=None):
         app.config.from_object('config.TestConfig')
 
     #ORM to Manage DB Models
+    # flask db stamp head  -> To set the revision in the database to the head, without performing any migrations. You can change head to the required change you want.
+    # flask db migrate     -> To detect automatically all the changes.
+    # flask db upgrade     -> To apply all the changes.
     db.init_app(app)
 
     #Enabled migrations

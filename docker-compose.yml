@@ -1,59 +1,46 @@
+services: 
+  flask: 
+    build: ./flaskapp
+    container_name: flask
+    environment: 
+      - FLASK_ENV=production
+      - FLASK_APP=run.py
+      - SECRET_KEY
+      - SLACK_API_TOKEN
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_HOST
+      - MYSQL_PORT
+      - MYSQL_DATABASE
+    expose: 
+      - 8080
+    restart: always
+  migrations: 
+    build: ./flaskapp
+    command: "sh -c \"flask db stamp head && flask db migrate && flask db upgrade\""
+    container_name: migrations
+    environment: 
+      - FLASK_ENV=production
+      - FLASK_APP=run.py
+      - SECRET_KEY
+      - SLACK_API_TOKEN
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_HOST
+      - MYSQL_PORT
+      - MYSQL_DATABASE
+  nginx: 
+    build: ./nginx
+    container_name: nginx_wallet_sentinel
+    depends_on: 
+      - flask
+    ports: 
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes: 
+      - "/etc/letsencrypt/live/mywalletsentinel.com/fullchain.pem:/etc/letsencrypt/live/mywalletsentinel.com/fullchain.pem"
+      - "/etc/letsencrypt/live/mywalletsentinel.com/privkey.pem:/etc/letsencrypt/live/mywalletsentinel.com/privkey.pem"
+      - "/etc/ssl/certs/dhparam.pem:/etc/ssl/certs/dhparam.pem"
+
 version: "3.7"
-
-services:
-    db:
-        image: mysql:5.7
-        restart: always
-        container_name: db
-        ports:
-            - "32000:3306"
-        environment:
-            MYSQL_DATABASE: wallet_sentinel_db
-            MYSQL_ROOT_PASSWORD: root
-        volumes:
-            - ./db:/docker-entrypoint-initdb.d/:ro
-
-    migrations:
-        build: ./flaskapp
-        container_name: migrations
-        environment:
-            - FLASK_ENV=development
-            - FLASK_APP=run.py
-            - MYSQL_USER=root
-            - MYSQL_PASSWORD=root
-            - MYSQL_HOST=db
-            - MYSQL_PORT=3306
-            - MYSQL_DATABASE=wallet_sentinel_db
-        command: flask db upgrade
-        depends_on:
-            - db
-
-    flask:
-        build: ./flaskapp
-        container_name: flask
-        restart: always
-        environment:
-            - FLASK_ENV=development
-            - FLASK_APP=run.py
-            - SECRET_KEY
-            - SLACK_API_TOKEN
-            - MYSQL_USER=root
-            - MYSQL_PASSWORD=root
-            - MYSQL_HOST=db
-            - MYSQL_PORT=3306
-            - MYSQL_DATABASE=wallet_sentinel_db
-        expose:
-            - 8080
-        depends_on: 
-            - db
-        links:
-            - db
-
-    nginx:
-        build: ./nginx
-        container_name: nginx
-        restart: always
-        ports:
-            - "3050:80"
-        depends_on:
-            - flask

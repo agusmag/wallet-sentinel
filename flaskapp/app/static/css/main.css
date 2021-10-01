@@ -167,7 +167,7 @@ body {
 }
 
 .icon-color-gift {
-    background-color: rgb(199, 59, 180);
+    background-color: rgb(199, 59, 134);
 }
 
 .icon-color-laptop {
@@ -210,12 +210,24 @@ body {
     background-color: rgb(94, 50, 15);
 }
 
-.icon-color-money-bill-wave {
-    background-color: rgb(77, 209, 0);
+.icon-flag {
+    background-color: rgb(206, 191, 207);
 }
 
 .icon-color-untappd {
     background-color: rgb(255, 80, 168);
+}
+
+.icon-color-university {
+    background-color: rgb(158 181 81);
+}
+
+.icon-color-money-bill-wave {
+    background-color: rgb(77, 209, 0);
+}
+
+.icon-color-building {
+    background-color: rgb(243, 63, 63);
 }
 
 
@@ -240,6 +252,55 @@ body {
 
 #iterationStatisticsTable {
     font-size: unset;
+}
+
+/*
+***********************
+* USER SAVING MODAL
+***********************
+*/
+
+.savingCard {
+    margin: 10px;
+    padding-left: 0px !important;
+}
+
+.savingCardMobile {
+    display: none;
+}
+
+.currencyCardText {
+    border-left: 4px solid rgb(11, 168, 63);
+    color: black;
+    font-size: 1.5rem !important;
+    height: 90px;
+    padding-top: 30px;
+}
+
+.deleteCurrencyBtn {
+    position: relative;
+    float: right;
+    top: -10px;
+    right: -10px;
+    width: 23px;
+    height: 23px;
+    background:rgb(248, 54, 54);
+    color: #fff;
+    border-radius: 30%;
+    cursor: pointer;
+}
+
+.customDivider {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+    margin-top: 50px;
+}
+
+.totalLabel {
+    background-color: rgb(50 55 62);
+    color: white;
+    font-size: 1rem !important;
 }
 
 
@@ -314,6 +375,9 @@ body {
     padding: 0px !important;
 }
 
+.generalFromSavingSection {
+    display: none;
+}
 
 /*
 *******************
@@ -329,7 +393,19 @@ body {
     .sigupCol {
         margin-right: 90px;
     }
+    .savingCardMobile {
+        display: none;
+    }
 }
+
+@media (max-width: 768px) and (min-width: 425px) {
+    .savingCard {
+        margin-bottom: 20px;
+        padding-left: 50px !important;
+    }
+    
+}
+
 
 @media (max-width: 424px) {
     .customNavBarLinks,
@@ -372,5 +448,12 @@ body {
     }
     #iterationStatisticsTable {
         font-size: small;
+    }
+    .savingCard {
+        margin-bottom: 20px;
+        padding-left: 15px !important;
+    }
+    .savingCardMobile {
+        display: block;
     }
 }
