@@ -7,6 +7,9 @@ from app.extensions import db
 # Flask_Migrate
 from app.extensions import migrations
 
+# Db Models
+from app.models import User, UserConfiguration, Operation, Saving, OperationType, Month, Currency
+
 # Flask Debugger
 from app.extensions import initialize_flask_server_debugger_if_needed
 

@@ -74,8 +74,8 @@ def signup_post():
         db.session.commit()
 
         #Create the object UserConfiguration to store it in the BD
-        new_user_config = UserConfiguration(spend_limit=totalAmount, warning_percent=75, hide_amounts=0, user_id=new_user.id)
-        
+        new_user_config = UserConfiguration(spend_limit=totalAmount, warning_percent=75, hide_amounts=0, user_id=new_user.id, exchange_rates='[1,1,1,1]')
+
         db.session.add(new_user_config)
         db.session.commit()
 

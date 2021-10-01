@@ -115,6 +115,7 @@
                 <tr>
                     <th>Detalle</th>
                     <th>Monto</th>
+                    <th>Moneda</th>
                     <th>Tipo</th>
                     <th>Fecha</th>
                     <th>Acción</th>
@@ -125,7 +126,8 @@
                 {% for op in operations %}
                 <tr class="table-dark">
                     <td>{{ op.description }}</td>
-                    <td>{{ "$ {:,.2f}".format(op.amount) }}</td>
+                    <td>{{ currencies[op.currency_id-1].symbol "{:,.2f}".format(op.amount) }}</td>
+                    <td>{{ currencies[op.currency_id-1].description }}</td>
                     <td>
                         <div class="row justify-content-center iconRow">
                             <div class="col-6 align-self-center iconLabel">
@@ -254,7 +256,7 @@
                             <div class="col-5 text-right iconContent">
                                 <div class="icon-shape icon-color-{{ operationTypeIconsColor[op.type_id - 1]}}"><i class="{{ operationTypeIcons[op.type_id - 1] }}"></i></div>
                             </div>
-                            <div class="col-6 text-right">{{ "$ {:,.2f}".format(op.amount) }}</div>
+                            <div class="col-6 text-right">{{ currencies[op.currency_id-1].symbol "{:,.2f}".format(op.amount) }}</div>
                         </div>
                     </td>
                     <!-- Show Operation Detail Modal -->
@@ -272,7 +274,7 @@
                                     <div class="row justify-content-center mb-4">
                                         <div class="icon-shape icon-color-{{ operationTypeIconsColor[op.type_id - 1]}} text-center"><i class="{{ operationTypeIcons[op.type_id - 1] }}"></i></div>
                                     </div>
-                                    <p>{{ "$ {:,.2f}".format(op.amount) }}</p>
+                                    <p>{{ currencies[op.currency_id-1].symbol "{:,.2f}".format(op.amount) }}</p>
                                     <p>{{ operationTypes[op.type_id-1].description }}</p>
                                     <p>{{ op.date.strftime('%d-%m-%Y') }}</p>
                                     <div class="modal-footer justify-content-center pl-1 pr-1">

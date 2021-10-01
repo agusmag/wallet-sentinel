@@ -152,20 +152,15 @@ $('#operations_table_mobile').DataTable({
  *  OPERATION FORMS
  * #################
  * 
- * New Operation saving dropdown visible for operation type = 17 (Ahorro)
+ * New Operation saving dropdown visible for all operation types
  * New Operation saving section visible for operation type = 15 (Ingreso)
  */
 function verifyOperationTypeDropdown(e, index, version) {
+    console.log("Estoy actualizado");
     if ($(e).children("option:selected").val() == '17') {
-        $('.savingDisplay').show();
         $('.generalFromSavingSection').hide();
     } else if ($(e).children("option:selected").val() == '15') {
         $('.generalFromSavingSection').show();
-        if ($(".savingCheck").parent().hasClass('btn-success')) {
-            $('.savingDisplay').show();
-        } else {
-            $('.savingDisplay').hide();
-        }
     } else {
         if (version == 'mobile') {
             $("#fromSavingIdMobileEd_" + index).parent().click();
@@ -174,7 +169,6 @@ function verifyOperationTypeDropdown(e, index, version) {
         } else if (version == 'desktop_create') {
             $("#fromSavingId").parent().click();
         }
-        $('.savingDisplay').hide();
         $('.generalFromSavingSection').hide();
     }
 };

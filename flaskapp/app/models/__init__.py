@@ -19,6 +19,7 @@ class UserConfiguration(db.Model):
     warning_percent = Column(Integer)
     hide_amounts = Column(Boolean)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    exchange_rates = Column(String(100), nullable=True)
 
 class Operation(db.Model):
     id = Column(Integer, primary_key=True)

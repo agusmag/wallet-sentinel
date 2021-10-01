@@ -134,9 +134,13 @@ def dashboard():
         operationTypes = OperationType.query.order_by(OperationType.id).all()
         operationTypesForEdit = OperationType.query.order_by('description')
 
+        # Load all Currencies
+        currencies = Currency.query.order_by(Currency.id).all()
+
         # Calculate Operation Type Statistics
         # Get total amounts of all User's operation types loaded
-        userOperationTypesAmounts = [ (op.id, round(sum(operation.amount for operation in operations if operation.type_id == op.id ), 2)) for op in operationTypes if op.id != 15 ]
+        # Also, convert all the amount to ARS based on the exchange_rate setted in userConfig.
+        userOperationTypesAmounts = [ (op.id, round(sum(operation.amount for operation in operations if operation.type_id == op.id ) * userConfig.exchange_rates[op.currency_id], 2)) for op in operationTypes if op.id != 15 ]
 
         #Calculate 
         operationStatistics = [ (operationTypes[uop[0]-1], uop[1], round((uop[1] * 100) / spendAmount if spendAmount > 0 else 0 , 2)) for uop in userOperationTypesAmounts ]
@@ -156,8 +160,6 @@ def dashboard():
         elif spendAmount >= gainedAmount:
             spendAmountStatusColor = 'badge-danger'
 
-        # Load all Currencies
-        currencies = Currency.query.order_by(Currency.id).all()
 
         # Get all the Savings
         savings = Saving.query.filter_by(user_id=user.id)
@@ -217,6 +219,8 @@ def dashboard():
             userConfig.spend_limit = float(userSettingsForm.spend_limit.data.replace("$", "").replace(",", ""))
             userConfig.warning_percent = int(userSettingsForm.warning_percent.data)
             userConfig.hide_amounts = userSettingsForm.hide_amounts.data
+            exchangeRates = [] #Find how assign dynamic inputs from form to array
+            userConfig.exchange_rates = exchangeRates
 
             db.session.commit()
             flash('La configuración fue actualizada con éxito', category='alert-success')
