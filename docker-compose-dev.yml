@@ -26,9 +26,9 @@ services:
             - MYSQL_DATABASE=wallet_sentinel_db_test
         command: flask db upgrade
         depends_on:
-            - db
+            - flask
         links:
-            - db
+            - flask
 
     flask:
         build: ./flaskapp

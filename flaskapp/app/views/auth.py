@@ -74,7 +74,7 @@ def signup_post():
         db.session.commit()
 
         #Create the object UserConfiguration to store it in the BD
-        new_user_config = UserConfiguration(spend_limit=totalAmount, warning_percent=75, hide_amounts=0, user_id=new_user.id, exchange_rates='[1,1,1,1]')
+        new_user_config = UserConfiguration(spend_limit=totalAmount, warning_percent=75, hide_amounts=0, user_id=new_user.id, exchange_rates='{"ars": 1, "usd": 1, "eur": 1, "gbp": 1}')
 
         db.session.add(new_user_config)
         db.session.commit()
@@ -86,12 +86,12 @@ def signup_post():
         db.session.commit()
 
         #Send Slack Message notifying the new registration
-        try:    
+        try:
             wsChannel = 'CSWSV4LLF' #walletsentinel channel
             sendNewUserSlackMessage(wsChannel, signupForm.username.data)
         except:
             print('Ha ocurrido un error al enviar la notifiación a slack..')
-        
+
         return redirect(url_for('auth.login'))
     else:
         return render_template('signup.html', form=signupForm)

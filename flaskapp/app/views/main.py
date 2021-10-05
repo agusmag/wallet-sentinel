@@ -47,7 +47,7 @@ def dashboard():
         filter_month_id = month
         filter_year_id = 0
         filter_type_id = 0
-        
+ 
         # Check for cookies values from preview dashboard filter POST
         if request.args.get('messages') is not None:
             messages = request.args['messages']
@@ -58,12 +58,12 @@ def dashboard():
 
             if messages.get('year_id') is not None:
                 filter_year_id = messages.get('year_id')
-            
+
             if messages.get('type_id') is not None:
                 filter_type_id = messages.get('type_id')
 
         filterForm = FiltersForm(month_id=filter_month_id, year_id=filter_year_id, type_id=filter_type_id)
-        
+
         # Get User Data
         user = User.query.filter_by(username=current_user.username).first()
 
@@ -71,7 +71,10 @@ def dashboard():
         userConfig = UserConfiguration.query.filter_by(user_id=user.id).first()
 
         # Set User Settings to UserSettingsForm
-        userSettingsForm = UserSettingsForm(spend_limit=userConfig.spend_limit, warning_percent=userConfig.warning_percent, hide_amounts=userConfig.hide_amounts, user_id=userConfig.user_id)
+        userSettingsForm = UserSettingsForm(spend_limit=userConfig.spend_limit, warning_percent=userConfig.warning_percent, hide_amounts=userConfig.hide_amounts, user_id=userConfig.user_id, exchange_rates=userConfig.exchange_rates)
+
+        # Set Exchange Rates for User Settings
+        exchangeRates = json.dumps(userConfig.exchange_rates)
 
         # Set hidden user_id to all the Forms in the Dashboard View
         newOperationForm = NewOperationForm(user_id=user.id)
@@ -85,7 +88,7 @@ def dashboard():
 
         yearList = list(range(year, year - 21, -1))
         filterForm.year_id.choices = [(index, description) for index, description in enumerate(yearList, start=0)]
-        
+
         filterForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
         filterForm.type_id.choices.insert(0, ('0', 'Todos'))
 
@@ -126,10 +129,10 @@ def dashboard():
 
         # Calculate gainedAmount ( SUM(user.operations.amount type == Ganancia ))
         gainedAmount = sum(operation.amount for operation in operations if operation.type_id == 15)
-        
+
         # Calculate SpendAmount ( gainedAmount - SUM(user.operations.amount type != Ganancia ))
         spendAmount = sum(operation.amount for operation in operations if operation.type_id != 15 and operation.type_id != 17)
-        
+
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
         operationTypesForEdit = OperationType.query.order_by('description')
@@ -140,7 +143,7 @@ def dashboard():
         # Calculate Operation Type Statistics
         # Get total amounts of all User's operation types loaded
         # Also, convert all the amount to ARS based on the exchange_rate setted in userConfig.
-        userOperationTypesAmounts = [ (op.id, round(sum(operation.amount for operation in operations if operation.type_id == op.id ) * userConfig.exchange_rates[op.currency_id], 2)) for op in operationTypes if op.id != 15 ]
+        userOperationTypesAmounts = [ (op.id, round(sum(operation.amount * userConfig.exchange_rates["{0}".format(Currency.query.filter_by(id=operation.currency_id).first().description)] for operation in operations if operation.type_id == op.id ), 2)) for op in operationTypes if op.id != 15 ]
 
         #Calculate 
         operationStatistics = [ (operationTypes[uop[0]-1], uop[1], round((uop[1] * 100) / spendAmount if spendAmount > 0 else 0 , 2)) for uop in userOperationTypesAmounts ]
@@ -160,7 +163,6 @@ def dashboard():
         elif spendAmount >= gainedAmount:
             spendAmountStatusColor = 'badge-danger'
 
-
         # Get all the Savings
         savings = Saving.query.filter_by(user_id=user.id)
 
@@ -177,6 +179,7 @@ def dashboard():
                                     userCurrencies=userCurrencies,
                                     leftCurrencies=leftCurrencies,
                                     haveCurrencies=haveCurrencies,
+                                    exchangeRates=exchangeRates,
                                     savings=savings,
                                     hideAmounts=userConfig.hide_amounts,
                                     operationTypes=operationTypes,
@@ -190,7 +193,6 @@ def dashboard():
                                     form4=userSettingsForm,
                                     form5=addCurrencyForm,
                                     form6=changeCurrencyForm)
-
     elif request.method == 'POST':
         filterForm = FiltersForm()
 
@@ -201,7 +203,6 @@ def dashboard():
         year = today_localize.year
         yearList = list(range(year, year - 21, -1))
         filterForm.year_id.choices = [(index, description) for index, description in enumerate(yearList, start=0)]
-        
         filterForm.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
         filterForm.type_id.choices.insert(0, ('0', 'Todos'))
 
@@ -219,12 +220,11 @@ def dashboard():
             userConfig.spend_limit = float(userSettingsForm.spend_limit.data.replace("$", "").replace(",", ""))
             userConfig.warning_percent = int(userSettingsForm.warning_percent.data)
             userConfig.hide_amounts = userSettingsForm.hide_amounts.data
-            exchangeRates = [] #Find how assign dynamic inputs from form to array
-            userConfig.exchange_rates = exchangeRates
+            userConfig.exchange_rates = userSettingsForm.exchange_rates.data
 
             db.session.commit()
             flash('La configuración fue actualizada con éxito', category='alert-success')
-        
+
         messages = json.dumps({'month_id': filterForm.month_id.data,'year_id': filterForm.year_id.data, 'type_id': filterForm.type_id.data})
         return redirect(url_for('main.dashboard', messages=messages))
 
@@ -234,7 +234,7 @@ def new_operation():
     # Obtain data from template
     formOperation = NewOperationForm()
     formOperation.type_id.choices = [(o.id, o.description) for o in OperationType.query.order_by('description')]
-    
+
     userCurrencies = Saving.query.filter_by(user_id=formOperation.user_id.data).with_entities(Saving.currency_id)
     haveCurrencies = Currency.query.filter(Currency.id.in_(userCurrencies))
     formOperation.currency_id.choices = [(c.id, c.description) for c in haveCurrencies]
@@ -245,7 +245,7 @@ def new_operation():
         if convertedAmount <= 0:
             flash('El gasto de la operación debe ser mayor a 0.', category="alert-danger")
             return redirect(url_for('main.dashboard'))
-        
+
         # Search User Configuration to verify Spend Limit
         userConfig = UserConfiguration.query.filter_by(user_id=formOperation.user_id.data).first()
 
@@ -269,9 +269,9 @@ def new_operation():
                 selectedCurrencyType = saving.currency_id
                 selectedCurrencyDesc = Currency.query.filter_by(id=saving.currency_id).first()
                 currencyId = formOperation.currency_id.data
-                
+
                 operation = Operation(description=formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data, currency_id=currencyId, from_saving=formOperation.from_saving.data)
-                
+
                 db.session.add(operation)
                 db.session.commit()
 
@@ -283,10 +283,10 @@ def new_operation():
 
         # Save operation in DB
         operation = Operation(description= formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data, currency_id=currencyId, from_saving=formOperation.from_saving.data)
-        
+
         db.session.add(operation)
         db.session.commit()
-        
+
         flash('La operación fue creada con éxito!', category="alert-success")
         return redirect(url_for('main.dashboard'))
 
@@ -303,7 +303,7 @@ def update_operation(id):
     userCurrencies = Saving.query.filter_by(user_id=editOperationForm.user_id.data).with_entities(Saving.currency_id)
     haveCurrencies = Currency.query.filter(Currency.id.in_(userCurrencies))
     editOperationForm.currency_id.choices = [(c.id, c.description) for c in haveCurrencies]
-    
+
     if editOperationForm.validate():
         # Parse amount string to decimal
         convertedAmount = float(editOperationForm.amount.data.replace("$","").replace(",",""))
@@ -331,7 +331,7 @@ def update_operation(id):
                 previousCurrencyType = edit_operation.currency_id
                 previousCurrencyDesc = Currency.query.filter_by(id=edit_operation.currency_id).first()
                 edit_operation.currency_id = editOperationForm.currency_id.data
-            
+
                 savingOld = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
                 if savingOld.amount - previousAmount >= 0:
                     savingOld.amount = savingOld.amount - previousAmount
@@ -345,7 +345,7 @@ def update_operation(id):
                 previousCurrencyType = edit_operation.currency_id
                 previousCurrencyDesc = Currency.query.filter_by(id=edit_operation.currency_id).first()
                 edit_operation.currency_id = editOperationForm.currency_id.data
-            
+
                 savingOld = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
 
                 savingNew = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
@@ -357,7 +357,7 @@ def update_operation(id):
                 else:
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
-                    
+
             elif edit_operation.currency_id == None and editOperationForm.from_saving.data:
                 # Tengo que sumarle el monto al disponible y sacarselo al saving
                 edit_operation.currency_id = editOperationForm.currency_id.data
@@ -376,7 +376,7 @@ def update_operation(id):
                 edit_operation.from_saving = editOperationForm.from_saving.data
                 saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()
                 saving.amount = saving.amount + convertedAmount
-                
+
             db.session.commit()
             flash('La operación fue actualizada con éxito', category='alert-success')
             return redirect(url_for('main.dashboard'))
@@ -392,7 +392,7 @@ def delete_operation(id):
 
     if operation.currency_id != None:
         saving = Saving.query.filter_by(user_id=operation.user_id, currency_id=operation.currency_id).first()
-        
+
         if operation.type_id == 17:
             saving.amount = saving.amount - operation.amount
 
@@ -421,13 +421,13 @@ def add_currency():
     if addCurrencyForm.validate():
         # Save saving in DB
         saving = Saving(user_id=addCurrencyForm.user_id.data, currency_id=addCurrencyForm.currency_id.data, amount=0)
-        
+
         db.session.add(saving)
         db.session.commit()
 
         flash('La moneda fue agregada correctamente', category='alert-success')
         return redirect(url_for('main.dashboard'))
-        
+
     flash('Hubo un problema al agregar la moneda', category="alert-danger")
     return redirect(url_for('main.dashboard'))
 
@@ -435,7 +435,7 @@ def add_currency():
 @login_required
 def exchange_currency():
     changeCurrencyForm = ChangeCurrencyForm()
-    
+
     # load have user currencies
     userCurrencies = Saving.query.filter_by(user_id=changeCurrencyForm.user_id.data).with_entities(Saving.currency_id)
     haveCurrencies = Currency.query.filter(Currency.id.in_(userCurrencies))
@@ -446,9 +446,9 @@ def exchange_currency():
     if changeCurrencyForm.validate():
         originSaving = Saving.query.filter_by(user_id=changeCurrencyForm.user_id.data, currency_id=changeCurrencyForm.origin_currency_id.data).first()
         destinationSaving = Saving.query.filter_by(user_id=changeCurrencyForm.user_id.data, currency_id=changeCurrencyForm.destination_currency_id.data).first()
-        
+
         originAmount = float(changeCurrencyForm.origin_amount.data.replace("$","").replace(",",""))
-        
+
         if originSaving.amount - originAmount >= 0:
             originSaving.amount = originSaving.amount - originAmount
             destinationSaving.amount = destinationSaving.amount + float(changeCurrencyForm.total_amount.data)
@@ -468,9 +468,27 @@ def exchange_currency():
 def delete_saving(id):
     # Detele operation from DB
     saving = Saving.query.filter_by(id=id).first()
+    currency = Currency.query.filter_by(id=saving.currency_id).first()
 
     db.session.delete(saving)
     db.session.commit()
 
-    flash('La moneda fue eliminada con éxito', category='alert-success')
+    flash('La moneda {0} fue eliminada con éxito'.format(currency.description), category='alert-success')
     return redirect(url_for('main.dashboard'))
+
+@main.route('/home/dashboard/adjust_saving/<string:id>', methods=['POST'])
+@login_required
+def adjust_saving(id):
+    # Initialize new form with the amount to adjust
+    savingAmount = request.form.get('newSavingValue')
+    # Replace value
+    saving = Saving.query.filter_by(id=id).first()
+    saving.amount = savingAmount
+    # Update db
+    db.session.commit()
+
+    currency = Currency.query.filter_by(id=saving.currency_id).first()
+
+    flash('El monto de la moneda {0} fue ajustado con éxito a {1} {2}'.format(currency.description, currency.symbol, savingAmount), category='alert-success')
+    return redirect(url_for('main.dashboard'))
+

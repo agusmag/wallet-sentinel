@@ -290,6 +290,19 @@ body {
     cursor: pointer;
 }
 
+.adjustCurrencyBtn {
+    position: relative;
+    float: right;
+    top -10px;
+    right: -30px;
+    width: 23px;
+    height: 23px;
+    background:rgb(145 152 235);
+    color: #fff;
+    border-radius: 30%;
+    cursor: pointer;
+}
+
 .customDivider {
     border: 0;
     height: 1px;

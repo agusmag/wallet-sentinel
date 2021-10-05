@@ -39,6 +39,7 @@ class UserSettingsForm(FlaskForm):
     warning_percent = StringField('Porcentaje de advertencia', validators=[ Optional()])
     hide_amounts = BooleanField('Difuminar Totales', validators=[ Optional()], id="user_cfg_hide_amt", render_kw={"data-toggle": "toggle", "data-onstyle": "success", "data-offstyle": "default"})
     user_id = HiddenField('User Id')
+    exchange_rates = HiddenField('Tasas de Cambio')
 
 class FiltersForm(FlaskForm):
     month_id = SelectField('Mes', coerce=int, validators=[
