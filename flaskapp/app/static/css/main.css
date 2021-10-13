@@ -293,8 +293,8 @@ body {
 .adjustCurrencyBtn {
     position: relative;
     float: right;
-    top -10px;
-    right: -30px;
+    top: 20px;
+    right: -33px;
     width: 23px;
     height: 23px;
     background:rgb(145 152 235);

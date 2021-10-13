@@ -139,11 +139,12 @@ def dashboard():
 
         # Load all Currencies
         currencies = Currency.query.order_by(Currency.id).all()
+        exchangeRatesJson = json.loads(userConfig.exchange_rates)
 
         # Calculate Operation Type Statistics
         # Get total amounts of all User's operation types loaded
         # Also, convert all the amount to ARS based on the exchange_rate setted in userConfig.
-        userOperationTypesAmounts = [ (op.id, round(sum(operation.amount * userConfig.exchange_rates["{0}".format(Currency.query.filter_by(id=operation.currency_id).first().description)] for operation in operations if operation.type_id == op.id ), 2)) for op in operationTypes if op.id != 15 ]
+        userOperationTypesAmounts = [ (op.id, round(sum(operation.amount * exchangeRatesJson["{0}".format(Currency.query.filter_by(id=operation.currency_id).first().description.lower())] for operation in operations if operation.type_id == op.id ), 2)) for op in operationTypes if op.id != 15 ]
 
         #Calculate 
         operationStatistics = [ (operationTypes[uop[0]-1], uop[1], round((uop[1] * 100) / spendAmount if spendAmount > 0 else 0 , 2)) for uop in userOperationTypesAmounts ]
@@ -250,25 +251,24 @@ def new_operation():
         userConfig = UserConfiguration.query.filter_by(user_id=formOperation.user_id.data).first()
 
         # Set currency_id to null in case that is not type 17
-        currencyId = None
+        currencyId = formOperation.currency_id.data
+
         if (formOperation.type_id.data != 15 and formOperation.type_id != 17 and userConfig.spend_limit != 0 and convertedAmount > userConfig.spend_limit):
                 flash('El gasto supera el límite establecido en la configuración.', category="alert-danger")
                 return redirect(url_for('main.dashboard'))
         elif formOperation.type_id.data == 17:
             # Save Saving in DB
-            saving = Saving.query.filter_by(user_id=formOperation.user_id.data, currency_id=formOperation.currency_id.data).first()
+            saving = Saving.query.filter_by(user_id=formOperation.user_id.data, currency_id=currencyId).first()
 
             saving.amount=saving.amount + convertedAmount
             db.session.commit()
 
-            currencyId = formOperation.currency_id.data
         elif formOperation.type_id.data == 15 and formOperation.from_saving.data:
-            saving = Saving.query.filter_by(user_id=formOperation.user_id.data, currency_id=formOperation.currency_id.data).first()
+            saving = Saving.query.filter_by(user_id=formOperation.user_id.data, currency_id=currencyId).first()
             if saving.amount - convertedAmount >= 0:
                 saving.amount=saving.amount - convertedAmount
                 selectedCurrencyType = saving.currency_id
                 selectedCurrencyDesc = Currency.query.filter_by(id=saving.currency_id).first()
-                currencyId = formOperation.currency_id.data
 
                 operation = Operation(description=formOperation.description.data, date=formOperation.date.data, amount=convertedAmount, type_id=formOperation.type_id.data, user_id=formOperation.user_id.data, currency_id=currencyId, from_saving=formOperation.from_saving.data)
 
@@ -292,7 +292,6 @@ def new_operation():
 
     flash('Hubo un problema al crear la operación', category="alert-danger")
     return redirect(url_for('main.dashboard', form2=formOperation, showNewModal=True))
-
 
 @main.route('/home/dashboard/update_operation/<string:id>', methods=['POST'])
 @login_required
@@ -327,6 +326,8 @@ def update_operation(id):
             edit_operation.amount = convertedAmount
             edit_operation.type_id = editOperationForm.type_id.data
             edit_operation.from_saving = editOperationForm.from_saving.data
+            edit_operation.currency_id = editOperationForm.currency_id.data
+
             if editOperationForm.type_id.data == 17:
                 previousCurrencyType = edit_operation.currency_id
                 previousCurrencyDesc = Currency.query.filter_by(id=edit_operation.currency_id).first()
@@ -344,7 +345,6 @@ def update_operation(id):
             elif editOperationForm.type_id.data == 15 and editOperationForm.from_saving.data:
                 previousCurrencyType = edit_operation.currency_id
                 previousCurrencyDesc = Currency.query.filter_by(id=edit_operation.currency_id).first()
-                edit_operation.currency_id = editOperationForm.currency_id.data
 
                 savingOld = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=previousCurrencyType).first()
 
@@ -358,7 +358,7 @@ def update_operation(id):
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
 
-            elif edit_operation.currency_id == None and editOperationForm.from_saving.data:
+            elif editOperationForm.from_saving.data:
                 # Tengo que sumarle el monto al disponible y sacarselo al saving
                 edit_operation.currency_id = editOperationForm.currency_id.data
                 currencyDesc = Currency.query.filter_by(id=editOperationForm.currency_id.data).first()
@@ -369,9 +369,8 @@ def update_operation(id):
                     flash("Ya no tienes ese monto en tu cuenta de ahorro en {0}, por lo que no se puede restar el dinero. Puedes ingresar más de forma manual y volver a intentarlo".format(previousCurrencyDesc.description), category="alert-danger")
                     return redirect(url_for('main.dashboard'))
 
-            elif edit_operation.currency_id != None and not editOperationForm.from_saving.data:
+            elif not editOperationForm.from_saving.data:
                 # Tengo que sumarle al saving el monto y sacarlo del disponible
-                edit_operation.currency_id = None
                 currencyDesc = Currency.query.filter_by(id=editOperationForm.currency_id.data).first()
                 edit_operation.from_saving = editOperationForm.from_saving.data
                 saving = Saving.query.filter_by(user_id=editOperationForm.user_id.data, currency_id=editOperationForm.currency_id.data).first()

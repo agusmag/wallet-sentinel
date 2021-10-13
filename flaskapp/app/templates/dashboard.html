@@ -125,8 +125,7 @@
                 {% for op in operations %}
                 <tr class="table-dark">
                     <td>{{ op.description }}</td>
-                    <td>{{ currencies[op.currency_id-1].symbol "{:,.2f}".format(op.amount) }}</td>
-                    <td>{{ currencies[op.currency_id-1].description }}</td>
+                    <td>{{ currencies[op.currency_id-1].symbol}} {{"{:,.2f}".format(op.amount) }}</td>
                     <td>
                         <div class="row justify-content-center iconRow">
                             <div class="col-6 align-self-center iconLabel">
@@ -255,7 +254,7 @@
                             <div class="col-5 text-right iconContent">
                                 <div class="icon-shape icon-color-{{ operationTypeIconsColor[op.type_id - 1]}}"><i class="{{ operationTypeIcons[op.type_id - 1] }}"></i></div>
                             </div>
-                            <div class="col-6 text-right">{{ currencies[op.currency_id-1].symbol "{:,.2f}".format(op.amount) }}</div>
+                            <div class="col-6 text-right">{{ currencies[op.currency_id-1].symbol}} {{"{:,.2f}".format(op.amount) }}</div>
                         </div>
                     </td>
                     <!-- Show Operation Detail Modal -->
@@ -273,7 +272,7 @@
                                     <div class="row justify-content-center mb-4">
                                         <div class="icon-shape icon-color-{{ operationTypeIconsColor[op.type_id - 1]}} text-center"><i class="{{ operationTypeIcons[op.type_id - 1] }}"></i></div>
                                     </div>
-                                    <p>{{ currencies[op.currency_id-1].symbol "{:,.2f}".format(op.amount) }}</p>
+                                    <p>{{ currencies[op.currency_id-1].symbol}} {{"{:,.2f}".format(op.amount) }}</p>
                                     <p>{{ operationTypes[op.type_id-1].description }}</p>
                                     <p>{{ op.date.strftime('%d-%m-%Y') }}</p>
                                     <div class="modal-footer justify-content-center pl-1 pr-1">
@@ -571,8 +570,8 @@
                                     <div style="background-color: rgb(202, 202, 202); height: 100px; border-radius: 5%; padding: 5px;">
                                         {% if saving.amount == 0 %} 
                                             <span id="deleteCurrencyBtn{{loop.index0}}" class="deleteCurrencyBtn" data-toggle="modal" data-target="#confirmDeleteSavingModal{{loop.index0}}"><i class="fas fa-trash-alt"></i></span>
-                                            <span id="adjustCurrencyBtn{{loop.index0}}" class="adjustCurrencyBtn" data-toggle="modal" data-target="#confirmAdjustSavingModal{{loop.index0}}"><i class="fas fa-pencil-alt"></i></span>
                                         {% endif %}
+                                        <span id="adjustCurrencyBtn{{loop.index0}}" class="adjustCurrencyBtn" data-toggle="modal" data-target="#confirmAdjustSavingModal{{loop.index0}}"><i class="fas fa-pencil-alt"></i></span>
                                         <div class="currencyCardText">
                                             {{ saving.amount }} <strong>{{ currencies[saving.currency_id - 1].description }}</strong>
                                         </div>
@@ -612,7 +611,7 @@
                                 <h5>Intercambiar monedas</h5>
                             </div>
                         </div>
-                        <div class="div" style="padding-left: 10px; padding-right: 10px; margin-bottom: 30px;">
+                        <div style="padding-left: 10px; padding-right: 10px; margin-bottom: 30px;">
                             <form class="form" id="exchangeCurrencyForm" action="/home/dashboard/exchange_curency" method="POST">
                                 {{ form6.user_id(id="user_id_saving_form_6") }}
                                 {{ form6.csrf_token(id = "csrf_token_form_6") }}
@@ -678,27 +677,35 @@
             </div>
         </div>
         <div class="modal fade" id="confirmAdjustSavingModal{{loop.index0}}" tabindex="-1" role="dialog" aria-labelledby="AdjustSavingTitleModal" aria-hidden="true">
-    1             <div class="modal-dialog" role="document">
-    2                 <div class="modal-content">
-    3                     <div class="modal-header">
-    4                         <h5 class="modal-title" id="AdjustSavingTitleModal">Ajustar saldo</h5>
-    5                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-    6                             <span aria-hidden="true">&times;</span>
-    7                         </button>
-    8                     </div>
-    9                     <div class="modal-body">
-   10                         <p>Ingresa el valor por el que quieras reemplazar el saldo actual de la moneda <i><strong>{{ currencies[saving.currency_id - 1].description }}</strong></i>, Una vez confirmada la operación, no hay forma de volver atrás.</p>
-   11                     </div>
-   12                     <div class="modal-footer">
-   13                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-   14                         <form action="/home/dashboard/adjust_saving/{{ saving.id }}" method="POST">
-       15                       <input type="text" class="form-control"  id="newSavingValue{{loop.index0}}" name="newSavingValue" pattern="^\d{1,3}(\d{3})*(\.\d+)?$" placeholder="{{ currencies[saving.currency_id - 1].symbol }} {{ saving.amount }}" value="{{saving.amount}}"/>
-                                <button type="submit" class="btn btn-success">Confirmar</button>
-   16                         </form>
-   17                     </div>
-   18                 </div>
-   19             </div>
-   20         </div>
+                 <div class="modal-dialog" role="document">
+                     <div class="modal-content">
+                         <div class="modal-header">
+                             <h5 class="modal-title" id="AdjustSavingTitleModal">Ajustar saldo</h5>
+                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                 <span aria-hidden="true">&times;</span>
+                             </button>
+                         </div>
+                         <div class="modal-body">
+                            <p>Ingresa el valor por el que quieras reemplazar el saldo actual de la moneda <i><strong>{{ currencies[saving.currency_id - 1].description }}</strong></i>, Una vez confirmada la operación, no hay forma de volver atrás.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="col-12">
+                                <form action="/home/dashboard/adjust_saving/{{ saving.id }}" method="POST">
+                                     <div class="row justify-content-center">
+                                         <div class="col-8"> 
+                                                <input type="text" class="form-control"  id="newSavingValue{{loop.index0}}" name="newSavingValue" pattern="^\d{1,3}(\d{3})*(\.\d+)?$" placeholder="{{ currencies[saving.currency_id - 1].symbol }} {{ saving.amount }}" value="{{saving.amount}}"/>
+                                        </div>
+                                        <div class="col-8 mt-4">
+                                            <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-success mr-2">Confirmar</button>
+                                        </div>
+                                     </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
     {% endfor %}
 </div>
 
