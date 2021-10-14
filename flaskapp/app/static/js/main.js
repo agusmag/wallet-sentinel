@@ -148,6 +148,19 @@ $('#operations_table_mobile').DataTable({
 });
 
 /**
+ * ###############
+ *  SETTINGS FORM
+ * ###############
+ * Update exchange rates from values to form input
+ **/
+function updateExchangeRates(e, currencyDescription) {
+    let exchangeRates = $('#exchange_rates_user_settings').val();
+    let exchangeRatesJson = JSON.parse(exchangeRates);
+    exchangeRatesJson[currencyDescription] = $(e).val();
+    $('#exchange_rates_user_settings').val(JSON.stringify(exchangeRatesJson);
+}
+
+/**
  * #################
  *  OPERATION FORMS
  * #################
@@ -156,7 +169,6 @@ $('#operations_table_mobile').DataTable({
  * New Operation saving section visible for operation type = 15 (Ingreso)
  */
 function verifyOperationTypeDropdown(e, index, version) {
-    console.log("Estoy actualizado");
     if ($(e).children("option:selected").val() == '17') {
         $('.generalFromSavingSection').hide();
     } else if ($(e).children("option:selected").val() == '15') {

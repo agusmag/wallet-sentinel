@@ -180,7 +180,7 @@ def dashboard():
                                     userCurrencies=userCurrencies,
                                     leftCurrencies=leftCurrencies,
                                     haveCurrencies=haveCurrencies,
-                                    exchangeRates=exchangeRates,
+                                    exchangeRates=exchangeRatesJson,
                                     savings=savings,
                                     hideAmounts=userConfig.hide_amounts,
                                     operationTypes=operationTypes,

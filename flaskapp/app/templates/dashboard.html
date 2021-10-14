@@ -480,10 +480,14 @@
                                  {{ form4.exchange_rates.label }}
                                  <a href="#" data-toggle="popover" data-trigger="focus" data-content="Podés indicar a que tasa de cambio (en ARS) querés que se realicen las conversiones entre monedas, por defecto es $ 1.00."><small class="ml-2"> <i class="far fa-question-circle"></i></small></a>
                             </div>
-
                             {% for currency in haveCurrencies %}
-                                {% if currency.symbol != 'ARS' %}
-                                    <input type="text" class="form-group" name="exchange_rate_{{ currency.description.lower() }}" pattern="^\d{1,3}(\d{3})*(\.\d+)?$" value="{{exchangeRates[currency.description.lower()]}}" />
+                                {% if currency.description != 'ARS' %}
+                                    <div class="row justify-content-center pl-4">
+                                        <div class="form-group">
+                                            <label for="exchange_rate_{{ currency.description.lower() }}">{{ currency.description }}</label>
+                                            <input type="text" class="form-control" name="exchange_rate_{{ currency.description.lower() }}" pattern="^\d{1,3}(\d{3})*(\.\d+)?$" value="{{exchangeRates[currency.description.lower()]}}" onChange="updateExchangeRates(this, '{{ currency.description.lower() }}')" />
+                                        </div>
+                                    </div> 
                                 {% endif %}
                             {% endfor %}
                         {% endif %}
