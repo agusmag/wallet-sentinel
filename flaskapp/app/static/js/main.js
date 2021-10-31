@@ -157,7 +157,7 @@ function updateExchangeRates(e, currencyDescription) {
     let exchangeRates = $('#exchange_rates_user_settings').val();
     let exchangeRatesJson = JSON.parse(exchangeRates);
     exchangeRatesJson[currencyDescription] = $(e).val();
-    $('#exchange_rates_user_settings').val(JSON.stringify(exchangeRatesJson);
+    $('#exchange_rates_user_settings').val(JSON.stringify(exchangeRatesJson));
 }
 
 /**
@@ -192,10 +192,8 @@ $(".savingCheck").parent().click(function() {
     // The classes are before the click, so the condition is negative
     if (!$(".savingCheck").parent().hasClass('btn-success')) {
         $('.operationCurrencySection').show();
-        $('.savingDisplay').show();
     } else {
         $('.operationCurrencySection').hide();
-        $('.savingDisplay').hide();
     }
 });
 

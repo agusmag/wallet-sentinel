@@ -69,7 +69,7 @@ def signup_post():
         #Create the object User to store it in the DB
         new_user = User(email=signupForm.email.data, username=signupForm.username.data, password=generate_password_hash(signupForm.password.data, method='sha256'))
 
-        #Save both records in the DB
+        #Save three objects in the DB
         db.session.add(new_user)
         db.session.commit()
 

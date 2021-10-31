@@ -127,11 +127,18 @@ def dashboard():
         else:
             operations = Operation.query.filter(Operation.user_id == user.id, extract('year', Operation.date) == yearFilter)
 
-        # Calculate gainedAmount ( SUM(user.operations.amount type == Ganancia ))
-        gainedAmount = sum(operation.amount for operation in operations if operation.type_id == 15)
+        activeRateDescriptions = {}
 
-        # Calculate SpendAmount ( gainedAmount - SUM(user.operations.amount type != Ganancia ))
-        spendAmount = sum(operation.amount for operation in operations if operation.type_id != 15 and operation.type_id != 17)
+        for currency in haveCurrencies:
+            activeRateDescriptions[currency.id] = currency.description.lower()
+
+        exchangeRatesJson = json.loads(userConfig.exchange_rates)
+
+        # Calculate gainedAmount ( SUM(user.operations.amount * exchange_rate if  type == Ganancia ))
+        gainedAmount = sum(operation.amount * float(exchangeRatesJson["{0}".format(activeRateDescriptions[operation.currency_id])]) for operation in operations if operation.type_id == 15)
+
+        # Calculate SpendAmount ( gainedAmount - SUM(user.operations.amount * exchange_rate if type != Ganancia ))
+        spendAmount = sum(operation.amount * float(exchangeRatesJson["{0}".format(activeRateDescriptions[operation.currency_id])]) for operation in operations if operation.type_id != 15 and operation.type_id != 17)
 
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
@@ -139,14 +146,13 @@ def dashboard():
 
         # Load all Currencies
         currencies = Currency.query.order_by(Currency.id).all()
-        exchangeRatesJson = json.loads(userConfig.exchange_rates)
 
         # Calculate Operation Type Statistics
         # Get total amounts of all User's operation types loaded
         # Also, convert all the amount to ARS based on the exchange_rate setted in userConfig.
-        userOperationTypesAmounts = [ (op.id, round(sum(operation.amount * exchangeRatesJson["{0}".format(Currency.query.filter_by(id=operation.currency_id).first().description.lower())] for operation in operations if operation.type_id == op.id ), 2)) for op in operationTypes if op.id != 15 ]
+        userOperationTypesAmounts = [(op.id, round(sum(operation.amount * float(exchangeRatesJson["{0}".format(activeRateDescriptions[operation.currency_id])]) for operation in operations if operation.type_id == op.id ), 2)) for op in operationTypes if op.id != 15 ]
 
-        #Calculate 
+        #Calculate
         operationStatistics = [ (operationTypes[uop[0]-1], uop[1], round((uop[1] * 100) / spendAmount if spendAmount > 0 else 0 , 2)) for uop in userOperationTypesAmounts ]
 
         # Format All the Amounts to Currency
