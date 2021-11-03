@@ -4,7 +4,7 @@ db = SQLAlchemy()
 
 # Flask_Migrate
 from flask_migrate import Migrate
-migrations = Migrate()
+migrations = Migrate(compare_type=True)
 
 # Flask_Login
 from flask_login import LoginManager

@@ -542,10 +542,12 @@
                             </div>
                         </div>
                         {% endfor %}
-                        <div class="row justify-content-center mt-4 alert alert-info" style="color: black; padding: 0px;">
-                            <div class="col-6 text-left"><strong>{{ spendAmount }}</strong></div>
-                            <div class="col-4 text-right"><strong>100.00 %</strong></div>
-                        </div>
+                        {% for currency in haveCurrencies %}
+                            <div class="row justify-content-center mt-4 alert alert-info" style="color: black; padding: 0px;">
+                                <div class="col-6 text-left"><strong>{{ formattedAmounts[currency.id] }}</strong></div>
+                                <div class="col-4 text-right"><strong>{% if percentagePerCurrency[currency.id] > 0 %}{{ "%.2f"|format((percentagePerCurrency[currency.id] * exchangeRates[currency.description.lower()]|float * 100)/spendAmountNotFormatted) }} %{% else %}00.00 %{% endif %}</strong></div>
+                            </div>
+                        {% endfor %}
                     </div>
 
                     <div class="modal-footer">

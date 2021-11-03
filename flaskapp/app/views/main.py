@@ -18,12 +18,12 @@ operationTypeIcons = [
     "fas fa-tshirt", "fas fa-hamburger", "fas fa-file-invoice-dollar", "fas fa-gift",
     "fas fa-laptop", "fas fa-couch", "fas fa-gas-pump", "fas fa-money-check-alt", "fas fa-eye",
     "fas fa-bath", "fas fa-bus", "fas fa-suitcase-rolling", "fas fa-gamepad", "fas fa-list-ul", "fas fa-money-bill-wave", "fab fa-untappd", "fas fa-university", "fas fa-flag",
-    "fas fa-building"
+    "fas fa-building", "fas fa-paw", "fas fa-first-aid", "fas fa-chart-line"
 ]
 
 operationTypeIconsColor = [
     "tshirt", "hamburger", "file-invoice-dollar", "gift", "laptop",
-    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling", "gamepad", "list-ul", "money-bill-wave", "untappd", "university", "flag", "building"
+    "couch", "gas-pump", "money-check", "eye", "bath", "bus", "suitcase-rolling", "gamepad", "list-ul", "money-bill-wave", "untappd", "university", "flag", "building", "paw", "first-aid", "chart-line"
 ]
 
 @main.route('/')
@@ -173,14 +173,24 @@ def dashboard():
         # Get all the Savings
         savings = Saving.query.filter_by(user_id=user.id)
 
+        # Format The total amounts by Currency for Statistics
+        formattedAmounts = {}
+        percentagePerCurrency = {}
+        for currency in haveCurrencies:
+            percentagePerCurrency[currency.id] = round(sum(operation.amount for operation in operations if operation.currency_id == currency.id and operation.type_id != 15 and operation.type_id != 17), 2)
+            formattedAmounts[currency.id] = "({0}) {1} {2}".format(currency.description, currency.symbol, "{:,.2f}".format(percentagePerCurrency[currency.id]))
+
         return render_template('dashboard.html',
                                     curDate=today_localize.today().date(),
                                     user_id=user.id,
                                     username=user.username,
                                     totalAmount=formattedTotalAmount,
                                     spendAmount=formattedSpendAmount,
+                                    spendAmountNotFormatted=spendAmount,
                                     spendAmountStatusColor=spendAmountStatusColor,
                                     availableAmount=formattedAvailableAmount,
+                                    formattedAmounts=formattedAmounts,
+                                    percentagePerCurrency=percentagePerCurrency,
                                     operationStatistics=operationStatistics,
                                     currencies=currencies,
                                     userCurrencies=userCurrencies,
