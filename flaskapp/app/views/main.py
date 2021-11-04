@@ -460,13 +460,24 @@ def exchange_currency():
 
     if changeCurrencyForm.validate():
         originSaving = Saving.query.filter_by(user_id=changeCurrencyForm.user_id.data, currency_id=changeCurrencyForm.origin_currency_id.data).first()
-        destinationSaving = Saving.query.filter_by(user_id=changeCurrencyForm.user_id.data, currency_id=changeCurrencyForm.destination_currency_id.data).first()
-
         originAmount = float(changeCurrencyForm.origin_amount.data.replace("$","").replace(",",""))
+        destinationSaving = Saving.query.filter_by(user_id=changeCurrencyForm.user_id.data, currency_id=changeCurrencyForm.destination_currency_id.data).first()
 
         if originSaving.amount - originAmount >= 0:
             originSaving.amount = originSaving.amount - originAmount
-            destinationSaving.amount = destinationSaving.amount + float(changeCurrencyForm.total_amount.data)
+
+            if request.form['exchange_currency_submit'] == 'Confirmar':
+                destinationSaving.amount = destinationSaving.amount + float(changeCurrencyForm.total_amount.data)
+            elif request.form['exchange_currency_submit'] == 'Registrar como ingreso':
+                newOperation = Operation()
+                newOperation.description = "Ingreso por conversión"
+                newOperation.date = datetime.datetime.now().strftime('%Y-%m-%d')
+                newOperation.amount = float(changeCurrencyForm.total_amount.data)
+                newOperation.type_id = 15
+                newOperation.user_id = changeCurrencyForm.user_id.data
+                newOperation.currency_id = changeCurrencyForm.destination_currency_id.data
+                newOperation.from_saving = True
+                db.session.add(newOperation)
 
             db.session.commit()
             flash('Se han convertido {0} {1} a {2} {3} correctamente'.format(changeCurrencyForm.origin_amount.data, haveCurrencies[originSaving.currency_id -1].description, changeCurrencyForm.total_amount.data, haveCurrencies[destinationSaving.currency_id -1].description), category='alert-success')

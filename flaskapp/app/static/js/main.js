@@ -325,8 +325,10 @@ function checkSaving(typeId, isFromSaving, loopIndex, isMobile) {
 function controlCurrenciesForExchange() {
     if ($("#originDropdownId option:selected").html() == $("#destinationDropdownId option:selected").html()) {
         $("#exchangeCurrencySubmit").prop('disabled', true);
+        $("#exchangeCurrencySubmitAsIncome").prop('disabled', true);
     } else {
         $("#exchangeCurrencySubmit").prop('disabled', false);
+        $("#exchangeCurrencySubmitAsIncome").prop('disabled', false);
     }
     $("#originAmountId").val("");
     $("#exchangeValueId").val("");
