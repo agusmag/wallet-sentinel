@@ -140,6 +140,8 @@ def dashboard():
         # Calculate SpendAmount ( gainedAmount - SUM(user.operations.amount * exchange_rate if type != Ganancia ))
         spendAmount = sum(operation.amount * float(exchangeRatesJson["{0}".format(activeRateDescriptions[operation.currency_id])]) for operation in operations if operation.type_id != 15 and operation.type_id != 17)
 
+        availableAmount = (gainedAmount - spendAmount)
+
         # Load Operation Types
         operationTypes = OperationType.query.order_by(OperationType.id).all()
         operationTypesForEdit = OperationType.query.order_by('description')
@@ -153,12 +155,12 @@ def dashboard():
         userOperationTypesAmounts = [(op.id, round(sum(operation.amount * float(exchangeRatesJson["{0}".format(activeRateDescriptions[operation.currency_id])]) for operation in operations if operation.type_id == op.id ), 2)) for op in operationTypes if op.id != 15 ]
 
         #Calculate
-        operationStatistics = [ (operationTypes[uop[0]-1], uop[1], round((uop[1] * 100) / spendAmount if spendAmount > 0 else 0 , 2)) for uop in userOperationTypesAmounts ]
+        operationStatistics = [ (operationTypes[uop[0]-1], uop[1], round((uop[1] * 100) / gainedAmount if gainedAmount > 0 else 0 , 2)) for uop in userOperationTypesAmounts ]
 
         # Format All the Amounts to Currency
         formattedTotalAmount = "$ {:,.2f}".format(gainedAmount)
         formattedSpendAmount = "$ {:,.2f}".format(spendAmount)
-        formattedAvailableAmount = "$ {:,.2f}".format(gainedAmount - spendAmount)
+        formattedAvailableAmount = "$ {:,.2f}".format(availableAmount)
 
         # Calculate Spend Amount Badge Status Color
         spendAmountStatusColor = 'badge-success'

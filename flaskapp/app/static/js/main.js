@@ -330,8 +330,15 @@ function controlCurrenciesForExchange() {
         $("#exchangeCurrencySubmit").prop('disabled', false);
         $("#exchangeCurrencySubmitAsIncome").prop('disabled', false);
     }
+    // Check if destination currency is ARS to use configuration values
+    if ($("#destinationDropdownId option:selected").val() == '1') {
+        let exchangeVal = $("[name='exchange_rate_" + $("#originDropdownId option:selected").text().toLowerCase() + "']").val()
+        $("#exchangeValueId").val(exchangeVal !== 'undefined' ? exchangeVal : "1.0");
+    }else {
+        $("#exchangeValueId").val("1.0");
+    }
+
     $("#originAmountId").val("");
-    $("#exchangeValueId").val("");
 }
 
 /**
